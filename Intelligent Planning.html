@@ -1,0 +1,2180 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Intelligent Planning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>:root {
+  color-scheme: dark;
+  --ink: #0A1018;
+  --deep: #0F1721;
+  --panel: #141F2C;
+  --panel2: #192637;
+  --line: #22324A;
+  --line2: #2F4360;
+  --text: #E7EDF4;
+  --soft: #B9C6D6;
+  --muted: #8494AB;
+  --faint: #56677E;
+  --demand: #7EB0FF;
+  --supply: #4CCFB2;
+  --rec: #FF5B4F;
+  --rec-soft: rgba(255, 91, 79, .14);
+  --warn: #F3B34C;
+  --good: #5ED39A;
+  --agent: #B7A7FF;
+  --agent-soft: rgba(183, 167, 255, .12);
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --cond: 'IBM Plex Sans Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --r: 8px;
+  --dock: 380px;
+}
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--ink); color: var(--text); font: 14px/1.45 var(--sans); overflow: hidden; }
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; cursor: pointer; }
+input, select, textarea { font: inherit; color: var(--text); }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.num { font-variant-numeric: tabular-nums; }
+.eyebrow { font: 600 10.5px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.red { color: var(--rec); }
+
+/* ── App frame */
+#app { height: 100%; display: grid; grid-template-rows: auto 1fr; }
+header.top { display: flex; align-items: center; gap: 20px; padding: 0 16px; min-height: 58px; border-bottom: 1px solid var(--line); background: var(--deep); position: relative; z-index: 20; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex-shrink: 0; }
+.brand-mark { width: 26px; height: 26px; flex-shrink: 0; }
+.brand-name { font: 600 15px/1.1 var(--cond); letter-spacing: .02em; }
+.brand-ctx { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+nav.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
+nav.tabs::-webkit-scrollbar { display: none; }
+.tab { background: none; border: 0; padding: 9px 12px 8px; border-radius: 6px; text-align: left; white-space: nowrap; border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
+.tab .stage { display: block; font: 600 9.5px/1 var(--cond); letter-spacing: .14em; color: var(--faint); margin-bottom: 4px; }
+.tab .tname { font-weight: 500; color: var(--soft); }
+.tab:hover .tname { color: var(--text); }
+.tab[aria-selected="true"] { border-bottom-color: var(--agent); }
+.tab[aria-selected="true"] .tname { color: var(--text); }
+.tab[aria-selected="true"] .stage { color: var(--agent); }
+.tab .badge { display: inline-block; margin-left: 6px; min-width: 18px; padding: 1px 5px; border-radius: 9px; background: var(--rec); color: #fff; font: 600 10.5px/1.4 var(--mono); text-align: center; }
+.agent-pill { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--line2); border-radius: 20px; background: var(--panel); font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex-shrink: 0; }
+.dot.live { background: var(--agent); box-shadow: 0 0 0 3px var(--agent-soft); animation: pulse 2.4s infinite; }
+.dot.demo { background: var(--warn); }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(183,167,255,0); } }
+
+main.body { display: grid; grid-template-columns: 1fr var(--dock); min-height: 0; }
+body.dock-closed main.body { grid-template-columns: 1fr 0; }
+.views { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.view { position: absolute; inset: 0; overflow: auto; }
+.view.pad { padding: 20px 20px 40px; }
+
+/* ── Common UI */
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 7px; border: 1px solid var(--line2); background: var(--panel2); color: var(--text); font-weight: 500; font-size: 13px; white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--agent); border-color: var(--agent); color: #150F2E; }
+.btn.primary:hover { background: #C9BDFF; }
+.btn.danger { background: var(--rec); border-color: var(--rec); color: #fff; }
+.btn.ghost { background: none; }
+.btn.sm { padding: 5px 10px; font-size: 12px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 5px; font-size: 11.5px; border: 1px solid var(--line2); color: var(--soft); background: var(--panel); white-space: nowrap; }
+.chip.rec { color: var(--rec); border-color: rgba(255,91,79,.45); background: var(--rec-soft); font-weight: 500; }
+.chip.good { color: var(--good); border-color: rgba(94,211,154,.35); }
+.chip.warn { color: var(--warn); border-color: rgba(243,179,76,.4); }
+.chip.bad { color: var(--rec); border-color: rgba(255,91,79,.4); }
+.chip.agent { color: var(--agent); border-color: rgba(183,167,255,.4); background: var(--agent-soft); }
+.chip.new::after { content: 'NEW'; font: 700 9px/1 var(--cond); letter-spacing: .1em; color: var(--ink); background: var(--warn); padding: 2px 4px; border-radius: 3px; margin-left: 2px; }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font: 600 11px/1.5 var(--sans); white-space: nowrap; }
+.pill.High { background: rgba(255,91,79,.16); color: var(--rec); }
+.pill.Medium { background: rgba(243,179,76,.16); color: var(--warn); }
+.pill.Low { background: rgba(94,211,154,.12); color: var(--good); }
+.mkt { font-size: 12px; white-space: nowrap; }
+.mkt::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 6px; vertical-align: 1px; background: var(--faint); }
+.mkt.Constrained::before { background: var(--rec); } .mkt.Tightening::before { background: var(--warn); } .mkt.Stable::before { background: var(--good); } .mkt.Surplus::before { background: var(--demand); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
+.section-title { font: 600 18px/1.25 var(--cond); letter-spacing: .01em; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 70ch; margin: 4px 0 0; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.kpi { padding: 14px 16px; }
+.kpi .eyebrow { line-height: 1.3; }
+.kpi .v { font: 500 24px/1.1 var(--mono); margin-top: 8px; font-variant-numeric: tabular-nums; }
+.kpi .s { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 7px; overflow: hidden; }
+.seg button { background: none; border: 0; padding: 7px 12px; font-size: 12.5px; color: var(--soft); }
+.seg button[aria-pressed="true"] { background: var(--panel2); color: var(--text); box-shadow: inset 0 -2px 0 var(--agent); }
+.field { background: var(--deep); border: 1px solid var(--line2); border-radius: 7px; padding: 7px 10px; font-size: 13px; }
+.field:focus { border-color: var(--agent); outline: none; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--soft); cursor: pointer; user-select: none; }
+.toggle input { accent-color: var(--agent); width: 15px; height: 15px; }
+
+/* ── Horizon (3D corridor) */
+#v-horizon { overflow: hidden; background: radial-gradient(120% 70% at 50% 36%, #132034 0%, var(--ink) 62%); }
+#hz-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#hz-canvas.drag { cursor: grabbing; }
+#hz-cards { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+.hz-card { position: absolute; left: 0; top: 0; width: 250px; display: block; pointer-events: auto; transform-origin: 50% 50%; border-radius: 9px; padding: 11px 13px 12px; background: rgba(16, 25, 38, .92); border: 1px solid var(--line2); box-shadow: 0 10px 30px rgba(0,0,0,.35); cursor: pointer; will-change: transform, opacity; text-align: left; color: var(--text); }
+.hz-card:hover { border-color: var(--soft); }
+.hz-card .k { display: flex; align-items: center; gap: 6px; font: 600 9.5px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.hz-card .k i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: var(--warn); }
+.hz-card .t { font-weight: 600; font-size: 14px; line-height: 1.25; margin: 7px 0 4px; }
+.hz-card .d { font-size: 12px; color: var(--soft); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hz-card.hzsig.bad .k i { background: var(--rec); }
+.hz-card.hzsig.good .k i { background: var(--good); }
+.hz-card.hzsig.neutral .k i { background: var(--demand); }
+.hz-card.recm { border-color: rgba(255,91,79,.55); background: rgba(40, 16, 18, .9); }
+.hz-card.recm .k { color: var(--rec); }
+.hz-card.recm .k i { background: var(--rec); box-shadow: 0 0 10px var(--rec); }
+.hz-card .pols { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 2px; }
+.hz-card .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11.5px; color: var(--muted); }
+.hz-card .foot b { color: var(--rec); font: 500 12px var(--mono); }
+.hz-card .newtag { margin-left: auto; font: 700 9px/1 var(--cond); letter-spacing: .1em; color: var(--ink); background: var(--warn); padding: 2px 5px; border-radius: 3px; }
+
+.hz-top { position: absolute; z-index: 2; left: 16px; right: 16px; top: 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; pointer-events: none; flex-wrap: wrap; }
+.hz-top > * { pointer-events: auto; }
+.hz-title { max-width: 420px; }
+.hz-title h1 { margin: 0; font: 600 26px/1.1 var(--cond); letter-spacing: .01em; }
+.hz-title p { margin: 6px 0 0; color: var(--soft); max-width: 46ch; font-size: 13px; }
+.hz-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.hz-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11.5px; color: var(--soft); margin-top: 10px; }
+.hz-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.hz-legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.hz-kpis { display: flex; gap: 10px; flex-wrap: wrap; }
+.hz-kpi { max-width: 290px; background: rgba(15,23,33,.82); border: 1px solid var(--line); border-radius: 9px; padding: 10px 14px; min-width: 140px; backdrop-filter: blur(6px); }
+.hz-kpi .v { font: 500 20px/1.1 var(--mono); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.hz-kpi .v s { color: var(--faint); font-size: 14px; margin-right: 6px; }
+.hz-kpi .s { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+.hz-bottom { position: absolute; z-index: 2; left: 16px; right: 16px; bottom: 28px; display: flex; align-items: center; gap: 10px; }
+.hz-strip { flex: 1; display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; position: relative; min-width: 0; }
+.hz-strip button { border: 0; padding: 0; height: 30px; border-radius: 3px; position: relative; background: var(--good); opacity: .75; }
+.hz-strip button span { position: absolute; left: 0; right: 0; top: 34px; font: 500 10px/1 var(--mono); color: var(--muted); text-align: center; }
+.hz-strip button.amber { background: var(--warn); }
+.hz-strip button.red { background: var(--rec); }
+.hz-strip button.cur { opacity: 1; outline: 2px solid var(--text); outline-offset: 1px; }
+.hz-strip button:hover { opacity: 1; }
+.hz-nav { display: flex; gap: 4px; }
+.hz-nav button { width: 34px; height: 30px; border-radius: 6px; border: 1px solid var(--line2); background: var(--panel); }
+.hz-hint { position: absolute; z-index: 2; left: 50%; bottom: 76px; transform: translateX(-50%); font-size: 11.5px; color: var(--muted); background: rgba(10,16,24,.7); padding: 5px 12px; border-radius: 12px; pointer-events: none; white-space: nowrap; }
+.hz-pop { position: absolute; z-index: 5; width: 320px; max-width: calc(100% - 32px); padding: 14px 16px; background: var(--panel); border: 1px solid var(--line2); border-radius: 10px; box-shadow: 0 18px 50px rgba(0,0,0,.5); }
+.hz-pop h3 { margin: 6px 0 6px; font-size: 15px; }
+.hz-pop p { margin: 0 0 10px; color: var(--soft); font-size: 12.5px; }
+.hz-pop ul { list-style: none; margin: 0 0 12px; padding: 0; max-height: 180px; overflow: auto; }
+.hz-pop li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 12.5px; }
+.hz-pop li button { background: none; border: 0; color: var(--text); padding: 0; text-align: left; }
+.hz-pop li button:hover { color: var(--agent); }
+.hz-pop .x { position: absolute; right: 8px; top: 8px; background: none; border: 0; color: var(--muted); font-size: 18px; width: 28px; height: 28px; }
+
+/* ── Plan */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0 12px; }
+.toolbar .grow { flex: 1; }
+.tablewrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--deep); max-height: calc(100vh - 250px); }
+table.grid { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 12.5px; }
+table.grid th, table.grid td { padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; text-align: right; }
+table.grid thead th { position: sticky; top: 0; background: var(--panel); z-index: 3; font: 600 10.5px/1.2 var(--cond); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-align: right; }
+table.grid thead th .dt { display: block; font: 400 10.5px var(--mono); letter-spacing: 0; color: var(--faint); text-transform: none; margin-top: 3px; }
+table.grid th.l, table.grid td.l { text-align: left; }
+table.grid .stick { position: sticky; left: 0; background: var(--deep); z-index: 2; }
+table.grid thead .stick { z-index: 4; background: var(--panel); }
+table.grid tbody tr.grp td { border-bottom: 0; }
+table.grid tbody tr.grp-end td { border-bottom: 1px solid var(--line2); }
+table.grid tbody tr:hover td { background: #121c29; }
+table.grid td.metric { color: var(--muted); text-align: left; font-size: 11.5px; }
+table.grid td.v { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--soft); }
+table.grid td.v.neg { color: var(--rec); font-weight: 600; background: rgba(255,91,79,.08); }
+table.grid td.v.adj { color: var(--rec); }
+table.grid td.v.adj.up::before { content: '▲ '; font-size: 8px; vertical-align: 1px; }
+table.grid td.v.adj.dn::before { content: '▼ '; font-size: 8px; vertical-align: 1px; }
+table.grid td.v.ev { box-shadow: inset 0 -2px 0 var(--warn); }
+.partcell { display: flex; flex-direction: column; gap: 2px; min-width: 170px; }
+.partcell button { background: none; border: 0; padding: 0; font: 600 12.5px var(--mono); color: var(--text); text-align: left; }
+.partcell button:hover { color: var(--agent); }
+.partcell small { color: var(--muted); font-size: 11px; }
+.recs { display: flex; flex-direction: column; gap: 2px; color: var(--rec); font-size: 12px; font-weight: 500; text-align: left; min-width: 190px; }
+.recs .was { color: var(--faint); font-weight: 400; text-decoration: line-through; font-size: 11px; }
+.recs .ok { color: var(--good); font-weight: 400; }
+.chg { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); margin-right: 6px; vertical-align: 1px; }
+.rr { font-family: var(--mono); }
+.rr small { font-size: 10.5px; margin-left: 4px; }
+.rr small.dn { color: var(--rec); }
+.status-accepted { color: var(--agent); font-size: 12px; }
+.why-btn { background: none; border: 1px solid rgba(183,167,255,.4); color: var(--agent); border-radius: 5px; padding: 3px 9px; font-size: 11.5px; }
+.why-btn:hover { background: var(--agent-soft); }
+
+/* ── Why drawer */
+.drawer-bg { position: fixed; inset: 0; background: rgba(4,8,14,.55); z-index: 40; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(640px, 100%); background: var(--deep); border-left: 1px solid var(--line2); z-index: 41; display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0,0,0,.4); animation: slidein .28s ease-out; }
+@keyframes slidein { from { transform: translateX(40px); opacity: 0; } }
+.drawer header { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); position: relative; }
+.drawer header h2 { margin: 6px 0 2px; font: 600 20px/1.2 var(--mono); }
+.drawer header .x { position: absolute; right: 12px; top: 12px; background: none; border: 1px solid var(--line2); color: var(--soft); border-radius: 6px; width: 32px; height: 32px; font-size: 16px; }
+.drawer .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.drawer .scroll { flex: 1; overflow: auto; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 22px; }
+.drawer footer { padding: 14px 20px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: var(--panel); }
+.recbox { border: 1px solid rgba(255,91,79,.45); background: linear-gradient(180deg, rgba(255,91,79,.1), rgba(255,91,79,.03)); border-radius: 10px; padding: 14px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.recbox .lbl { font: 600 10px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.recbox .val { color: var(--rec); font-weight: 600; font-size: 16px; margin-top: 6px; line-height: 1.3; }
+.recbox .sub { font-size: 12px; color: var(--soft); margin-top: 4px; }
+.recbox .was { font-size: 11.5px; color: var(--faint); margin-top: 6px; }
+.why-sec h4 { margin: 0 0 10px; font: 600 10.5px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.siglist { display: flex; flex-direction: column; gap: 8px; }
+.sig { display: grid; grid-template-columns: 86px 1fr; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); }
+.sig .kind { font: 600 10px/1.3 var(--cond); letter-spacing: .12em; text-transform: uppercase; }
+.sig.bad .kind { color: var(--rec); } .sig.good .kind { color: var(--good); } .sig.neutral .kind { color: var(--demand); }
+.sig .src { display: block; color: var(--faint); font: 400 10.5px var(--sans); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+.sig b { font-size: 13px; font-weight: 600; }
+.sig p { margin: 3px 0 0; color: var(--soft); font-size: 12.5px; }
+.rules { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.rules td { padding: 7px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+.rules tr.pick td { background: rgba(255,91,79,.07); }
+.rules tr.pick td:first-child { box-shadow: inset 3px 0 0 var(--rec); }
+.rules .pn { font-weight: 600; white-space: nowrap; }
+.rules tr.pick .pn { color: var(--rec); }
+.rules .el { font: 600 11px var(--mono); white-space: nowrap; }
+.rules .el.y { color: var(--good); } .rules .el.n { color: var(--faint); }
+.rules .bar { width: 70px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 5px; }
+.rules .bar i { display: block; height: 100%; background: var(--soft); }
+.rules tr.pick .bar i { background: var(--rec); }
+.rules .rs { color: var(--soft); }
+.agent-text { font: 400 16px/1.55 var(--serif); color: var(--text); background: var(--agent-soft); border: 1px solid rgba(183,167,255,.25); border-radius: 10px; padding: 14px 16px; white-space: pre-wrap; min-height: 80px; }
+.agent-text.thinking { color: var(--muted); font-style: italic; }
+.agent-src { font-size: 11px; color: var(--muted); margin-top: 6px; }
+.routes { display: flex; flex-direction: column; gap: 8px; }
+.route { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+.route .who { margin-left: auto; font-size: 12px; color: var(--muted); text-align: right; }
+.av { width: 28px; height: 28px; border-radius: 50%; display: inline-grid; place-items: center; font: 600 11px var(--sans); color: var(--ink); flex-shrink: 0; }
+.av.de { background: #9CC7FF; } .av.scm { background: #F3C77A; } .av.buyer { background: #7EE0C3; } .av.dp { background: #D9B7FF; } .av.ai { background: var(--agent); }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart .ax { fill: var(--faint); font: 10px var(--mono); }
+
+/* ── Actions */
+.lanes { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 6px; }
+.lane { background: var(--deep); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 230px; display: flex; flex-direction: column; gap: 10px; }
+.lane-h { display: flex; align-items: center; gap: 10px; }
+.lane-h b { font-size: 13.5px; } .lane-h small { display: block; color: var(--muted); font-size: 11.5px; }
+.lane-h .cnt { white-space: nowrap; margin-left: auto; font: 500 12px var(--mono); color: var(--muted); }
+.act { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 11px 12px; display: flex; flex-direction: column; gap: 7px; }
+.act.fresh { animation: fresh 1.6s ease-out; }
+@keyframes fresh { from { border-color: var(--agent); box-shadow: 0 0 0 3px var(--agent-soft); } }
+.act .t { font-weight: 600; font-size: 13px; }
+.act .p { font: 500 12px var(--mono); color: var(--soft); }
+.act .meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 8px; font-size: 11.5px; color: var(--muted); }
+.act .meta > span:nth-child(2) { white-space: nowrap; margin-right: auto; }
+.st { font: 600 10.5px/1 var(--cond); letter-spacing: .1em; text-transform: uppercase; padding: 4px 7px; border-radius: 4px; }
+.st.Assigned { background: rgba(126,176,255,.15); color: var(--demand); }
+.st.In-review { background: rgba(243,179,76,.15); color: var(--warn); }
+.st.Approved { background: rgba(76,207,178,.15); color: var(--supply); }
+.st.Done { background: rgba(94,211,154,.15); color: var(--good); }
+.lane .empty { color: var(--faint); font-size: 12px; padding: 10px 2px; }
+.feed { display: flex; flex-direction: column; }
+.feed .ev { display: grid; grid-template-columns: 56px 28px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; align-items: start; }
+.feed .ev time { font: 400 11px var(--mono); color: var(--faint); padding-top: 6px; }
+.feed .ev p { margin: 0; color: var(--soft); }
+.feed .ev p b { color: var(--text); font-weight: 600; }
+.feed .ev.reassess p { color: var(--text); }
+.twocol { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.routing-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.routing-table td { padding: 7px 6px; border-top: 1px solid var(--line); }
+.routing-table select { width: 100%; }
+
+/* ── Workflows */
+.wf-grid { display: grid; grid-template-columns: minmax(280px, 400px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.composer { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.composer textarea { width: 100%; min-height: 128px; resize: vertical; background: var(--deep); border: 1px solid var(--line2); border-radius: 8px; padding: 12px; font: 400 15px/1.5 var(--serif); }
+.composer textarea:focus { border-color: var(--agent); outline: none; }
+.examples { display: flex; flex-direction: column; gap: 6px; }
+.examples button { text-align: left; background: var(--deep); border: 1px dashed var(--line2); border-radius: 7px; padding: 8px 10px; font-size: 12.5px; color: var(--soft); }
+.examples button:hover { border-color: var(--agent); color: var(--text); }
+.wf-card { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; }
+.wf-card h3 { margin: 4px 0 4px; font: 600 20px/1.2 var(--cond); }
+.wf-card .sum { font: 400 15.5px/1.5 var(--serif); color: var(--soft); margin: 0; }
+.trig { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+.trig .t { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line2); background: var(--deep); }
+.trig .t .ty { font: 600 10px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--agent); }
+.trig .t b { display: block; margin-top: 6px; font-size: 13px; }
+.trig .t small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.pipe { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; }
+.pipe .s { position: relative; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 8px; background: var(--deep); font-size: 12.5px; color: var(--soft); }
+.pipe .s .n { font: 600 10px/1 var(--cond); letter-spacing: .14em; color: var(--agent); display: block; margin-bottom: 6px; }
+.pipe .s.run { background: var(--agent-soft); }
+.pipe .s.done .n::after { content: ' ✓'; color: var(--good); }
+.wf-list { display: flex; flex-direction: column; gap: 8px; }
+.wf-item { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 12px 14px; }
+.wf-item b { font-size: 13.5px; } .wf-item small { color: var(--muted); font-size: 12px; grid-column: 1; }
+.wf-item .right { grid-row: 1 / span 2; grid-column: 2; display: flex; align-items: center; gap: 8px; }
+.findings { display: flex; flex-direction: column; gap: 6px; }
+.finding { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 9px 12px; background: var(--deep); border: 1px solid var(--line); border-radius: 7px; font-size: 12.5px; align-items: center; }
+.finding .mono { font-weight: 600; }
+.refine { display: flex; gap: 8px; }
+.refine input { flex: 1; min-width: 0; }
+
+/* ── Scenarios */
+.sc-grid { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.sc-panel { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.ask { display: flex; gap: 8px; }
+.ask input { flex: 1; min-width: 0; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.presets button { background: var(--deep); border: 1px solid var(--line2); border-radius: 16px; padding: 5px 11px; font-size: 12px; color: var(--soft); }
+.presets button:hover, .presets button[aria-pressed="true"] { border-color: var(--agent); color: var(--text); background: var(--agent-soft); }
+.param { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; align-items: center; font-size: 12.5px; }
+.param label { color: var(--soft); }
+.param output { font: 500 12px var(--mono); color: var(--text); }
+.param input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--agent); }
+.param select { grid-column: 1 / -1; }
+.cmp { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.cmp .kpi .v small { font-size: 12px; color: var(--muted); margin-left: 6px; }
+.delta-up { color: var(--rec); } .delta-dn { color: var(--good); }
+
+/* ── Agent dock */
+aside.dock { border-left: 1px solid var(--line); background: var(--deep); display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; }
+body.dock-closed aside.dock { visibility: hidden; }
+.dock-h { padding: 14px 16px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+.dock-h .glyph { width: 30px; height: 30px; border-radius: 8px; background: var(--agent-soft); border: 1px solid rgba(183,167,255,.35); display: grid; place-items: center; }
+.dock-h b { font-size: 14px; } .dock-h small { display: block; color: var(--muted); font-size: 11.5px; }
+.dock-h .x { margin-left: auto; background: none; border: 1px solid var(--line2); border-radius: 6px; width: 30px; height: 30px; color: var(--soft); }
+.feedwrap { flex: 1; overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
+.msg.agent .body { font: 400 15px/1.55 var(--serif); color: var(--text); }
+.msg.agent .body p { margin: 0 0 9px; }
+.msg.agent .body ol { margin: 4px 0 10px; padding-left: 20px; }
+.msg.agent .body li { margin-bottom: 8px; }
+.msg.agent .body strong { font-weight: 600; color: #fff; }
+.msg .who { font: 600 10px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--agent); margin-bottom: 7px; display: flex; gap: 8px; align-items: center; }
+.msg .who time { color: var(--faint); letter-spacing: 0; font: 400 10.5px var(--mono); }
+.msg.user { align-self: flex-end; max-width: 88%; background: var(--panel2); border: 1px solid var(--line2); border-radius: 12px 12px 3px 12px; padding: 9px 12px; font-size: 13.5px; }
+.msg .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.tool { font: 400 11.5px/1.4 var(--mono); color: var(--muted); padding: 6px 10px; border-left: 2px solid var(--agent); background: rgba(183,167,255,.05); border-radius: 0 5px 5px 0; }
+.tool b { color: var(--agent); font-weight: 500; }
+.typing::after { content: '▍'; animation: blink 1s steps(2) infinite; color: var(--agent); margin-left: 1px; }
+@keyframes blink { 50% { opacity: 0; } }
+.dock-in { border-top: 1px solid var(--line); padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.sugg { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.sugg::-webkit-scrollbar { display: none; }
+.sugg button { flex-shrink: 0; background: none; border: 1px solid var(--line2); color: var(--soft); border-radius: 14px; padding: 4px 10px; font-size: 11.5px; }
+.sugg button:hover { border-color: var(--agent); color: var(--text); }
+.dock-in form { display: flex; gap: 8px; align-items: flex-end; }
+.dock-in textarea { flex: 1; min-width: 0; resize: none; height: 42px; max-height: 120px; background: var(--panel); border: 1px solid var(--line2); border-radius: 9px; padding: 10px 12px; font-size: 13.5px; }
+.dock-in textarea:focus { border-color: var(--agent); outline: none; }
+.send { width: 42px; height: 42px; border-radius: 9px; border: 0; background: var(--agent); color: #150F2E; display: grid; place-items: center; flex-shrink: 0; }
+.fab { display: none; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--panel2); border: 1px solid var(--agent); color: var(--text); padding: 10px 16px; border-radius: 9px; z-index: 60; font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: calc(100% - 32px); }
+
+@media (max-width: 1100px) {
+  :root { --dock: 340px; }
+  .wf-grid, .sc-grid { grid-template-columns: 1fr; }
+  .lanes { grid-template-columns: repeat(4, 240px); }
+}
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  header.top { flex-wrap: wrap; gap: 8px 12px; padding: 8px 16px 0; }
+  nav.tabs { order: 3; flex-basis: 100%; }
+  .brand-ctx { display: none; }
+  main.body { grid-template-columns: 1fr !important; }
+  aside.dock { position: fixed; left: 0; right: 0; bottom: 0; height: 72vh; z-index: 50; border-left: 0; border-top: 1px solid var(--line2); border-radius: 14px 14px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,.5); transition: transform .25s; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body.dock-closed aside.dock { transform: translateY(105%); visibility: visible; }
+  .fab { display: flex; position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 45; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 24px; background: var(--agent); color: #150F2E; border: 0; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+  .view.pad { padding: 16px 16px 90px; }
+  .twocol { grid-template-columns: 1fr; }
+  .hz-kpis { display: none; }
+  .hz-title p { display: none; }
+  .hz-card { width: 210px; }
+  .recbox { grid-template-columns: 1fr; }
+  .agent-pill { display: none; }
+  .hz-strip button span { display: none; }
+  .hz-bottom { bottom: 80px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 26 26" aria-hidden="true"><path d="M2 20 L13 6 L24 20" fill="none" stroke="#B7A7FF" stroke-width="2"/><path d="M7 20 L13 12.5 L19 20" fill="none" stroke="#4CCFB2" stroke-width="2"/><circle cx="13" cy="6" r="2.4" fill="#FF5B4F"/></svg>
+      <div><div class="brand-name">Intelligent Planning</div><div class="brand-ctx" id="ctx"></div></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" data-view="horizon"><span class="stage">SENSE</span><span class="tname">Horizon</span></button>
+      <button class="tab" role="tab" data-view="plan"><span class="stage">ANALYZE · RECOMMEND</span><span class="tname">Plan</span><span class="badge" id="b-plan"></span></button>
+      <button class="tab" role="tab" data-view="actions"><span class="stage">ASSIGN · ACT</span><span class="tname">Actions</span><span class="badge" id="b-actions" hidden></span></button>
+      <button class="tab" role="tab" data-view="scenarios"><span class="stage">REASSESS · WHAT-IF</span><span class="tname">Scenarios</span></button>
+      <button class="tab" role="tab" data-view="workflows"><span class="stage">AUTOMATE</span><span class="tname">Agent workflows</span></button>
+    </nav>
+    <button class="agent-pill" id="agent-pill" title="Show or hide the planning agent"><span class="dot" id="agent-dot"></span><span id="agent-state">Connecting agent…</span></button>
+  </header>
+  <main class="body">
+    <div class="views">
+      <section class="view" id="v-horizon" data-view="horizon"></section>
+      <section class="view pad" id="v-plan" data-view="plan" hidden></section>
+      <section class="view pad" id="v-actions" data-view="actions" hidden></section>
+      <section class="view pad" id="v-scenarios" data-view="scenarios" hidden></section>
+      <section class="view pad" id="v-workflows" data-view="workflows" hidden></section>
+    </div>
+    <aside class="dock" id="dock" aria-label="Planning agent">
+      <div class="dock-h">
+        <div class="glyph"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B7A7FF"/></svg></div>
+        <div><b>Planning agent</b><small id="dock-sub">Monitors 48 parts · 2 active workflows</small></div>
+        <button class="x" id="dock-x" aria-label="Hide agent">✕</button>
+      </div>
+      <div class="feedwrap" id="feed" aria-live="polite"></div>
+      <div class="dock-in">
+        <div class="sugg" id="sugg"></div>
+        <form id="ask">
+          <textarea id="ask-in" rows="1" placeholder="Ask the agent, or tell it what to do…" aria-label="Message the planning agent"></textarea>
+          <button class="send" type="submit" aria-label="Send"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 8 L14 2 L10 14 L8 9 Z" fill="currentColor"/></svg></button>
+        </form>
+      </div>
+    </aside>
+  </main>
+</div>
+<button class="fab" id="fab"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="currentColor"/></svg>Agent</button>
+<script>// ───────────────────────── Sample world ─────────────────────────
+// All data is simulated for the prototype. Manufacturers and events are fictional.
+
+const WEEK0 = new Date(Date.UTC(2026, 8, 28)); // Mon 28 Sep 2026 = ISO wk 40
+const NWEEKS = 16;
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WEEKS = Array.from({ length: NWEEKS }, (_, i) => {
+  const d = new Date(WEEK0.getTime() + i * 7 * 864e5);
+  const iso = ((39 + i) % 53) + 1; // 40..53, then 1..
+  return { i, iso, label: `Wk ${iso}`, date: `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}` };
+});
+
+const PRODUCT = { name: 'Edge Gateway X9', asp: 640, program: 'Industrial IoT', site: 'Guadalajara CM' };
+const BUILD_PLAN = [1180,1220,1240,1200,1260,1300,1280,1320,1300,1340,1360,1320,1380,1400,1380,1420];
+
+// Market intelligence by commodity classification (now vs. last week)
+const COMMODITIES = {
+  mlcc:  { name: 'Capacitors · MLCC',             status: 'Constrained', prev: 'Stable',      lt: 24, ltPrev: 16, price: 12, note: 'Allocation notices from 2 of the top 5 MLCC makers; distributor stock down 31% in 6 weeks.' },
+  poly:  { name: 'Capacitors · Aluminum polymer', status: 'Stable',      prev: 'Stable',      lt: 14, ltPrev: 14, price: 1,  note: 'Balanced supply; lead times flat for 10 weeks.' },
+  mcu:   { name: 'Microcontrollers · 32-bit',     status: 'Tightening',  prev: 'Tightening',  lt: 26, ltPrev: 22, price: 6,  note: 'Automotive pull-in absorbing 40nm capacity; lead times rising for 5 straight weeks.' },
+  dram:  { name: 'Memory · DRAM DDR4',            status: 'Constrained', prev: 'Tightening',  lt: 20, ltPrev: 16, price: 18, note: 'Capacity shifting to DDR5/HBM; open-market DDR4 availability down 38% in 30 days.' },
+  nand:  { name: 'Memory · eMMC / NAND',          status: 'Surplus',     prev: 'Stable',      lt: 8,  ltPrev: 12, price: -9, note: 'Channel inventory above 14 weeks; contract prices softening.' },
+  gan:   { name: 'Power · GaN FET',               status: 'Constrained', prev: 'Stable',      lt: 30, ltPrev: 18, price: 15, note: 'Gallium export licensing tightened; epi wafer supply rationed.' },
+  pmic:  { name: 'Power · PMIC & regulators',     status: 'Tightening',  prev: 'Stable',      lt: 22, ltPrev: 18, price: 4,  note: 'Mixed-signal fab utilization above 92%.' },
+  mosfet:{ name: 'Power · Si MOSFET',             status: 'Stable',      prev: 'Stable',      lt: 16, ltPrev: 16, price: 0,  note: 'Stable; ample 8-inch capacity.' },
+  conn:  { name: 'Connectors · Board-to-board',   status: 'Stable',      prev: 'Stable',      lt: 10, ltPrev: 10, price: 1,  note: 'Stable.' },
+  xtal:  { name: 'Timing · Crystals & oscillators', status: 'Surplus',   prev: 'Surplus',     lt: 6,  ltPrev: 7,  price: -5, note: 'Excess channel inventory; lead times at 2-year low.' },
+  ind:   { name: 'Magnetics · Power inductors',   status: 'Stable',      prev: 'Stable',      lt: 12, ltPrev: 12, price: 2,  note: 'Stable.' },
+  phy:   { name: 'Interface · Ethernet PHY',      status: 'Tightening',  prev: 'Stable',      lt: 24, ltPrev: 18, price: 7,  note: 'Legacy node consolidation; several PCNs issued this quarter.' },
+  sens:  { name: 'Sensors · MEMS',                status: null,          prev: null,          lt: null, ltPrev: null, price: null, note: 'No market intelligence coverage for this classification.' },
+  diode: { name: 'Discretes · Diodes & TVS',      status: 'Surplus',     prev: 'Surplus',     lt: 8,  ltPrev: 8,  price: -6, note: 'Oversupplied; prices falling.' },
+  opamp: { name: 'Analog · Amplifiers',           status: 'Stable',      prev: 'Stable',      lt: 12, ltPrev: 12, price: 0,  note: 'Stable.' },
+  rf:    { name: 'RF · Wi-Fi / BLE modules',      status: 'Stable',      prev: 'Tightening',  lt: 14, ltPrev: 18, price: 1,  note: 'Constraint easing after module maker added capacity.' },
+};
+
+// Geopolitical / supply-chain events (simulated signals)
+const EVENTS = [
+  { id: 'ev1', kind: 'Geopolitical', title: 'Port congestion at Kaohsiung', detail: 'Typhoon-season closures are stacking vessel queues; outbound electronics freight delayed 9–12 days.', region: 'Taiwan', from: 1, weeks: 4, impact: 0.35, isNew: true, source: 'Logistics risk feed' },
+  { id: 'ev2', kind: 'Geopolitical', title: 'Gallium export licensing tightened', detail: 'New licensing rules on gallium compounds slow GaN epi wafer supply for at least two quarters.', commodity: 'gan', from: 0, weeks: 16, impact: 0.2, isNew: true, source: 'Trade policy monitor' },
+  { id: 'ev3', kind: 'Geopolitical', title: 'Grid power rationing in Jiangsu', detail: 'Provincial rationing limits factories to 4 production days per week through late October.', region: 'China · Jiangsu', from: 3, weeks: 4, impact: 0.45, isNew: false, source: 'Regional risk feed' },
+];
+
+// Parts: [mpn, mfr, desc, commodity, region, qtyPer, price, sources, crossesP2P, crossNew, lifecycle, rr, rrPrev, onHandWeeks, pcnNew]
+const RAW_PARTS = [
+  ['KPC0402X7R104K','Kestrel Passives','0.1µF 16V X7R 0402 MLCC','mlcc','Japan',38,0.004,1,1,true,'Active',61,64,1.0],
+  ['KPC0603X5R106M','Kestrel Passives','10µF 10V X5R 0603 MLCC','mlcc','Japan',12,0.021,2,3,false,'Active',70,72,1.5],
+  ['KPC0402C0G101J','Kestrel Passives','100pF 50V C0G 0402 MLCC','mlcc','Japan',16,0.003,2,4,false,'Active',78,78,2],
+  ['KPC0805X7R475K','Kestrel Passives','4.7µF 25V X7R 0805 MLCC','mlcc','Taiwan',6,0.034,1,0,false,'Active',52,60,1.0],
+  ['KPC1206X7R226M','Kestrel Passives','22µF 16V X7R 1206 MLCC','mlcc','Korea',4,0.09,2,2,false,'Active',66,67,1.2],
+  ['LMC0402X7R103K','Lumen Ceramics','10nF 50V X7R 0402 MLCC','mlcc','Philippines',20,0.003,2,3,false,'Active',74,74,1.5],
+  ['LMC0201X5R104M','Lumen Ceramics','0.1µF 6.3V X5R 0201 MLCC','mlcc','Philippines',24,0.005,1,1,false,'Active',58,59,1.0],
+  ['KPC0603X7R225K','Kestrel Passives','2.2µF 16V X7R 0603 MLCC','mlcc','Japan',10,0.012,3,5,false,'Active',81,81,2],
+  ['AMC32F407VG','Arcturus Micro','32-bit Arm M4 MCU, 168MHz, LQFP100','mcu','Taiwan',1,6.8,1,0,false,'Active',48,55,1.5],
+  ['AMC32G071KB','Arcturus Micro','32-bit Arm M0+ MCU, 64MHz, LQFP32','mcu','Malaysia',2,1.35,1,1,false,'Active',63,63,2],
+  ['NVS-RA4M2','Norvale Semiconductor','32-bit Arm M33 MCU, 100MHz, LQFP64','mcu','Japan',1,3.1,2,2,false,'Active',72,72,3],
+  ['AMC32H563ZI','Arcturus Micro','Arm M33 secure MCU, 250MHz, LQFP144','mcu','Taiwan',1,9.4,1,0,false,'Active',55,57,2.5],
+  ['MMD4-8G16-3200','Meridian Memory','DDR4 8Gb x16 3200MT/s','dram','Korea',2,3.9,2,2,false,'Active',57,63,1.0],
+  ['MMD4-4G16-2666','Meridian Memory','DDR4 4Gb x16 2666MT/s','dram','China · Jiangsu',1,2.4,1,1,false,'Active',50,54,1.0],
+  ['MME-32GB-EMMC51','Meridian Memory','32GB eMMC 5.1','nand','Korea',1,5.2,2,2,false,'Active',80,80,3],
+  ['MMN-SPI-1GB','Meridian Memory','1Gb SPI NAND Flash','nand','Korea',1,1.1,2,3,false,'Active',76,76,4],
+  ['HPG-650V-15A','Hollis Power','GaN FET 650V 15A','gan','United States',2,4.6,1,0,false,'Active',44,62,2],
+  ['HPG-100V-48A','Hollis Power','GaN FET 100V 48A','gan','Taiwan',1,2.9,1,1,true,'Active',51,60,1.5],
+  ['HPR-BK3A-SOT','Hollis Power','3A synchronous buck regulator','pmic','China · Jiangsu',4,0.62,2,3,false,'Active',69,70,2],
+  ['HPR-PM8841','Hollis Power','Multi-rail PMIC, 6 outputs','pmic','Malaysia',1,2.3,1,0,false,'Active',59,61,1.5],
+  ['VAL-LDO-500','Veyra Analog','LDO regulator 500mA','pmic','Philippines',6,0.18,3,6,false,'Active',84,84,3],
+  ['VAL-LDO-150','Veyra Analog','LDO regulator 150mA','pmic','Thailand',3,0.09,2,4,false,'Active',82,82,3],
+  ['BWD-NMOS-30V','Brightwell Discretes','N-ch MOSFET 30V 8A','mosfet','China · Jiangsu',6,0.21,2,5,false,'Active',79,79,3],
+  ['BWD-PMOS-20V','Brightwell Discretes','P-ch MOSFET 20V 4A','mosfet','Philippines',4,0.14,2,4,false,'Active',80,80,3],
+  ['HPM-NMOS-60V','Hollis Power','N-ch MOSFET 60V SO-8','mosfet','Malaysia',2,0.48,2,3,false,'Active',77,77,2.5],
+  ['TIC-B2B-40P','Tessera Interconnect','Board-to-board, 40 pos, 0.4mm','conn','Taiwan',2,0.86,1,0,false,'Active',71,72,1.5],
+  ['TIC-RJ45-MAG','Tessera Interconnect','RJ45 jack with magnetics','conn','China · Jiangsu',2,1.95,2,2,false,'Active',75,75,3],
+  ['TIC-USBC-24P','Tessera Interconnect','USB-C receptacle, 24 pos','conn','Mexico',1,0.72,2,6,false,'Active',83,83,4],
+  ['TIC-FFC-30P','Tessera Interconnect','FFC connector, 30 pos','conn','Germany',1,0.31,2,3,false,'Active',80,80,3],
+  ['QTM-XO-25M','Quillon Timing','25MHz crystal oscillator','xtal','Thailand',2,0.42,2,4,false,'Active',82,82,4],
+  ['QTM-XTAL-32K','Quillon Timing','32.768kHz crystal','xtal','Thailand',1,0.16,3,8,false,'Active',88,88,5],
+  ['QTM-TCXO-26M','Quillon Timing','26MHz TCXO ±0.5ppm','xtal','Japan',1,1.1,1,2,false,'Active',64,64,3],
+  ['SMG-PI-2R2','Solen Magnetics','2.2µH power inductor','ind','China · Jiangsu',6,0.12,2,4,false,'Active',78,78,3],
+  ['SMG-PI-10R','Solen Magnetics','10µH power inductor','ind','Philippines',3,0.19,2,3,false,'Active',79,79,3],
+  ['SMG-CMC-90','Solen Magnetics','Common-mode choke 90Ω','ind','Taiwan',2,0.33,1,0,false,'Active',67,68,1.5],
+  ['CNX-PHY8211','Castor Networks','Gigabit Ethernet PHY, RGMII','phy','Taiwan',2,2.15,1,1,false,'LTB',40,66,3,true],
+  ['CNX-SW5-GE','Castor Networks','5-port GbE switch','phy','Taiwan',1,6.2,1,0,false,'Active',58,60,1.5],
+  ['ORS-IMU-6AX','Orrin Sensors','6-axis IMU, I²C/SPI','sens','Germany',1,2.8,1,1,false,'Active',62,62,3],
+  ['ORS-TH-HUM','Orrin Sensors','Temp & humidity sensor','sens','Switzerland',1,1.05,2,2,false,'Active',74,74,3],
+  ['BWD-TVS-5V','Brightwell Discretes','TVS diode 5V, SOD-323','diode','China · Jiangsu',8,0.05,3,9,false,'Active',86,86,4],
+  ['BWD-SCH-40V','Brightwell Discretes','Schottky 40V 1A','diode','Philippines',6,0.04,2,7,false,'Active',85,85,4],
+  ['BWD-ESD-ARR','Brightwell Discretes','4-ch ESD array','diode','Malaysia',4,0.07,2,5,false,'Active',83,83,5],
+  ['VAL-OPA2140','Veyra Analog','Dual precision op-amp, JFET','opamp','United States',2,1.4,1,1,false,'LTB',45,46,4,false],
+  ['VAL-OPA333','Veyra Analog','Zero-drift op-amp','opamp','United States',3,0.95,2,3,false,'Active',80,80,3],
+  ['CNX-WB-M2','Castor Networks','Wi-Fi 6 / BLE 5.3 module','rf','Taiwan',1,7.8,1,0,false,'Active',66,66,3],
+  ['CNX-ANT-CHIP','Castor Networks','2.4/5GHz chip antenna','rf','United States',1,0.22,2,4,false,'Active',82,82,4],
+  ['KPC-POLY-220','Kestrel Passives','220µF 6.3V polymer cap','poly','Japan',4,0.28,2,3,false,'Active',76,76,3],
+  ['KPC-POLY-470','Kestrel Passives','470µF 10V polymer cap','poly','China · Jiangsu',2,0.41,1,2,false,'Active',68,69,2.5],
+];
+
+const CROSS_MFRS = { mlcc: 'Lumen Ceramics', poly: 'Lumen Ceramics', mcu: 'Norvale Semiconductor', dram: 'Castor Memory', nand: 'Castor Memory', gan: 'Vantor GaN', pmic: 'Veyra Analog', mosfet: 'Hollis Power', conn: 'Axon Connect', xtal: 'Tempo Frequency', ind: 'Coilwright Magnetics', phy: 'Norvale Semiconductor', sens: 'Axis MEMS', diode: 'Hollis Power', opamp: 'Norvale Semiconductor', rf: 'Aerolink Modules' };
+
+function seeded(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+
+function makeParts() {
+  const rnd = seeded(42);
+  return RAW_PARTS.map((r, idx) => {
+    const [mpn, mfr, desc, commodity, region, qtyPer, price, sources, crossesP2P, crossNew, lifecycle, rr, rrPrev, onHandWeeks, pcnNew] = r;
+    const demand = BUILD_PLAN.map(b => Math.round(b * qtyPer * (0.97 + rnd() * 0.06)));
+    const avg = demand.reduce((a, b) => a + b, 0) / NWEEKS;
+    const crossMfr = mfr === CROSS_MFRS[commodity] ? 'Kestrel Passives' : CROSS_MFRS[commodity];
+    return {
+      id: 'p' + idx, mpn, mfr, desc, commodity, region, qtyPer, price, sources, crossesP2P, crossNew, lifecycle, rr, rrPrev,
+      onHand: Math.round(avg * onHandWeeks),
+      demand,
+      supplyPlan: demand.map(d => d), // supply plan committed to meet demand
+      pcn: lifecycle === 'LTB' ? { id: 'PCN-' + (26000 + idx * 37), isNew: !!pcnNew, ltbDate: pcnNew ? 'Mar 31, 2027' : 'Dec 15, 2026' } : null,
+      bestCross: crossesP2P > 0 ? { mpn: crossMpn(mpn, commodity), mfr: crossMfr, match: crossNew ? 'Pin-to-pin · form-fit-function' : 'Pin-to-pin' } : null,
+      critical: qtyPer >= 10 || price >= 2 || sources === 1,
+      // mitigations applied through actions (REASSESS)
+      applied: {},
+    };
+  });
+}
+function crossMpn(mpn, c) {
+  const map = { mlcc: 'LMC', poly: 'LMP', mcu: 'NVS', dram: 'CMD4', nand: 'CMN', gan: 'VGN', pmic: 'VAR', mosfet: 'HPM', conn: 'AXC', xtal: 'TFQ', ind: 'CMG', phy: 'NVP', sens: 'AXM', diode: 'HPD', opamp: 'NVA', rf: 'AEM' };
+  const tail = mpn.replace(/^[A-Z]+-?/, '');
+  return (map[c] || 'ALT') + '-' + tail;
+}
+
+// Routing: recommendation → default owner role (configurable in Actions view)
+const ROLES = {
+  de: { name: 'Design Engineer', person: 'Priya Raman', initials: 'PR' },
+  scm: { name: 'Supply Chain Manager', person: 'Marcus Webb', initials: 'MW' },
+  buyer: { name: 'Procurement / Buyer', person: 'Elena Ortiz', initials: 'EO' },
+  dp: { name: 'Demand Planner', person: 'Jordan Kim', initials: 'JK' },
+};
+const DEFAULT_ROUTING = {
+  'Multi-source': ['de', 'Find or validate crosses', 'Evaluate technical compatibility and approve alternate; set quota split'],
+  'Buffer': ['scm', 'Increase buffer stock', 'Adjust target inventory / safety stock'],
+  'Strategic buy': ['scm', 'Strategic buy', 'Evaluate and approve additional purchase'],
+  'Long Term Supply Agreement': ['buyer', 'Negotiate LTSA', 'Secure allocation and price for 12 months'],
+  'Life-time buy': ['scm', 'Life-time buy', 'Size and approve last-time buy before PCN deadline'],
+  'Open-market sourcing': ['buyer', 'Open-market sourcing', 'Investigate availability, price and sourcing options'],
+  'Adjust forecast (pull)': ['dp', 'Pull demand forward', 'Apply market-adjusted demand to the weekly plan'],
+  'Adjust forecast (push)': ['dp', 'Push demand out', 'Apply market-adjusted demand to the weekly plan'],
+};
+
+// ───────────────────────── Recommendation engine ─────────────────────────
+// Deterministic rules (section 3 + 4 of the concept) produce repeatable,
+// explainable recommendations. The AI layer synthesizes, prioritizes and explains.
+
+const POLICY_SHORT = { 'Long Term Supply Agreement': 'LTSA', 'Life-time buy': 'LTB', 'Strategic buy': 'Strategic buy', 'Multi-source': 'Multi-source', 'Buffer': 'Buffer', 'MRP': 'MRP' };
+const CONSTRAINED = s => s === 'Constrained' || s === 'Tightening';
+
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+function makeWorld() {
+  return { parts: makeParts(), commodities: clone(COMMODITIES), events: clone(EVENTS), build: BUILD_PLAN.slice(), demandPct: 0, label: 'Current plan' };
+}
+
+// Previous-week view of the world: used to detect recommendation changes
+function prevWorld(w) {
+  const p = clone(w);
+  for (const k in p.commodities) { const c = p.commodities[k]; c.status = c.prev; c.lt = c.ltPrev; }
+  p.events = p.events.filter(e => !e.isNew);
+  for (const part of p.parts) {
+    part.rr = part.rrPrev;
+    if (part.crossNew) { part.crossesP2P -= 1; part.crossNew = false; if (!part.crossesP2P) part.bestCross = null; }
+    if (part.pcn && part.pcn.isNew) { part.lifecycle = 'Active'; part.pcn = null; }
+  }
+  return p;
+}
+
+function eventImpact(world, part) {
+  const imp = new Array(NWEEKS).fill(0); const hits = [];
+  for (const e of world.events) {
+    const match = (e.region && e.region === part.region) || (e.commodity && e.commodity === part.commodity);
+    if (!match) continue;
+    hits.push(e);
+    for (let w = e.from; w < Math.min(NWEEKS, e.from + e.weeks); w++) imp[w] = Math.max(imp[w], e.impact);
+  }
+  return { imp, hits };
+}
+
+function adjustedDemand(part, mkt, dem) {
+  const avg = dem.reduce((a, b) => a + b, 0) / NWEEKS;
+  const out = dem.slice(); let dir = null, qty = 0;
+  if (mkt && CONSTRAINED(mkt.status)) {
+    dir = 'pull';
+    const ltDelta = Math.max(2, (mkt.lt || 0) - (mkt.ltPrev || 0));
+    qty = Math.round(avg * Math.min(4, ltDelta / 2) * 0.5);
+    for (let w = 0; w < 4; w++) out[w] += Math.round(qty / 4);
+    for (let w = 8; w < 16; w++) out[w] -= Math.round(qty / 8);
+  } else if (mkt && mkt.status === 'Surplus') {
+    dir = 'push';
+    qty = Math.round(dem.slice(0, 4).reduce((a, b) => a + b, 0) * 0.25);
+    for (let w = 0; w < 4; w++) out[w] -= Math.round(qty / 4);
+    for (let w = 8; w < 12; w++) out[w] += Math.round(qty / 4);
+  }
+  return { out, dir, qty };
+}
+
+function evaluatePart(world, part) {
+  const mkt = world.commodities[part.commodity];
+  const a = part.applied || {};
+  const dmult = 1 + (world.demandPct || 0) / 100;
+  const baseDemand = part.demand.map(d => Math.round(d * dmult));
+  const adj = adjustedDemand(part, mkt, baseDemand);
+  const demand = a.forecast ? adj.out : baseDemand;
+  const { imp, hits } = eventImpact(world, part);
+  const sources = a.multi ? Math.max(2, part.sources) : part.sources;
+  const sole = sources === 1;
+  const mitig = a.multi ? 0.4 : 1;
+  const supply = part.supplyPlan.map((s, w) => Math.round(s * dmult * (1 - imp[w] * mitig)));
+  let inv = part.onHand + (a.buffer ? Math.round(part.onHand * 0 + avgOf(baseDemand) * 3) : 0) + (a.strategic ? Math.round(avgOf(baseDemand) * 6) : 0) + (a.ltb ? Math.round(avgOf(baseDemand) * 20) : 0);
+  const startInv = inv;
+  const balance = [], short = [];
+  for (let w = 0; w < NWEEKS; w++) {
+    const avail = inv + supply[w]; const use = Math.min(avail, demand[w]);
+    short.push(demand[w] - use); inv = avail - use; balance.push(inv - short[w]);
+  }
+  const shortUnits = short.reduce((a, b) => a + b, 0);
+  const avg = avgOf(baseDemand);
+  const minBal = Math.min(...balance);
+  const invRisk = shortUnits > 0 ? 'High' : minBal < avg * 0.5 ? 'Medium' : 'Low';
+  const mktStatus = mkt ? mkt.status : null;
+  const mktConstraint = CONSTRAINED(mktStatus);
+  const geo = hits.length > 0;
+  const rrDrop = (part.rrPrev || part.rr) - part.rr;
+  const ltb = part.lifecycle === 'LTB';
+  const diversifiable = sources >= 2 || part.crossesP2P > 0;
+  const annualSpend = avg * 52 * part.price;
+  const ltDelta = mkt && mkt.lt != null ? mkt.lt - mkt.ltPrev : 0;
+
+  // After mitigations are in place and no shortage remains, the part returns to MRP (REASSESS)
+  const covered = (a.multi || a.buffer || a.strategic || a.ltsa || a.ltb) && invRisk === 'Low';
+  // Candidate policies: eligibility per section 4, then a deterministic priority score
+  const cands = [];
+  const add = (policy, eligible, score, why) => { if (covered && policy !== 'MRP') { eligible = false; why = 'Mitigation already in place; no shortage projected'; } cands.push({ policy, eligible, score: eligible ? score : 0, why }); };
+  add('Life-time buy', ltb && !a.ltb, 100, ltb ? `Lifecycle moved to LTB via ${part.pcn ? part.pcn.id : 'PCN'}; last-time-buy deadline ${part.pcn ? part.pcn.ltbDate : ''}` : 'Part is not under a last-time-buy PCN');
+  let ms = 0;
+  if (diversifiable && !a.multi) { ms = sole ? 40 + 20 : 20; if (part.crossNew) ms += 30; if (mktConstraint || geo) ms += 15; if (rrDrop >= 8) ms += 10; if (ltb) ms = 60; }
+  add('Multi-source', diversifiable && !a.multi, ms, a.multi ? 'Alternate source already approved' : diversifiable ? (sole ? `Sole-sourced today, but ${part.crossesP2P} pin-to-pin cross${part.crossesP2P > 1 ? 'es' : ''} available${part.crossNew ? ' (new this week)' : ''}` : `${sources} approved sources; quota can be rebalanced`) : 'No approved alternates or pin-to-pin crosses');
+  const bufElig = !a.buffer && !ltb && (sole || invRisk === 'High' || mktConstraint || geo) && !(a.ltsa && !sole && invRisk !== 'High');
+  add('Buffer', bufElig, 30 + (sole ? 30 : 0) + (invRisk === 'High' ? 25 : 0) + (mktConstraint && !a.ltsa ? (sole ? 10 : 5) : 0) + (geo ? 15 : 0) - (a.multi ? 25 : 0), bufElig ? [sole && 'sole source', invRisk === 'High' && 'projected shortage', mktConstraint && 'constrained market', geo && 'event exposure'].filter(Boolean).join(', ') : 'No sole-source, inventory or market trigger');
+  const sbElig = !a.strategic && !a.ltb && (invRisk === 'High' || (mktConstraint && !a.ltsa));
+  add('Strategic buy', sbElig, 15 + (invRisk === 'High' ? 45 : invRisk === 'Medium' ? 15 : 0) + (mktConstraint ? 15 : 0) + (mkt && mkt.price >= 8 ? 10 : 0), sbElig ? `${invRisk === 'High' ? 'Projected shortage' : 'Rising market'}${mkt && mkt.price > 0 ? `; price +${mkt.price}% and rising` : ''}` : 'Inventory risk low and market not constrained');
+  const ltsaElig = mktConstraint && !a.ltsa && !ltb;
+  add('Long Term Supply Agreement', ltsaElig, 20 + 20 + (annualSpend > 150000 ? 15 : 0) + (ltDelta >= 6 ? 10 : 0), ltsaElig ? `Market ${mktStatus.toLowerCase()}, lead time +${ltDelta} wks; annual spend ${money(annualSpend)}` : 'Market not constrained');
+  const normal = covered || (!mktConstraint && invRisk === 'Low' && !ltb && !geo && (!sole || a.multi || a.buffer));
+  add('MRP', true, normal ? 50 : 1, covered ? 'Mitigations are in place and supply now covers demand; return to standard MRP and keep monitoring' : normal ? 'Market stable, supply meets demand, no lifecycle or event trigger' : 'Conditions are not normal');
+
+  const ranked = cands.filter(c => c.eligible).sort((x, y) => y.score - x.score);
+  const policies = [ranked[0]];
+  if (ranked[1] && ranked[1].score >= 60 && ranked[0].policy !== 'MRP') policies.push(ranked[1]);
+  const policyNames = policies.map(p => p.policy);
+
+  // Market-adjusted forecast recommendation (section 3)
+  let forecast = '';
+  if (a.forecast) forecast = 'Hold';
+  else if (!mkt || !mktStatus) forecast = '';
+  else if (mktConstraint) forecast = 'Adjust forecast (pull)';
+  else if (mktStatus === 'Surplus') forecast = 'Adjust forecast (push)';
+  else forecast = 'Hold forecast';
+
+  const signals = buildSignals(world, part, mkt, hits, rrDrop, invRisk, shortUnits, a);
+  const boardsShort = shortUnits / part.qtyPer;
+
+  return {
+    part, mkt, demand: baseDemand, adjDemand: adj.out, adjDir: a.forecast ? null : adj.dir, adjQty: adj.qty,
+    supply, balance, short, shortUnits, startInv, invRisk, sole, sources, geo, hits, rrDrop, ltb, mktStatus,
+    forecast, policies: policyNames, primary: policyNames[0], cands, ranked, signals,
+    revenueAtRisk: boardsShort * PRODUCT.asp, annualSpend,
+    firstShortWeek: short.findIndex(s => s > 0),
+  };
+}
+function avgOf(a) { return a.reduce((x, y) => x + y, 0) / a.length; }
+
+function buildSignals(world, part, mkt, hits, rrDrop, invRisk, shortUnits, a) {
+  const s = [];
+  if (mkt && mkt.status) {
+    const lt = mkt.lt != null && mkt.lt !== mkt.ltPrev ? `lead time ${mkt.ltPrev}→${mkt.lt} wks` : `lead time ${mkt.lt} wks`;
+    s.push({ kind: 'Market', tone: CONSTRAINED(mkt.status) ? 'bad' : mkt.status === 'Surplus' ? 'good' : 'neutral', title: `${mkt.name.split(' · ')[1] || mkt.name} market ${mkt.status.toLowerCase()}`, detail: `${cap(lt)} · price ${mkt.price > 0 ? '+' : ''}${mkt.price}%. ${mkt.note}`, isNew: mkt.status !== mkt.prev, source: 'Market intelligence' });
+  } else s.push({ kind: 'Market', tone: 'neutral', title: 'No market coverage', detail: 'No market intelligence for this commodity classification, so the forecast recommendation is left blank.', isNew: false, source: 'Market intelligence' });
+  for (const e of hits) s.push({ kind: e.kind, tone: 'bad', title: e.title, detail: `${e.detail} Affects ${wkRange(e.from, e.from + e.weeks - 1)}, ~${Math.round(e.impact * 100)}% supply impact.`, isNew: e.isNew, source: e.source, eventId: e.id, week: e.from });
+  if (part.pcn) s.push({ kind: 'Lifecycle', tone: 'bad', title: `${part.pcn.id}: last-time buy`, detail: `Manufacturer notice moves the part to LTB; final orders due ${part.pcn.ltbDate}.`, isNew: part.pcn.isNew, source: 'PCN notification' });
+  if (part.crossNew && part.bestCross) s.push({ kind: 'Cross', tone: 'good', title: 'Pin-to-pin cross available', detail: `${part.bestCross.mpn} (${part.bestCross.mfr}) matched ${part.bestCross.match.toLowerCase()}; ${part.crossesP2P} alternates in total.`, isNew: true, source: 'Cross reference' });
+  if (rrDrop >= 5) s.push({ kind: 'Resilience', tone: 'bad', title: `Resilience Rating ${part.rrPrev}→${part.rr}`, detail: `Rating fell ${rrDrop} points; drivers include ${part.sources === 1 ? 'single source, ' : ''}${hits.length ? 'regional event exposure, ' : ''}${mkt && CONSTRAINED(mkt.status) ? 'market constraint' : 'lifecycle risk'}.`, isNew: true, source: 'Resilience Rating' });
+  if (shortUnits > 0) s.push({ kind: 'Supply', tone: 'bad', title: 'Projected shortage', detail: `${fmt(shortUnits)} units short over the horizon.`, isNew: false, source: 'Demand / supply plan' });
+  return s;
+}
+
+function compute(world) {
+  const results = world.parts.map(p => evaluatePart(world, p));
+  const byId = Object.fromEntries(results.map(r => [r.part.id, r]));
+  return { world, results, byId, ctb: clearToBuild(world, results) };
+}
+
+// Clear-to-build: boards buildable each week given every part's projected supply
+function clearToBuild(world, results) {
+  const dmult = 1 + (world.demandPct || 0) / 100;
+  const plan = world.build.map(b => Math.round(b * dmult));
+  const inv = results.map(r => r.startInv);
+  const built = [], limiting = [];
+  for (let w = 0; w < NWEEKS; w++) {
+    let cap = plan[w]; let lim = [];
+    results.forEach((r, i) => {
+      const can = Math.floor((inv[i] + r.supply[w]) / r.part.qtyPer);
+      if (can < plan[w]) lim.push({ id: r.part.id, can });
+      if (can < cap) cap = can;
+    });
+    cap = Math.max(0, cap);
+    results.forEach((r, i) => { inv[i] = inv[i] + r.supply[w] - cap * r.part.qtyPer; });
+    built.push(cap); limiting.push(lim.sort((a, b) => a.can - b.can).slice(0, 4));
+  }
+  const shortBoards = plan.map((p, w) => p - built[w]);
+  const rev = shortBoards.reduce((a, b) => a + b, 0) * PRODUCT.asp;
+  return { plan, built, shortBoards, limiting, revenueAtRisk: rev };
+}
+
+// Apply every current recommendation (as if all actions were approved) → "AI plan"
+function withAllApplied(world, comp) {
+  const w = clone(world);
+  for (const p of w.parts) {
+    const r = comp.byId[p.id];
+    applyPolicies(p, r.policies, r.forecast);
+  }
+  return w;
+}
+function applyPolicies(p, policies, forecast) {
+  p.applied = p.applied || {};
+  for (const pol of policies) {
+    if (pol === 'Multi-source') p.applied.multi = true;
+    if (pol === 'Buffer') p.applied.buffer = true;
+    if (pol === 'Strategic buy') p.applied.strategic = true;
+    if (pol === 'Long Term Supply Agreement') p.applied.ltsa = true;
+    if (pol === 'Life-time buy') p.applied.ltb = true;
+  }
+  if (forecast && forecast.startsWith('Adjust')) p.applied.forecast = true;
+}
+
+// Scenario: apply what-if parameters to a copy of the world
+function scenarioWorld(base, prm) {
+  const w = clone(base);
+  w.label = prm.label || 'Scenario';
+  w.demandPct = (base.demandPct || 0) + (prm.demandPct || 0);
+  for (const s of prm.commodityShocks || []) {
+    const c = w.commodities[s.commodity]; if (!c) continue;
+    if (s.status) c.status = s.status;
+    if (s.ltDelta) c.lt = (c.lt || 12) + s.ltDelta;
+    if (s.pricePct) c.price = (c.price || 0) + s.pricePct;
+    if (s.supplyImpact) w.events.push({ id: 'sx' + s.commodity, kind: 'Scenario', title: `${c.name} supply constrained`, detail: 'What-if assumption.', commodity: s.commodity, from: s.from || 0, weeks: s.weeks || 12, impact: s.supplyImpact, isNew: true, source: 'Scenario' });
+  }
+  for (const e of prm.regionEvents || []) w.events.push({ id: 'sr' + e.region, kind: 'Scenario', title: e.title || `${e.region} disruption`, detail: 'What-if assumption.', region: e.region, from: e.from || 0, weeks: e.weeks || 4, impact: e.impact || 0.5, isNew: true, source: 'Scenario' });
+  for (const x of prm.eventOverrides || []) { const ev = w.events.find(e => e.id === x.id); if (ev) Object.assign(ev, x); }
+  if (prm.crossQualified) for (const p of w.parts) if (p.crossNew) { p.applied = p.applied || {}; p.applied.multi = true; }
+  return w;
+}
+
+// ── formatting helpers
+function wkRange(a, b) { b = Math.min(NWEEKS - 1, b); return WEEKS[b].iso > WEEKS[a].iso ? `${WEEKS[a].label}–${WEEKS[b].iso}` : `${WEEKS[a].label} – ${WEEKS[b].label}`; }
+function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+function money(n) { const a = Math.abs(n); const s = a >= 1e6 ? (a / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M' : a >= 1e3 ? Math.round(a / 1e3) + 'K' : Math.round(a).toString(); return (n < 0 ? '−$' : '$') + s; }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function shortPolicy(p) { return POLICY_SHORT[p] || p; }
+
+// ───────────────────────── App state & shell ─────────────────────────
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const h = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+
+const S = {
+  world: null, comp: null, lastWeek: null, ai: null,
+  view: 'horizon',
+  plan: { mode: 'grid', changedOnly: true, q: '', commodity: '', policy: '' },
+  actions: [], activity: [], workflows: [], routing: clone(DEFAULT_ROUTING),
+  accepted: {}, dismissed: {}, resolved: {},
+  scenario: null,
+  hz: { scope: 'portfolio', showAI: true, source: 'base' },
+  dirty: {},
+};
+let ACT_SEQ = 1;
+
+function nowStr(offsetMin = 0) { const d = new Date(Date.now() + offsetMin * 60000); return d.toTimeString().slice(0, 5); }
+
+function recompute() {
+  S.comp = compute(S.world);
+  S.ai = compute(withAllApplied(S.world, S.comp));
+  if (S.scenario) refreshScenario();
+  updateBadges();
+  for (const v of ['horizon', 'plan', 'actions', 'scenarios', 'workflows']) S.dirty[v] = true;
+  renderView(S.view);
+}
+function lastRec(id) { return S.lastWeek.byId[id]; }
+function isChanged(r) { const p = lastRec(r.part.id); return p.policies.join('|') !== r.policies.join('|') || p.forecast !== r.forecast; }
+function needsDecision(r) { return !S.accepted[r.part.id] && !S.dismissed[r.part.id] && (r.primary !== 'MRP' || (r.forecast || '').startsWith('Adjust')); }
+function changedResults() { return S.comp.results.filter(isChanged); }
+function pendingChanged() { return changedResults().filter(needsDecision); }
+function priority(r) { return r.revenueAtRisk * 10 + (r.primary === 'Life-time buy' ? 5e5 : 0) + (r.part.crossNew ? 3e5 : 0) + (r.invRisk === 'Medium' ? 1e5 : 0) + (r.policies.length > 1 ? 5e4 : 0) + (r.primary !== 'MRP' ? 1e4 : 0); }
+function findPart(q) { q = String(q || '').trim().toUpperCase(); return S.world.parts.find(p => p.mpn.toUpperCase() === q) || S.world.parts.find(p => p.mpn.toUpperCase().includes(q)); }
+
+function updateBadges() {
+  const n = pendingChanged().length;
+  const b = $('#b-plan'); b.textContent = n; b.hidden = !n;
+  const open = S.actions.filter(a => a.status !== 'Done').length;
+  const ba = $('#b-actions'); ba.textContent = open; ba.hidden = !open; ba.style.background = 'var(--agent)'; ba.style.color = '#150F2E';
+  $('#ctx').textContent = `${PRODUCT.name} · ${S.world.parts.length} parts · ${PRODUCT.site}`;
+}
+
+// ── Views
+const VIEWS = {};
+function setView(v, opts = {}) {
+  S.view = v;
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === v)));
+  $$('.view').forEach(el => { el.hidden = el.dataset.view !== v; });
+  S.dirty[v] = true; renderView(v, opts);
+  if (v === 'horizon') HZ_wake();
+}
+function renderView(v, opts) { if (S.view !== v || !VIEWS[v]) return; if (S.dirty[v] || opts) { S.dirty[v] = false; VIEWS[v](opts || {}); } }
+
+function toast(msg) { const t = h(`<div class="toast" role="status">${msg}</div>`); document.body.append(t); setTimeout(() => t.remove(), 3200); }
+
+// ── Activity log
+function logActivity(who, html, cls = '') { S.activity.unshift({ t: nowStr(), who, html, cls }); if (S.view === 'actions') S.dirty.actions = true; }
+
+// ── Orchestration: recommendation → routed actions
+function actionsFor(r) {
+  const out = [];
+  if ((r.forecast || '').startsWith('Adjust')) out.push(r.forecast);
+  for (const p of r.policies) if (p !== 'MRP') out.push(p);
+  return out.map(pol => {
+    const [role, title, detail] = S.routing[pol] || ['scm', pol, ''];
+    let spec = detail;
+    if (pol === 'Multi-source' && r.part.bestCross) spec = `Validate ${r.part.bestCross.mpn} (${r.part.bestCross.mfr}) and approve a 60/40 quota split`;
+    if (pol === 'Buffer') spec = `Raise safety stock to ${fmt(avgOf(r.demand) * 3)} units (3 weeks of cover)`;
+    if (pol === 'Strategic buy') spec = `Approve buy of ${fmt(avgOf(r.demand) * 6)} units (~${money(avgOf(r.demand) * 6 * r.part.price * (1 + (r.mkt?.price || 0) / 100))})`;
+    if (pol === 'Life-time buy') spec = `Size LTB before ${r.part.pcn?.ltbDate}: ~${fmt(avgOf(r.demand) * 20)} units`;
+    if (pol === 'Long Term Supply Agreement') spec = `12-month LTSA; lock lead time at ${r.mkt?.ltPrev ?? '—'} wks`;
+    if (pol.startsWith('Adjust')) spec = `${r.adjDir === 'pull' ? 'Pull' : 'Push'} ${fmt(r.adjQty)} units ${r.adjDir === 'pull' ? 'into Wk ' + WEEKS[0].iso + '–' + WEEKS[3].iso : 'out to Wk ' + WEEKS[8].iso + '–' + WEEKS[11].iso}`;
+    return { pol, role, title, spec };
+  });
+}
+function acceptRec(partId, source = 'You') {
+  const r = S.comp.byId[partId]; if (!r || S.accepted[partId]) return [];
+  const plan = actionsFor(r);
+  if (!plan.length) return [];
+  const due = r.firstShortWeek >= 0 ? WEEKS[Math.max(0, r.firstShortWeek - 1)].label : WEEKS[1].label;
+  const created = plan.map(p => ({ id: 'A' + (ACT_SEQ++), partId, mpn: r.part.mpn, policy: p.pol, role: p.role, title: p.title, spec: p.spec, status: 'Assigned', due, fresh: true, createdBy: source }));
+  S.actions.push(...created); S.accepted[partId] = true;
+  const who = [...new Set(created.map(a => ROLES[a.role].person))].join(', ');
+  logActivity('ai', `<b>${esc(r.part.mpn)}</b>: ${source === 'You' ? 'you accepted' : 'workflow accepted'} <span class="red">${esc(plan.map(p => shortPolicy(p.pol)).join(' + '))}</span>. Created ${created.length} action${created.length > 1 ? 's' : ''} for ${esc(who)}.`);
+  updateBadges();
+  S.dirty.plan = S.dirty.horizon = S.dirty.actions = true;
+  return created;
+}
+function acceptAll(source = 'You') {
+  const list = pendingChanged().sort((a, b) => priority(b) - priority(a));
+  let n = 0; for (const r of list) n += acceptRec(r.part.id, source).length;
+  renderView(S.view, {});
+  return { parts: list.length, actions: n };
+}
+const FLOW = ['Assigned', 'In review', 'Approved', 'Done'];
+function advanceAction(id) {
+  const a = S.actions.find(x => x.id === id); if (!a || a.status === 'Done') return;
+  a.status = FLOW[FLOW.indexOf(a.status) + 1]; a.fresh = false;
+  const person = ROLES[a.role].person;
+  if (a.status === 'In review') logActivity(a.role, `<b>${esc(person)}</b> started review: ${esc(a.title)} · ${esc(a.mpn)}`);
+  if (a.status === 'Approved') logActivity(a.role, `<b>${esc(person)}</b> approved: ${esc(a.title)} · ${esc(a.mpn)}`);
+  if (a.status === 'Done') {
+    logActivity(a.role, `<b>${esc(person)}</b> completed: ${esc(a.title)} · ${esc(a.mpn)}`);
+    const all = S.actions.filter(x => x.partId === a.partId);
+    if (all.every(x => x.status === 'Done')) reassess(a.partId, all);
+  }
+  updateBadges();
+  S.dirty.actions = true; renderView(S.view, {});
+}
+function reassess(partId, acts) {
+  const part = S.world.parts.find(p => p.id === partId);
+  const before = S.comp.byId[partId];
+  applyPolicies(part, acts.filter(a => !a.policy.startsWith('Adjust')).map(a => a.policy), acts.some(a => a.policy.startsWith('Adjust')) ? 'Adjust' : '');
+  delete S.accepted[partId]; S.resolved[partId] = true;
+  const ctbBefore = S.comp.ctb.revenueAtRisk;
+  recompute();
+  const after = S.comp.byId[partId];
+  logActivity('ai', `<b>Reassessed ${esc(part.mpn)}.</b> Mitigations are in place, so the part plan moves from <span class="red">${esc(before.policies.map(shortPolicy).join(' + '))}</span> to <b>${esc(after.policies.map(shortPolicy).join(' + '))}</b>${after.forecast ? ' · ' + esc(after.forecast) : ''}. Portfolio revenue at risk ${money(ctbBefore)} → ${money(S.comp.ctb.revenueAtRisk)}.`, 'reassess');
+  agentSay(`**Reassessed ${part.mpn}.** All actions are closed, so I re-ran the part against today's signals. Policy is now **${after.policies.map(shortPolicy).join(' + ')}**${after.revenueAtRisk ? `, with ${money(after.revenueAtRisk)} still at risk` : ' and no projected shortage remains'}. Portfolio revenue at risk is now ${money(S.comp.ctb.revenueAtRisk)}.`);
+}
+
+// ── Agent dock
+const feedEl = () => $('#feed');
+function mdToHtml(md) {
+  const lines = esc(md).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').split(/\n/);
+  let out = '', inList = false, para = [];
+  const flush = () => { if (para.length) { out += `<p>${para.join(' ')}</p>`; para = []; } };
+  for (const ln of lines) {
+    const m = ln.match(/^\s*(\d+)[.)]\s+(.*)/) || ln.match(/^\s*[-•]\s+(.*)/);
+    if (m) { flush(); if (!inList) { out += '<ol>'; inList = true; } out += `<li>${m[2] ?? m[1]}</li>`; continue; }
+    if (inList) { out += '</ol>'; inList = false; }
+    if (!ln.trim()) flush(); else para.push(ln);
+  }
+  flush(); if (inList) out += '</ol>';
+  return out;
+}
+function agentMsg() {
+  const el = h(`<div class="msg agent"><div class="who">Agent <time>${nowStr()}</time></div><div class="body"></div><div class="acts"></div></div>`);
+  feedEl().append(el); scrollFeed(); return el;
+}
+function agentSay(md, acts = []) {
+  const el = agentMsg(); $('.body', el).innerHTML = mdToHtml(md); addActs(el, acts); scrollFeed(); return el;
+}
+function addActs(el, acts) { const box = $('.acts', el); box.innerHTML = ''; for (const a of acts) { const b = h(`<button class="btn sm ${a.primary ? 'primary' : ''}">${esc(a.label)}</button>`); b.onclick = a.fn; box.append(b); } }
+async function agentType(md, acts = [], speed = 9) {
+  const el = agentMsg(); const body = $('.body', el); body.classList.add('typing');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) for (let i = 0; i <= md.length; i += speed) { body.innerHTML = mdToHtml(md.slice(0, i)); scrollFeed(); await sleep(16); }
+  body.classList.remove('typing'); body.innerHTML = mdToHtml(md); addActs(el, acts); scrollFeed(); return el;
+}
+function userSay(text) { feedEl().append(h(`<div class="msg user">${esc(text)}</div>`)); scrollFeed(); }
+function toolLine(html) { const el = h(`<div class="tool">${html}</div>`); if (typeof CHAT !== 'undefined' && CHAT.pending && CHAT.pending.isConnected) CHAT.pending.before(el); else feedEl().append(el); scrollFeed(); return el; }
+function scrollFeed() { const f = feedEl(); f.scrollTop = f.scrollHeight; }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function setDock(open) { document.body.classList.toggle('dock-closed', !open); setTimeout(() => HZ_resize && HZ_resize(), 30); }
+
+function initShell() {
+  $$('.tab').forEach(t => t.onclick = () => setView(t.dataset.view));
+  $('#agent-pill').onclick = () => setDock(document.body.classList.contains('dock-closed'));
+  $('#dock-x').onclick = () => setDock(false);
+  $('#fab').onclick = () => setDock(true);
+  if (matchMedia('(max-width: 860px)').matches) document.body.classList.add('dock-closed');
+  const ta = $('#ask-in');
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#ask').requestSubmit(); } });
+  ta.addEventListener('input', () => { ta.style.height = '42px'; ta.style.height = Math.min(120, ta.scrollHeight) + 'px'; });
+  $('#ask').addEventListener('submit', e => { e.preventDefault(); const v = ta.value.trim(); if (!v) return; ta.value = ''; ta.style.height = '42px'; chat(v); });
+  const sugg = ['Why is GaN our biggest exposure?', 'What if the MLCC constraint lasts 6 months?', 'Every morning, check my sole-source parts and assign mitigations', 'What is waiting on engineering?', 'Walk me through the MLCC case'];
+  $('#sugg').innerHTML = sugg.map(s => `<button type="button">${esc(s)}</button>`).join('');
+  $$('#sugg button').forEach(b => b.onclick = () => chat(b.textContent));
+}
+
+// ── Seed history so the prototype opens in a realistic working state
+function seedHistory() {
+  const opa = S.world.parts.find(p => p.mpn === 'VAL-OPA2140');
+  const nmos = S.world.parts.find(p => p.mpn === 'BWD-NMOS-30V');
+  const r1 = S.comp.byId[opa.id], r2 = S.comp.byId[nmos.id];
+  S.actions.push({ id: 'A' + (ACT_SEQ++), partId: opa.id, mpn: opa.mpn, policy: 'Life-time buy', role: 'scm', title: 'Life-time buy', spec: `Size LTB before ${opa.pcn.ltbDate}: ~${fmt(avgOf(r1.demand) * 20)} units`, status: 'In review', due: 'Wk 41', createdBy: 'Workflow' });
+  S.actions.push({ id: 'A' + (ACT_SEQ++), partId: opa.id, mpn: opa.mpn, policy: 'Multi-source', role: 'de', title: 'Find or validate crosses', spec: `Validate ${opa.bestCross.mpn} (${opa.bestCross.mfr}) for redesign`, status: 'Assigned', due: 'Wk 42', createdBy: 'Workflow' });
+  S.actions.push({ id: 'A' + (ACT_SEQ++), partId: nmos.id, mpn: nmos.mpn, policy: 'Buffer', role: 'scm', title: 'Increase buffer stock', spec: `Raise safety stock to ${fmt(avgOf(r2.demand) * 3)} units (3 weeks of cover)`, status: 'Approved', due: 'Wk 41', createdBy: 'Workflow' });
+  S.accepted[opa.id] = true; S.accepted[nmos.id] = true;
+  S.activity.push(
+    { t: nowStr(-4), who: 'ai', html: `Daily run complete: 48 parts, 16 market classifications, 3 active events, 1 new PCN. <b>${pendingChanged().length} recommendations changed</b> since last week.`, cls: 'reassess' },
+    { t: nowStr(-5), who: 'ai', html: `Detected <b>MLCC market: Stable → Constrained</b> (lead time 16 → 24 wks). Re-scored 8 MLCC parts.` },
+    { t: nowStr(-6), who: 'ai', html: `Detected new event <b>Gallium export licensing tightened</b>; 2 GaN parts exposed.` },
+    { t: nowStr(-7), who: 'ai', html: `Run started by workflow <b>Nightly plan refresh</b>.` },
+  );
+}
+
+// ───────────────────────── Horizon: 3D signal corridor ─────────────────────────
+const HZ = { cam: -3.2, camT: -0.25, raf: 0, w: 0, h: 0, dpr: 1, cards: [], built: false, drag: null, series: null, lastInteract: 0 };
+const ZD = 12, CAMH = 4.2, WALL = 6.6, GATE_X = 8.6, GATE_H = 5.6, BAND = 2.7, CAM_OFF = 0.25;
+
+function hzSource() {
+  if (S.hz.source === 'scenario' && S.scenario) return { comp: S.scenario.comp, ai: S.scenario.ai, label: S.scenario.label };
+  return { comp: S.comp, ai: S.ai, label: 'Current plan' };
+}
+
+VIEWS.horizon = function () {
+  const el = $('#v-horizon');
+  if (!HZ.built) {
+    el.innerHTML = `
+      <canvas id="hz-canvas" aria-label="Three-dimensional timeline of demand, supply, signals and recommendations"></canvas>
+      <div id="hz-cards"></div>
+      <div class="hz-top">
+        <div class="hz-title">
+          <div class="eyebrow">Sense · next 16 weeks</div>
+          <h1 id="hz-h1">The road ahead</h1>
+          <p id="hz-sub"></p>
+          <div class="hz-controls">
+            <select class="field" id="hz-scope" aria-label="Scope"></select>
+            <select class="field" id="hz-src" aria-label="Plan source" hidden></select>
+            <label class="toggle"><input type="checkbox" id="hz-ai" checked> Show AI-recommended plan</label>
+          </div>
+          <div class="hz-legend" id="hz-legend"></div>
+        </div>
+        <div class="hz-kpis" id="hz-kpis"></div>
+      </div>
+      <div class="hz-hint" id="hz-hint">Scroll or drag to travel through time · click any card</div>
+      <div class="hz-bottom">
+        <div class="hz-nav"><button id="hz-prev" aria-label="Previous week">‹</button><button id="hz-next" aria-label="Next week">›</button></div>
+        <div class="hz-strip" id="hz-strip"></div>
+      </div>`;
+    HZ.built = true;
+    HZ.canvas = $('#hz-canvas'); HZ.ctx = HZ.canvas.getContext('2d'); HZ.cardLayer = $('#hz-cards');
+    bindHorizon();
+    new ResizeObserver(() => HZ_resize()).observe(el);
+  }
+  $('#hz-ai').checked = S.hz.showAI;
+  // scope options
+  const src = hzSource();
+  const parts = src.comp.results.slice().sort((a, b) => priority(b) - priority(a));
+  const scopeSel = $('#hz-scope');
+  scopeSel.innerHTML = `<option value="portfolio">Portfolio · ${esc(PRODUCT.name)} clear-to-build</option>` +
+    `<optgroup label="Parts with changed recommendations">${parts.filter(isChangedSrc).map(r => `<option value="${r.part.id}">${esc(r.part.mpn)} · ${esc(r.policies.map(shortPolicy).join(' + '))}</option>`).join('')}</optgroup>` +
+    `<optgroup label="All other parts">${parts.filter(r => !isChangedSrc(r)).map(r => `<option value="${r.part.id}">${esc(r.part.mpn)}</option>`).join('')}</optgroup>`;
+  scopeSel.value = S.hz.scope;
+  const srcSel = $('#hz-src');
+  srcSel.hidden = !S.scenario;
+  if (S.scenario) { srcSel.innerHTML = `<option value="base">Current plan</option><option value="scenario">Scenario: ${esc(S.scenario.label)}</option>`; srcSel.value = S.hz.source; }
+  buildSeries(); buildCards(); renderHzChrome(); HZ_resize();
+};
+function isChangedSrc(r) { const p = S.lastWeek.byId[r.part.id]; return p && (p.policies.join('|') !== r.policies.join('|') || p.forecast !== r.forecast); }
+
+function bindHorizon() {
+  const c = HZ.canvas;
+  $('#v-horizon').addEventListener('wheel', e => { if (e.target.closest('.hz-pop, .hz-top select')) return; e.preventDefault(); nudge((e.deltaY + e.deltaX) * 0.0032); }, { passive: false });
+  c.addEventListener('pointerdown', e => { HZ.drag = { y: e.clientY, x: e.clientX, cam: HZ.camT }; c.setPointerCapture(e.pointerId); c.classList.add('drag'); });
+  c.addEventListener('pointermove', e => { if (!HZ.drag) return; const d = (HZ.drag.y - e.clientY) * 0.014 + (HZ.drag.x - e.clientX) * 0.01; setCam(HZ.drag.cam + d); });
+  const end = () => { HZ.drag = null; c.classList.remove('drag'); };
+  c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end);
+  $('#hz-prev').onclick = () => setCam(Math.round(HZ.camT + CAM_OFF) - 1 - CAM_OFF);
+  $('#hz-next').onclick = () => setCam(Math.round(HZ.camT + CAM_OFF) + 1 - CAM_OFF);
+  $('#hz-scope').onchange = e => { S.hz.scope = e.target.value; buildSeries(); buildCards(); renderHzChrome(); setCam(-CAM_OFF); };
+  $('#hz-src').onchange = e => { S.hz.source = e.target.value; VIEWS.horizon(); };
+  $('#hz-ai').onchange = e => { S.hz.showAI = e.target.checked; renderHzChrome(); HZ_wake(); };
+  document.addEventListener('keydown', e => {
+    if (S.view !== 'horizon' || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); $('#hz-next').click(); }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { e.preventDefault(); $('#hz-prev').click(); }
+  });
+}
+function nudge(d) { setCam(HZ.camT + d); }
+function setCam(v) { HZ.camT = Math.max(-2.2, Math.min(NWEEKS - 3.5, v)); HZ.lastInteract = performance.now(); const hint = $('#hz-hint'); if (hint) hint.hidden = true; HZ_wake(); }
+
+function HZ_resize() {
+  if (!HZ.canvas) return;
+  const r = HZ.canvas.getBoundingClientRect(); HZ.dpr = Math.min(2, window.devicePixelRatio || 1);
+  HZ.w = r.width; HZ.h = r.height; HZ.canvas.width = Math.max(1, r.width * HZ.dpr); HZ.canvas.height = Math.max(1, r.height * HZ.dpr);
+  HZ_wake();
+}
+function HZ_wake() { if (!HZ.raf && HZ.canvas) HZ.raf = requestAnimationFrame(hzFrame); }
+
+// ── Data series for the band
+function buildSeries() {
+  const src = hzSource();
+  if (S.hz.scope === 'portfolio') {
+    const c = src.comp.ctb, a = src.ai.ctb;
+    HZ.series = { unit: 'boards', demand: c.plan, supply: c.built, ai: a.built, adj: null, short: c.shortBoards, max: Math.max(...c.plan) * 1.05 };
+  } else {
+    const r = src.comp.byId[S.hz.scope], ar = src.ai.byId[S.hz.scope];
+    if (!r) { S.hz.scope = 'portfolio'; return buildSeries(); }
+    const aiSupply = ar.supply.map((s, w) => s + (w === 0 ? Math.max(0, ar.startInv - r.startInv) : 0));
+    HZ.series = { unit: 'units', demand: r.demand, supply: r.supply.map((s, w) => s), ai: ar.short.map((s, w) => r.demand[w] - s), adj: r.adjDir ? r.adjDemand : null, short: r.short, max: Math.max(...r.demand, ...r.adjDemand, ...r.supply) * 1.08, r };
+    void aiSupply;
+  }
+}
+
+// ── Cards (signals left wall, recommendations right wall)
+function buildCards() {
+  const src = hzSource(); const cards = [];
+  if (S.hz.scope === 'portfolio') {
+    const world = src.comp.world;
+    for (const [k, c] of Object.entries(world.commodities)) {
+      if (!c.status || c.status === c.prev) continue;
+      const n = world.parts.filter(p => p.commodity === k).length;
+      const wk = Math.min(NWEEKS - 1, Math.max(0, Math.round(Math.abs((c.lt || 0) - (c.ltPrev || 0)) / 2)));
+      cards.push({ side: -1, week: wk, cls: 'hzsig ' + (CONSTRAINED(c.status) ? 'bad' : c.status === 'Surplus' ? 'good' : 'neutral'), kind: 'Market shift', isNew: true, title: `${c.name.split(' · ')[1]}: ${c.prev} → ${c.status}`, detail: `Lead time ${c.ltPrev}→${c.lt} wks · price ${c.price > 0 ? '+' : ''}${c.price}%. ${c.note}`, foot: `${n} part${n > 1 ? 's' : ''} affected`, pop: { type: 'commodity', key: k } });
+    }
+    for (const e of world.events) {
+      const n = world.parts.filter(p => (e.region && p.region === e.region) || (e.commodity && p.commodity === e.commodity)).length;
+      cards.push({ side: -1, week: e.from, cls: 'hzsig bad', kind: e.kind === 'Scenario' ? 'What-if assumption' : 'Geopolitical event', isNew: e.isNew, title: e.title, detail: e.detail, foot: `${n} part${n !== 1 ? 's' : ''} exposed · ${Math.round(e.impact * 100)}% impact`, pop: { type: 'event', id: e.id } });
+    }
+    for (const r of src.comp.results) {
+      if (r.part.pcn && r.part.pcn.isNew) cards.push({ side: -1, week: 0, cls: 'hzsig bad', kind: 'Lifecycle · PCN', isNew: true, title: `${r.part.mpn} moved to last-time buy`, detail: `${r.part.pcn.id}: final orders due ${r.part.pcn.ltbDate}. ${r.part.crossesP2P} pin-to-pin alternate available.`, foot: 'Open part ›', pop: { type: 'part', id: r.part.id } });
+      if (r.part.crossNew) cards.push({ side: -1, week: 1, cls: 'hzsig good', kind: 'Cross reference', isNew: true, title: `New pin-to-pin cross for ${r.part.mpn}`, detail: `${r.part.bestCross.mpn} (${r.part.bestCross.mfr}) now matches form-fit-function. Opens a second source.`, foot: 'Open part ›', pop: { type: 'part', id: r.part.id } });
+    }
+    const recs = src.comp.results.filter(r => isChangedSrc(r) && r.primary !== 'MRP').sort((a, b) => priority(b) - priority(a)).slice(0, 12);
+    for (const r of recs) {
+      const sig = r.hits[0];
+      const wk = r.firstShortWeek >= 0 ? Math.max(0, r.firstShortWeek - 1) : sig ? sig.from : r.part.crossNew ? 1 : 2;
+      const pols = [r.adjDir ? (r.adjDir === 'pull' ? 'Pull forecast' : 'Push forecast') : null, ...r.policies.map(shortPolicy)].filter(Boolean);
+      cards.push({ side: 1, week: wk, cls: 'recm', kind: S.accepted[r.part.id] ? 'Recommendation · assigned' : 'Recommendation', isNew: false, title: r.part.mpn, pols, detail: r.ranked[0].why, foot: r.revenueAtRisk > 0 ? `<b>${money(r.revenueAtRisk)}</b> at risk` : 'Pre-emptive: no gap yet', pop: { type: 'why', id: r.part.id } });
+    }
+  } else {
+    const r = src.comp.byId[S.hz.scope];
+    for (const s of r.signals) {
+      const wk = s.week != null ? s.week : s.kind === 'Supply' ? Math.max(0, r.firstShortWeek) : s.kind === 'Market' ? 1 : 0;
+      cards.push({ side: -1, week: wk, cls: 'hzsig ' + s.tone, kind: s.kind, isNew: s.isNew, title: s.title, detail: s.detail, foot: s.source, pop: { type: 'why', id: r.part.id } });
+    }
+    if (r.adjDir) cards.push({ side: 1, week: 0, cls: 'recm', kind: 'Market-adjusted plan', title: r.forecast, pols: [], detail: `${r.adjDir === 'pull' ? 'Pull' : 'Push'} ${fmt(r.adjQty)} units ${r.adjDir === 'pull' ? `into ${WEEKS[0].label}–${WEEKS[3].iso}` : `out to ${WEEKS[8].label}–${WEEKS[11].iso}`} so orders reflect the market, not history.`, foot: 'Why ›', pop: { type: 'why', id: r.part.id } });
+    r.policies.forEach((p, i) => { if (p === 'MRP') return; const c = r.cands.find(c => c.policy === p); cards.push({ side: 1, week: r.firstShortWeek > 0 ? r.firstShortWeek - 1 : 1 + i, cls: 'recm', kind: 'Plan for every part', title: p, pols: [], detail: c.why, foot: r.revenueAtRisk > 0 ? `<b>${money(r.revenueAtRisk)}</b> at risk` : 'Why ›', pop: { type: 'why', id: r.part.id } }); });
+    if (r.primary === 'MRP' && !r.adjDir) cards.push({ side: 1, week: 1, cls: 'hzsig good', kind: 'Plan for every part', title: 'MRP · no change', pols: [], detail: r.ranked[0].why, foot: 'Why ›', pop: { type: 'why', id: r.part.id } });
+  }
+  // de-collide: at most 2 cards per wall per week
+  const used = {};
+  cards.sort((a, b) => a.week - b.week || (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+  for (const c of cards) {
+    let w = c.week; while ((used[c.side + ':' + w] || 0) >= 2 && w < NWEEKS - 1) w++;
+    c.slot = used[c.side + ':' + w] || 0; used[c.side + ':' + w] = c.slot + 1; c.week = w;
+  }
+  HZ.cardLayer.innerHTML = '';
+  HZ.cards = cards.map(c => {
+    const el = h(`<div class="hz-card ${c.cls}" role="button" tabindex="0">
+      <div class="k"><i></i>${esc(c.kind)}${c.isNew ? '<span class="newtag">NEW</span>' : ''}</div>
+      <div class="t">${esc(c.title)}</div>
+      ${c.pols && c.pols.length ? `<div class="pols">${c.pols.map(p => `<span class="chip rec">${esc(p)}</span>`).join('')}</div>` : ''}
+      <div class="d">${esc(c.detail)}</div>
+      <div class="foot"><span>${c.foot}</span><span>${esc(WEEKS[c.week].label)}</span></div></div>`);
+    el.onclick = (e) => { e.stopPropagation(); cardClick(c, el); };
+    el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cardClick(c, el); } };
+    HZ.cardLayer.append(el);
+    return { ...c, el, z: (c.week + 0.3 + c.slot * 0.45) * ZD, y: 2.5 + c.slot * 1.5 };
+  });
+  HZ_wake();
+}
+
+function cardClick(c, el) {
+  const p = c.pop; closePop();
+  if (p.type === 'why' || p.type === 'part') return openWhy(p.id);
+  const src = hzSource(); const world = src.comp.world;
+  let parts = [], title = '', text = '';
+  if (p.type === 'commodity') { const cm = world.commodities[p.key]; parts = src.comp.results.filter(r => r.part.commodity === p.key); title = cm.name; text = cm.note; }
+  if (p.type === 'event') { const e = world.events.find(x => x.id === p.id); parts = src.comp.results.filter(r => (e.region && r.part.region === e.region) || (e.commodity && r.part.commodity === e.commodity)); title = e.title; text = e.detail; }
+  const pop = h(`<div class="hz-pop" role="dialog" aria-label="${esc(title)}"><button class="x" aria-label="Close">×</button>
+    <div class="eyebrow">${esc(c.kind)}</div><h3>${esc(title)}</h3><p>${esc(text)}</p>
+    <div class="eyebrow" style="margin-bottom:6px">Exposed parts and what the agent recommends</div>
+    <ul>${parts.map(r => `<li><button data-id="${r.part.id}" class="mono">${esc(r.part.mpn)}</button><span class="red" style="font-size:12px">${esc([r.adjDir ? (r.adjDir === 'pull' ? 'Pull' : 'Push') : null, ...r.policies.map(shortPolicy)].filter(Boolean).join(' + '))}</span></li>`).join('')}</ul>
+    <button class="btn sm" id="pop-plan">Open these parts in Plan</button></div>`);
+  const rect = el.getBoundingClientRect(), host = $('#v-horizon').getBoundingClientRect();
+  pop.style.left = Math.min(host.width - 336, Math.max(16, rect.left - host.left)) + 'px';
+  pop.style.top = Math.min(host.height - 360, Math.max(80, rect.top - host.top)) + 'px';
+  $('#v-horizon').append(pop);
+  $('.x', pop).onclick = closePop;
+  $$('li button', pop).forEach(b => b.onclick = () => { closePop(); openWhy(b.dataset.id); });
+  $('#pop-plan', pop).onclick = () => { closePop(); S.plan.changedOnly = false; S.plan.q = ''; S.plan.commodity = p.type === 'commodity' ? p.key : ''; S.plan.ids = parts.map(r => r.part.id); setView('plan'); };
+  HZ.pop = pop;
+}
+function closePop() { if (HZ.pop) { HZ.pop.remove(); HZ.pop = null; } }
+
+function renderHzChrome() {
+  const src = hzSource(); const sc = S.hz.scope === 'portfolio';
+  const c = src.comp.ctb, a = src.ai.ctb;
+  const pct = x => Math.round(x.built.reduce((s, v) => s + v, 0) / x.plan.reduce((s, v) => s + v, 0) * 100) + '%';
+  const nChanged = src.comp.results.filter(isChangedSrc).length;
+  $('#hz-h1').textContent = sc ? (S.hz.source === 'scenario' ? 'Scenario: ' + src.label : 'The road ahead') : src.comp.byId[S.hz.scope].part.mpn;
+  const r = sc ? null : src.comp.byId[S.hz.scope];
+  $('#hz-sub').textContent = sc
+    ? `Demand is the build plan for ${PRODUCT.name}. Supply is what every part lets you build. Signals arrive on the left; the agent's recommendations appear in red on the right.`
+    : `${r.part.desc} · ${r.part.mfr} · ${r.mkt?.name || ''}. Demand vs. projected supply in units, with the market-adjusted plan dashed.`;
+  $('#hz-legend').innerHTML = `<span><i style="background:var(--demand)"></i>${sc ? 'Build plan (demand)' : 'Demand'}</span><span><i style="background:var(--supply)"></i>${sc ? 'Clear-to-build (supply)' : 'Projected supply'}</span><span><i style="background:var(--rec)"></i>Gap</span>${!sc && r.adjDir ? '<span><i style="background:repeating-linear-gradient(90deg,var(--rec) 0 4px,transparent 4px 7px)"></i>Market-adjusted demand</span>' : ''}${S.hz.showAI ? '<span><i style="background:repeating-linear-gradient(90deg,var(--agent) 0 4px,transparent 4px 7px)"></i>With AI plan</span>' : ''}`;
+  if (sc) {
+    $('#hz-kpis').innerHTML = `
+      <div class="hz-kpi"><div class="eyebrow">Revenue at risk · 16 wks</div><div class="v"><span class="red">${money(c.revenueAtRisk)}</span></div><div class="s">${money(a.revenueAtRisk)} with AI plan</div></div>
+      <div class="hz-kpi"><div class="eyebrow">Clear-to-build</div><div class="v">${pct(c)}</div><div class="s">${pct(a)} with AI plan</div></div>
+      <div class="hz-kpi"><div class="eyebrow">Changed this week</div><div class="v">${nChanged}<small style="font-size:13px;color:var(--muted)"> / ${src.comp.results.length}</small></div><div class="s">${pendingChanged().length} awaiting your decision</div></div>`;
+  } else {
+    $('#hz-kpis').innerHTML = `
+      <div class="hz-kpi"><div class="eyebrow">Recommendation</div><div class="v red" style="font:600 15px/1.3 var(--sans)">${esc([r.forecast, ...r.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</div><div class="s">Was ${esc([S.lastWeek.byId[r.part.id].forecast, ...S.lastWeek.byId[r.part.id].policies.map(shortPolicy)].filter(Boolean).join(' · '))}</div></div>
+      <div class="hz-kpi"><div class="eyebrow">Resilience Rating</div><div class="v">${r.part.rr}<small style="font-size:13px;color:${r.rrDrop > 0 ? 'var(--rec)' : 'var(--muted)'}"> ${r.rrDrop > 0 ? '▼' + r.rrDrop : ''}</small></div><div class="s">${r.sources} approved source${r.sources > 1 ? 's' : ''} · ${r.part.region}</div></div>
+      <div class="hz-kpi"><div class="eyebrow">Revenue at risk</div><div class="v ${r.revenueAtRisk ? 'red' : ''}">${money(r.revenueAtRisk)}</div><div class="s"><button class="why-btn" id="hz-why">Why? ›</button></div></div>`;
+    $('#hz-why').onclick = () => openWhy(r.part.id);
+  }
+  // strip
+  const s = HZ.series;
+  $('#hz-strip').innerHTML = WEEKS.map((w, i) => {
+    const frac = s.short[i] / (s.demand[i] || 1);
+    return `<button class="${frac > 0.05 ? 'red' : frac > 0 ? 'amber' : ''}" data-i="${i}" title="${w.label} · ${w.date}${s.short[i] ? ' · short ' + fmt(s.short[i]) + ' ' + s.unit : ''}"><span>${w.iso}</span></button>`;
+  }).join('');
+  $$('#hz-strip button').forEach(b => b.onclick = () => setCam(+b.dataset.i - CAM_OFF));
+}
+
+// ── Render loop
+function hzFrame() {
+  HZ.raf = 0;
+  if (S.view !== 'horizon' || !HZ.w) return;
+  const d = HZ.camT - HZ.cam;
+  HZ.cam += d * 0.09;
+  if (Math.abs(d) < 0.0008) HZ.cam = HZ.camT;
+  drawHorizon();
+  if (HZ.cam !== HZ.camT) HZ.raf = requestAnimationFrame(hzFrame);
+}
+
+function drawHorizon() {
+  const { ctx, w, h, dpr } = HZ; const s = HZ.series; if (!s) return;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+  const F = Math.min(h * 0.9, w * 0.7), cx = w / 2, hy = h * 0.36, camZ = HZ.cam * ZD - 6;
+  const NEAR = 4;
+  const P = (x, y, z) => { const dz = z - camZ; return [cx + x * F / dz, hy + (CAMH - y) * F / dz, dz]; };
+  const fog = dz => Math.max(0, Math.min(1, 1.2 - dz / 150));
+  // horizon glow
+  const hg = ctx.createLinearGradient(0, hy - 60, 0, hy + 40); hg.addColorStop(0, 'rgba(183,167,255,0)'); hg.addColorStop(0.6, 'rgba(183,167,255,.07)'); hg.addColorStop(1, 'rgba(183,167,255,0)'); ctx.fillStyle = hg; ctx.fillRect(0, hy - 60, w, 100);
+  const zMax = NWEEKS * ZD;
+  // floor grid
+  ctx.lineWidth = 1;
+  for (let x = -14; x <= 14; x += 1.4) {
+    const a = P(x, 0, camZ + NEAR), b = P(x, 0, zMax + 30);
+    const g = ctx.createLinearGradient(a[0], a[1], b[0], b[1]); g.addColorStop(0, 'rgba(60,86,120,.28)'); g.addColorStop(1, 'rgba(60,86,120,0)');
+    ctx.strokeStyle = g; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  }
+  // band segments per week
+  const hw = v => (v / s.max) * BAND;
+  const quad = (x0, x1, z0, z1, fill) => { const a = P(x0, 0, z0), b = P(x1, 0, z0), c2 = P(x1, 0, z1), d2 = P(x0, 0, z1); ctx.fillStyle = fill; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c2[0], c2[1]); ctx.lineTo(d2[0], d2[1]); ctx.closePath(); ctx.fill(); };
+  const line = (x, z0, z1, style, width, dash) => { const a = P(x, 0, z0), b = P(x, 0, z1); ctx.strokeStyle = style; ctx.lineWidth = width; ctx.setLineDash(dash || []); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); };
+  for (let i = NWEEKS - 1; i >= 0; i--) {
+    let z0 = i * ZD, z1 = (i + 1) * ZD;
+    if (z1 <= camZ + NEAR) continue; z0 = Math.max(z0, camZ + NEAR);
+    const f = fog(z0 - camZ);
+    const hd = hw(s.demand[i]), hs = hw(Math.max(0, s.demand[i] - s.short[i] > s.supply[i] ? s.demand[i] - s.short[i] : s.supply[i]));
+    const hsBand = hw(s.demand[i] - s.short[i]);
+    quad(-hsBand, hsBand, z0, z1, `rgba(76,207,178,${0.2 * f})`);
+    if (hd > hsBand + 0.01) { quad(hsBand, hd, z0, z1, `rgba(255,91,79,${0.5 * f})`); quad(-hd, -hsBand, z0, z1, `rgba(255,91,79,${0.5 * f})`); }
+    line(hsBand, z0, z1, `rgba(76,207,178,${0.95 * f})`, 2); line(-hsBand, z0, z1, `rgba(76,207,178,${0.95 * f})`, 2);
+    line(hd, z0, z1, `rgba(126,176,255,${0.95 * f})`, 1.6); line(-hd, z0, z1, `rgba(126,176,255,${0.95 * f})`, 1.6);
+    if (s.adj) { const ha = hw(s.adj[i]); line(ha, z0, z1, `rgba(255,91,79,${f})`, 1.6, [6, 5]); line(-ha, z0, z1, `rgba(255,91,79,${f})`, 1.6, [6, 5]); }
+    if (S.hz.showAI && s.ai && Math.abs(s.ai[i] - (s.demand[i] - s.short[i])) > 0.5) { const hai = hw(s.ai[i]); line(hai, z0, z1, `rgba(183,167,255,${f})`, 2, [3, 4]); line(-hai, z0, z1, `rgba(183,167,255,${f})`, 2, [3, 4]); }
+    void hs;
+  }
+  // gates + labels
+  ctx.textAlign = 'center';
+  for (let i = NWEEKS; i >= 0; i--) {
+    const z = i * ZD; if (z <= camZ + NEAR) continue;
+    const dz = z - camZ, f = fog(dz) * Math.max(0, Math.min(1, (dz - 7) / 9)); if (f <= 0.02) continue;
+    const short = i < NWEEKS && s.short[i] > 0;
+    const isNow = i === 0;
+    const col = isNow ? `rgba(183,167,255,${0.9 * f})` : short ? `rgba(255,91,79,${0.55 * f})` : `rgba(90,120,160,${0.45 * f})`;
+    const bl = P(-GATE_X, 0, z), tl = P(-GATE_X, GATE_H, z), tr = P(GATE_X, GATE_H, z), br = P(GATE_X, 0, z);
+    ctx.strokeStyle = col; ctx.lineWidth = isNow ? 2 : 1.2;
+    ctx.beginPath(); ctx.moveTo(bl[0], bl[1]); ctx.lineTo(tl[0], tl[1]); ctx.lineTo(tr[0], tr[1]); ctx.lineTo(br[0], br[1]); ctx.stroke();
+    // floor tick
+    const l0 = P(-GATE_X, 0, z), l1 = P(GATE_X, 0, z); ctx.strokeStyle = `rgba(90,120,160,${0.25 * f})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(l0[0], l0[1]); ctx.lineTo(l1[0], l1[1]); ctx.stroke();
+    if (i === NWEEKS) continue;
+    const sz = Math.max(0, Math.min(24, 190 / dz));
+    if (sz < 6.5) continue;
+    const top = P(0, GATE_H + 0.35, z);
+    ctx.fillStyle = isNow ? `rgba(183,167,255,${f})` : `rgba(231,237,244,${0.9 * f})`;
+    ctx.font = `600 ${sz}px 'IBM Plex Sans Condensed', sans-serif`;
+    ctx.fillText((isNow ? 'NOW · ' : '') + WEEKS[i].label.toUpperCase(), top[0], top[1]);
+    ctx.fillStyle = `rgba(132,148,171,${f})`; ctx.font = `400 ${sz * 0.72}px 'IBM Plex Mono', monospace`;
+    ctx.fillText(WEEKS[i].date, top[0], top[1] + sz * 0.95);
+    if (short && sz > 8) {
+      const g = P(0, 0.25, z + ZD * 0.5);
+      ctx.fillStyle = `rgba(255,120,110,${f})`; ctx.font = `600 ${sz * 0.9}px 'IBM Plex Mono', monospace`;
+      ctx.fillText(`−${fmt(s.short[i])} ${s.unit}`, g[0], g[1]);
+    }
+  }
+  // cards
+  for (const c of HZ.cards) {
+    const [sx, sy, dz] = P(c.side * WALL, c.y, c.z);
+    const sc = 15 / dz;
+    let op = 1;
+    if (dz < 13) op = Math.max(0, (dz - 8) / 5);
+    if (dz > 34) op = Math.min(op, Math.max(0, (52 - dz) / 18));
+    if (op <= 0.01 || dz <= 0) { c.el.style.opacity = 0; c.el.style.visibility = 'hidden'; continue; }
+    c.el.style.visibility = 'visible';
+    const cw = c.el.offsetWidth, ch = c.el.offsetHeight;
+    c.el.style.opacity = op.toFixed(3);
+    c.el.style.transform = `translate(${(sx - cw / 2).toFixed(1)}px, ${(sy - ch / 2).toFixed(1)}px) scale(${Math.min(1.0, sc).toFixed(3)})`;
+    c.el.style.zIndex = String(1000 - Math.round(dz));
+    c.el.tabIndex = op > 0.5 ? 0 : -1; c.el.style.pointerEvents = op > 0.3 ? 'auto' : 'none';
+  }
+  // strip "current" marker
+  const cur = Math.max(0, Math.min(NWEEKS - 1, Math.round(HZ.cam + CAM_OFF)));
+  $$('#hz-strip button').forEach((b, i) => b.classList.toggle('cur', i === cur));
+}
+
+// ───────────────────────── Plan: weekly grid + summary by part ─────────────────────────
+function planRows() {
+  const f = S.plan; const q = f.q.trim().toUpperCase();
+  return S.comp.results.filter(r => {
+    if (f.ids && !f.ids.includes(r.part.id)) return false;
+    if (f.changedOnly && !isChanged(r)) return false;
+    if (f.commodity && r.part.commodity !== f.commodity) return false;
+    if (f.policy && !r.policies.includes(f.policy) && r.forecast !== f.policy) return false;
+    if (q && !(r.part.mpn.toUpperCase().includes(q) || r.part.mfr.toUpperCase().includes(q) || r.part.desc.toUpperCase().includes(q))) return false;
+    return true;
+  }).sort((a, b) => priority(b) - priority(a));
+}
+function recHtml(r, withWas = true) {
+  const p = lastRec(r.part.id); const ch = isChanged(r);
+  const fc = r.forecast ? (r.forecast.startsWith('Adjust') ? `<span>${esc(r.forecast)}</span>` : `<span class="ok">${esc(r.forecast)}</span>`) : '<span class="ok" title="No market coverage">—</span>';
+  const pol = r.primary === 'MRP' ? `<span class="ok">MRP</span>` : r.policies.map(x => `<span>${esc(x)}</span>`).join('');
+  const was = withWas && ch ? `<span class="was">${esc([p.forecast, ...p.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</span>` : '';
+  return `<div class="recs">${fc}${pol}${was}</div>`;
+}
+function statusHtml(r) {
+  const id = r.part.id;
+  if (S.accepted[id]) { const open = S.actions.filter(a => a.partId === id && a.status !== 'Done').length; return `<span class="status-accepted">Assigned · ${open} open</span>`; }
+  if (S.resolved[id]) return `<span class="chip good">Resolved</span>`;
+  if (S.dismissed[id]) return `<span class="muted">Dismissed</span>`;
+  if (isChanged(r) && needsDecision(r)) return `<span class="chip warn">Awaiting decision</span>`;
+  return '<span class="muted">—</span>';
+}
+const kfmt = n => { const a = Math.abs(n); return a >= 10000 ? (n / 1000).toFixed(0) + 'K' : a >= 1000 ? (n / 1000).toFixed(1) + 'K' : String(Math.round(n)); };
+
+VIEWS.plan = function () {
+  const el = $('#v-plan'); const f = S.plan;
+  const rows = planRows();
+  const pend = pendingChanged();
+  const shortPend = pend.filter(r => r.revenueAtRisk > 0);
+  const commOpts = Object.entries(COMMODITIES).map(([k, c]) => `<option value="${k}" ${f.commodity === k ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  const polOpts = ['Adjust forecast (pull)', 'Adjust forecast (push)', 'Multi-source', 'Buffer', 'Strategic buy', 'Long Term Supply Agreement', 'Life-time buy', 'MRP'].map(p => `<option ${f.policy === p ? 'selected' : ''}>${p}</option>`).join('');
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end">
+      <div><div class="eyebrow">Analyze · Recommend</div><h2 class="section-title" style="font-size:24px;margin-top:6px">Part plans</h2>
+      <p class="lede">Weekly demand and supply for each part, with the agent's market-adjusted forecast and Plan for Every Part policy in red. Last week's recommendation is struck through.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px;padding:14px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-color:rgba(183,167,255,.3);background:linear-gradient(90deg,var(--agent-soft),transparent)">
+      <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true" style="flex-shrink:0"><path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B7A7FF"/></svg>
+      <div style="flex:1;min-width:240px;font:400 15.5px/1.5 var(--serif)">${pend.length
+        ? `<b>${pend.length} recommendations</b> changed and are waiting on you. ${shortPend.length} address a projected shortage worth <b class="red">${money(shortPend.reduce((a, r) => a + r.revenueAtRisk, 0))}</b>; the other ${pend.length - shortPend.length} are pre-emptive, driven by market and event signals before any gap appears.`
+        : 'Every changed recommendation has an owner. The agent will reassess each part as its actions close.'}</div>
+      ${pend.length ? `<button class="btn primary" id="pl-all">Accept all ${pend.length} and assign</button>` : `<button class="btn" id="pl-acts">Open actions</button>`}
+    </div>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Layout"><button aria-pressed="${f.mode === 'grid'}" data-m="grid">Weekly plan</button><button aria-pressed="${f.mode === 'sum'}" data-m="sum">Summary by part</button></div>
+      <label class="toggle"><input type="checkbox" id="pl-ch" ${f.changedOnly ? 'checked' : ''}> Only parts whose recommendation changed</label>
+      <span class="grow"></span>
+      <input class="field" id="pl-q" placeholder="Search part or maker" value="${esc(f.q)}" style="width:190px" aria-label="Search parts">
+      <select class="field" id="pl-c" aria-label="Commodity"><option value="">All commodities</option>${commOpts}</select>
+      <select class="field" id="pl-p" aria-label="Recommendation"><option value="">All recommendations</option>${polOpts}</select>
+      <span class="muted" style="font-size:12px">${rows.length} of ${S.comp.results.length} parts${f.ids ? ` · <button class="why-btn" id="pl-clr">Clear selection</button>` : ''}</span>
+    </div>
+    <div class="tablewrap" id="pl-table">${f.mode === 'grid' ? gridTable(rows) : sumTable(rows)}</div>`;
+  $$('.seg button', el).forEach(b => b.onclick = () => { f.mode = b.dataset.m; VIEWS.plan(); });
+  $('#pl-ch').onchange = e => { f.changedOnly = e.target.checked; VIEWS.plan(); };
+  $('#pl-q').oninput = e => { f.q = e.target.value; const pos = e.target.selectionStart; VIEWS.plan(); const n = $('#pl-q'); n.focus(); n.setSelectionRange(pos, pos); };
+  $('#pl-c').onchange = e => { f.commodity = e.target.value; VIEWS.plan(); };
+  $('#pl-p').onchange = e => { f.policy = e.target.value; VIEWS.plan(); };
+  if ($('#pl-clr')) $('#pl-clr').onclick = () => { f.ids = null; f.commodity = ''; VIEWS.plan(); };
+  if ($('#pl-all')) $('#pl-all').onclick = () => { const res = acceptAll(); toast(`Created ${res.actions} actions across ${res.parts} parts`); agentSay(`Done. I routed **${res.actions} actions** for ${res.parts} parts to Design Engineering, Supply Chain, Procurement and Demand Planning. I'll reassess each part as its actions close.`, [{ label: 'Open actions', fn: () => setView('actions') }]); };
+  if ($('#pl-acts')) $('#pl-acts').onclick = () => setView('actions');
+  $$('[data-why]', el).forEach(b => b.onclick = () => openWhy(b.dataset.why));
+};
+
+function gridTable(rows) {
+  if (!rows.length) return `<p class="muted" style="padding:20px">No parts match these filters.</p>`;
+  const head = `<thead><tr><th class="l stick">Part</th><th class="l">Recommendation</th><th>Inv.</th><th>RR</th><th class="l">Plan</th>${WEEKS.map(w => `<th>${w.label}<span class="dt">${w.date}</span></th>`).join('')}</tr></thead>`;
+  const body = rows.map(r => {
+    const ev = (w) => r.hits.some(e => w >= e.from && w < e.from + e.weeks);
+    const lines = [
+      ['Demand', r.demand.map((v, w) => `<td class="v">${kfmt(v)}</td>`)],
+      r.adjDir ? ['Mkt-adj. demand', r.adjDemand.map((v, w) => { const d = v - r.demand[w]; return `<td class="v ${d ? 'adj ' + (d > 0 ? 'up' : 'dn') : ''}">${kfmt(v)}</td>`; })] : null,
+      ['Supply', r.supply.map((v, w) => `<td class="v ${ev(w) ? 'ev' : ''}" ${ev(w) ? `title="${esc(r.hits.map(e => e.title).join('; '))}"` : ''}>${kfmt(v)}</td>`)],
+      ['Proj. balance', r.balance.map(v => `<td class="v ${v < 0 ? 'neg' : ''}">${kfmt(v)}</td>`)],
+    ].filter(Boolean);
+    const n = lines.length;
+    return lines.map((ln, i) => `<tr class="${i === n - 1 ? 'grp-end' : 'grp'}">${i === 0 ? `
+      <td class="l stick" rowspan="${n}"><div class="partcell">${isChanged(r) ? '' : ''}<button data-why="${r.part.id}">${isChanged(r) ? '<span class="chg" title="Changed this week"></span>' : ''}${esc(r.part.mpn)}</button><small>${esc(r.part.mfr)}</small><small>${esc(COMMODITIES[r.part.commodity].name)}</small><small><span class="mkt ${r.mktStatus || ''}">${esc(r.mktStatus || 'No coverage')}</span></small></div></td>
+      <td class="l" rowspan="${n}">${recHtml(r)}<div style="margin-top:6px"><button class="why-btn" data-why="${r.part.id}">Why?</button></div></td>
+      <td rowspan="${n}" class="v">${kfmt(r.part.onHand)}</td>
+      <td rowspan="${n}" class="rr">${r.part.rr}${r.rrDrop > 0 ? `<small class="dn">▼${r.rrDrop}</small>` : ''}</td>` : ''}
+      <td class="metric">${ln[0]}</td>${ln[1].join('')}</tr>`).join('');
+  }).join('');
+  return `<table class="grid">${head}<tbody>${body}</tbody></table>`;
+}
+
+function sumTable(rows) {
+  if (!rows.length) return `<p class="muted" style="padding:20px">No parts match these filters.</p>`;
+  const head = `<thead><tr><th class="l stick">Part</th><th class="l">Commodity · market</th><th>RR</th><th class="l">Lifecycle</th><th>Sources</th><th class="l">Inventory risk</th><th class="l">Market-adjusted plan</th><th class="l">Plan for Every Part</th><th class="l">Last week</th><th>Revenue at risk</th><th class="l">Status</th><th></th></tr></thead>`;
+  const body = rows.map(r => {
+    const p = lastRec(r.part.id);
+    return `<tr class="grp-end">
+      <td class="l stick"><div class="partcell"><button data-why="${r.part.id}">${isChanged(r) ? '<span class="chg"></span>' : ''}${esc(r.part.mpn)}</button><small>${esc(r.part.mfr)}</small></div></td>
+      <td class="l"><div>${esc(COMMODITIES[r.part.commodity].name)}</div><span class="mkt ${r.mktStatus || ''}">${esc(r.mktStatus || 'No coverage')}</span></td>
+      <td class="rr">${r.part.rr}${r.rrDrop > 0 ? `<small class="dn">▼${r.rrDrop}</small>` : ''}</td>
+      <td class="l">${r.ltb ? `<span class="chip bad">LTB · ${esc(r.part.pcn.ltbDate)}</span>` : 'Active'}</td>
+      <td class="v">${r.sources}${r.part.crossesP2P ? `<small class="muted"> +${r.part.crossesP2P}×</small>` : ''}</td>
+      <td class="l"><span class="pill ${r.invRisk}">${r.invRisk}</span></td>
+      <td class="l red" style="font-weight:500">${r.forecast ? (r.forecast.startsWith('Adjust') ? esc(r.forecast) : `<span class="muted">${esc(r.forecast)}</span>`) : '<span class="muted">—</span>'}</td>
+      <td class="l red" style="font-weight:500">${r.primary === 'MRP' ? '<span class="muted">MRP</span>' : esc(r.policies.join(' + '))}</td>
+      <td class="l muted" style="font-size:11.5px">${isChanged(r) ? `<s>${esc([p.forecast, ...p.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</s>` : 'No change'}</td>
+      <td class="v ${r.revenueAtRisk ? 'neg' : ''}">${r.revenueAtRisk ? money(r.revenueAtRisk) : '—'}</td>
+      <td class="l">${statusHtml(r)}</td>
+      <td><button class="why-btn" data-why="${r.part.id}">Why?</button></td></tr>`;
+  }).join('');
+  return `<table class="grid">${head}<tbody>${body}</tbody></table>`;
+}
+
+// ───────────────────────── Explainability drawer ─────────────────────────
+let WHY_CTL = null;
+function closeWhy() { $('.drawer')?.remove(); $('.drawer-bg')?.remove(); WHY_CTL?.abort(); WHY_CTL = null; }
+
+function openWhy(partId, opts = {}) {
+  closeWhy(); closePop && closePop();
+  const comp = opts.comp || S.comp; const r = comp.byId[partId]; if (!r) return;
+  const p = lastRec(partId); const ch = isChanged(r);
+  const acts = actionsFor(r);
+  const lt = r.mkt && r.mkt.lt != null ? `${r.mkt.ltPrev}→${r.mkt.lt} wks` : 'n/a';
+  const bg = h(`<div class="drawer-bg"></div>`); bg.onclick = closeWhy;
+  const d = h(`<div class="drawer" role="dialog" aria-modal="true" aria-label="Why ${esc(r.part.mpn)}">
+    <header>
+      <div class="eyebrow">Explain recommendation${opts.comp ? ' · scenario' : ''}</div>
+      <h2>${esc(r.part.mpn)}</h2>
+      <div class="muted" style="font-size:13px">${esc(r.part.desc)} · ${esc(r.part.mfr)}</div>
+      <div class="chips">
+        <span class="chip">${esc(COMMODITIES[r.part.commodity].name)}</span>
+        <span class="chip ${CONSTRAINED(r.mktStatus) ? 'bad' : r.mktStatus === 'Surplus' ? 'good' : ''}">Market: ${esc(r.mktStatus || 'no coverage')}</span>
+        <span class="chip">Lead time ${lt}</span>
+        <span class="chip ${r.rrDrop >= 5 ? 'bad' : ''}">Resilience Rating ${r.part.rr}${r.rrDrop > 0 ? ' ▼' + r.rrDrop : ''}</span>
+        <span class="chip ${r.sole ? 'warn' : ''}">${r.sources === 1 ? 'Sole source' : r.sources + ' sources'}${r.part.crossesP2P ? ` · ${r.part.crossesP2P} cross${r.part.crossesP2P > 1 ? 'es' : ''}` : ''}</span>
+        <span class="chip">${esc(r.part.region)}</span>
+        <span class="chip ${r.ltb ? 'bad' : ''}">${r.ltb ? 'LTB · ' + esc(r.part.pcn.ltbDate) : 'Active'}</span>
+      </div>
+      <button class="x" aria-label="Close">✕</button>
+    </header>
+    <div class="scroll">
+      <div class="recbox">
+        <div><div class="lbl">Market-adjusted plan</div><div class="val">${r.forecast ? esc(r.forecast) : '<span class="muted">No recommendation</span>'}</div>
+          <div class="sub">${r.adjDir ? `${r.adjDir === 'pull' ? 'Pull' : 'Push'} ${fmt(r.adjQty)} units ${r.adjDir === 'pull' ? `into ${WEEKS[0].label}–${WEEKS[3].iso}` : `out to ${WEEKS[8].label}–${WEEKS[11].iso}`}` : r.forecast ? 'Market is stable; keep the statistical forecast' : 'No market intelligence for this classification'}</div>
+          ${ch ? `<div class="was">Last week: ${esc(p.forecast || '—')}</div>` : ''}</div>
+        <div><div class="lbl">Plan for Every Part</div><div class="val">${esc(r.policies.join(' + '))}</div>
+          <div class="sub">${r.revenueAtRisk ? `${money(r.revenueAtRisk)} revenue at risk from ${WEEKS[r.firstShortWeek].label}` : 'No shortage projected yet: pre-emptive'}</div>
+          ${ch ? `<div class="was">Last week: ${esc(p.policies.join(' + '))}</div>` : ''}</div>
+      </div>
+      <div class="why-sec"><h4>Agent reasoning <span class="chip agent" id="why-mode">…</span></h4><div class="agent-text thinking" id="why-ai">Reading the signals…</div><div class="agent-src" id="why-src"></div></div>
+      <div class="why-sec"><h4>Demand vs. supply · ${esc(r.part.mpn)}</h4><div class="chart">${whyChart(r)}</div>
+        <div class="hz-legend" style="margin-top:6px"><span><i style="background:var(--demand)"></i>Demand</span>${r.adjDir ? '<span><i style="background:repeating-linear-gradient(90deg,var(--rec) 0 4px,transparent 4px 7px)"></i>Market-adjusted</span>' : ''}<span><i style="background:var(--supply)"></i>Projected supply</span><span><i style="background:var(--rec)"></i>Shortage</span></div></div>
+      <div class="why-sec"><h4>Signals the agent combined</h4><div class="siglist">${r.signals.map(s => `<div class="sig ${s.tone}"><div class="kind">${esc(s.kind)}<span class="src">${esc(s.source)}</span></div><div><b>${esc(s.title)}</b>${s.isNew ? ' <span class="chip new" style="padding:1px 4px;border:0;background:none"></span>' : ''}<p>${esc(s.detail)}</p></div></div>`).join('')}</div></div>
+      <div class="why-sec"><h4>Decision logic · every policy the rules considered</h4>
+        <table class="rules"><tbody>${r.cands.slice().sort((a, b) => b.score - a.score).map(c => `<tr class="${r.policies.includes(c.policy) ? 'pick' : ''}"><td class="pn">${esc(c.policy)}${r.policies[0] === c.policy ? ' <span class="muted" style="font-weight:400;font-size:11px">primary</span>' : r.policies.includes(c.policy) ? ' <span class="muted" style="font-weight:400;font-size:11px">secondary</span>' : ''}<div class="bar"><i style="width:${Math.min(100, c.score)}%"></i></div></td><td class="el ${c.eligible ? 'y' : 'n'}">${c.eligible ? 'eligible · ' + c.score : 'not eligible'}</td><td class="rs">${esc(c.why)}</td></tr>`).join('')}</tbody></table>
+        <p class="muted" style="font-size:11.5px;margin:8px 0 0">Eligibility follows the Plan for Every Part rules. The score sets priority when several policies apply; the agent explains the trade-off.</p></div>
+      <div class="why-sec"><h4>If you accept, the agent will assign</h4><div class="routes">${acts.length ? acts.map(a => `<div class="route"><span class="av ${a.role}">${ROLES[a.role].initials}</span><div><b>${esc(a.title)}</b><div class="muted" style="font-size:12px">${esc(a.spec)}</div></div><div class="who">${esc(ROLES[a.role].person)}<br>${esc(ROLES[a.role].name)}</div></div>`).join('') : '<p class="muted" style="margin:0">No action needed. The part stays on MRP.</p>'}</div></div>
+    </div>
+    <footer>
+      ${opts.comp ? '<span class="muted" style="font-size:12px">Scenario view · recommendations are not applied to the live plan.</span>' :
+        S.accepted[partId] ? `<span class="status-accepted">Assigned · ${S.actions.filter(a => a.partId === partId && a.status !== 'Done').length} actions open</span><button class="btn" id="w-acts">Open actions</button>` :
+        acts.length ? `<button class="btn primary" id="w-acc">Accept and assign ${acts.length} action${acts.length > 1 ? 's' : ''}</button><button class="btn ghost" id="w-dis">Dismiss</button>` : ''}
+      <span style="flex:1"></span><button class="btn" id="w-ask">Ask the agent about this part</button>
+    </footer></div>`);
+  document.body.append(bg, d);
+  $('.x', d).onclick = closeWhy;
+  d.addEventListener('keydown', e => { if (e.key === 'Escape') closeWhy(); });
+  $('.x', d).focus();
+  if ($('#w-acc', d)) $('#w-acc', d).onclick = () => { const c = acceptRec(partId); closeWhy(); toast(`Assigned ${c.length} action${c.length > 1 ? 's' : ''} for ${r.part.mpn}`); renderView(S.view, {}); agentSay(`Assigned **${c.length} action${c.length > 1 ? 's' : ''}** for ${r.part.mpn}: ${c.map(a => `${a.title} → ${ROLES[a.role].person}`).join('; ')}. I'll reassess the part when they close.`, [{ label: 'Open actions', fn: () => setView('actions') }]); };
+  if ($('#w-dis', d)) $('#w-dis', d).onclick = () => { S.dismissed[partId] = true; closeWhy(); logActivity('you', `Dismissed recommendation for <b>${esc(r.part.mpn)}</b>.`); updateBadges(); S.dirty.plan = S.dirty.horizon = true; renderView(S.view, {}); };
+  if ($('#w-acts', d)) $('#w-acts', d).onclick = () => { closeWhy(); setView('actions'); };
+  $('#w-ask', d).onclick = () => { closeWhy(); setDock(true); chat(`What happens if we wait two weeks on ${r.part.mpn}?`); };
+  explainPart(r, $('#why-ai', d), $('#why-mode', d), $('#why-src', d));
+}
+
+function whyChart(r) {
+  const W = 600, H = 190, L = 44, R = 10, T = 12, B = 26;
+  const max = Math.max(...r.demand, ...r.adjDemand, ...r.supply) * 1.1;
+  const x = i => L + (i + 0.5) * (W - L - R) / NWEEKS, bw = (W - L - R) / NWEEKS * 0.56;
+  const y = v => T + (1 - v / max) * (H - T - B);
+  const path = arr => arr.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  const ticks = [0, max / 2, max].map(v => `<text class="ax" x="${L - 6}" y="${y(v) + 3}" text-anchor="end">${kfmt(v)}</text><line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`).join('');
+  const bars = r.supply.map((v, i) => `<rect x="${(x(i) - bw / 2).toFixed(1)}" y="${y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H - B - y(v)).toFixed(1)}" fill="rgba(76,207,178,.45)" rx="2"/>`).join('');
+  const shorts = r.short.map((s, i) => s > 0 ? `<rect x="${(x(i) - bw / 2).toFixed(1)}" y="${y(r.demand[i]).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(2, y(r.demand[i] - s) - y(r.demand[i])).toFixed(1)}" fill="var(--rec)" opacity=".85" rx="2"/>` : '').join('');
+  const lbl = WEEKS.map((w, i) => i % 2 === 0 ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="middle">${w.iso}</text>` : '').join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly demand and projected supply">${ticks}${bars}${shorts}<path d="${path(r.demand)}" fill="none" stroke="var(--demand)" stroke-width="2"/>${r.adjDir ? `<path d="${path(r.adjDemand)}" fill="none" stroke="var(--rec)" stroke-width="2" stroke-dasharray="5 4"/>` : ''}${lbl}</svg>`;
+}
+
+// ───────────────────────── AI layer ─────────────────────────
+// Live: Claude via the artifact `sample` capability (with page tools).
+// Offline / not granted: deterministic fallbacks so the demo never breaks.
+const AI = { sample: null, live: false, tools: false, state: 'connecting' };
+const PERMANENT = ['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed', 'session_expired'];
+
+async function initAI() {
+  try {
+    const s = window.claude && window.claude.use ? await window.claude.use('sample') : null;
+    if (s) { AI.sample = s; AI.live = true; const lim = await s.limits().catch(() => null); AI.tools = !!(lim && lim.tools); }
+  } catch (e) { /* stay in demo mode */ }
+  setAgentState(AI.live ? 'live' : 'demo');
+}
+function setAgentState(st) {
+  AI.state = st; const dot = $('#agent-dot'), lab = $('#agent-state');
+  dot.className = 'dot ' + (st === 'live' ? 'live' : st === 'demo' ? 'demo' : '');
+  lab.textContent = st === 'live' ? 'Agent live · Claude' : st === 'demo' ? 'Agent · demo mode' : 'Connecting agent…';
+  $('#agent-pill').title = st === 'live' ? 'Recommendations are explained live by Claude. Click to show or hide the agent.' : 'Claude is not available in this view, so the agent uses scripted explanations built from the same data.';
+}
+async function aiCall(input, opts = {}) {
+  if (!AI.live || !AI.sample) throw { code: 'offline' };
+  try {
+    const o = { modelTier: opts.tier || 'quick' };
+    if (opts.onText) o.onText = opts.onText;
+    if (opts.signal) o.signal = opts.signal;
+    if (opts.tools) o.tools = opts.tools; else if (opts.cache === false) o.cache = false;
+    return opts.json ? await AI.sample.json(input, o) : (await AI.sample(input, o)).text;
+  } catch (e) {
+    if (e && PERMANENT.includes(e.code)) { AI.live = false; setAgentState('demo'); }
+    throw e;
+  }
+}
+async function typeInto(el, text, signal) {
+  el.classList.remove('thinking');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) { el.textContent = text; return; }
+  for (let i = 0; i <= text.length; i += 4) { if (signal && signal.aborted) return; el.textContent = text.slice(0, i); await sleep(12); }
+  el.textContent = text;
+}
+
+// ── Facts handed to Claude (never lets it invent numbers)
+function partFacts(r) {
+  const p = lastRec(r.part.id);
+  return {
+    part: r.part.mpn, manufacturer: r.part.mfr, description: r.part.desc, commodity: COMMODITIES[r.part.commodity].name, region: r.part.region,
+    qty_per_board: r.part.qtyPer, approved_sources: r.sources, pin_to_pin_crosses: r.part.crossesP2P, best_cross: r.part.bestCross, lifecycle: r.part.lifecycle, pcn: r.part.pcn,
+    resilience_rating: { now: r.part.rr, last_week: r.part.rrPrev },
+    market: r.mkt && r.mkt.status ? { status: r.mkt.status, last_week: r.mkt.prev, lead_time_weeks: r.mkt.lt, lead_time_last_week: r.mkt.ltPrev, price_change_pct: r.mkt.price, note: r.mkt.note } : 'no coverage',
+    events: r.hits.map(e => ({ title: e.title, weeks: wkRange(e.from, e.from + e.weeks - 1), supply_impact_pct: Math.round(e.impact * 100) })),
+    inventory_risk: r.invRisk, units_short_16wks: r.shortUnits, first_short_week: r.firstShortWeek >= 0 ? WEEKS[r.firstShortWeek].label : null, revenue_at_risk_usd: Math.round(r.revenueAtRisk),
+    recommendation: { forecast: r.forecast || 'none (no market data)', forecast_adjustment_units: r.adjDir ? `${r.adjDir} ${r.adjQty}` : null, policy: r.policies },
+    last_week_recommendation: { forecast: p.forecast, policy: p.policies },
+    policies_considered: r.cands.map(c => ({ policy: c.policy, eligible: c.eligible, score: c.score, reason: c.why })),
+  };
+}
+function portfolioFacts(comp = S.comp, ai = S.ai) {
+  const c = comp.ctb, a = ai.ctb; const pct = x => Math.round(x.built.reduce((s, v) => s + v, 0) / x.plan.reduce((s, v) => s + v, 0) * 100);
+  return {
+    product: PRODUCT.name, board_asp_usd: PRODUCT.asp, parts: comp.results.length, horizon: `${WEEKS[0].label} (${WEEKS[0].date}) to ${WEEKS[NWEEKS - 1].label}`,
+    revenue_at_risk_usd: Math.round(c.revenueAtRisk), revenue_at_risk_with_ai_plan_usd: Math.round(a.revenueAtRisk), clear_to_build_pct: pct(c), clear_to_build_with_ai_plan_pct: pct(a),
+    recommendations_changed_this_week: comp.results.filter(isChanged).length, awaiting_decision: pendingChanged().length, open_actions: S.actions.filter(x => x.status !== 'Done').length,
+    top_risks: comp.results.filter(r => r.revenueAtRisk > 0).sort((x, y) => y.revenueAtRisk - x.revenueAtRisk).slice(0, 6).map(r => ({ part: r.part.mpn, commodity: COMMODITIES[r.part.commodity].name, revenue_at_risk_usd: Math.round(r.revenueAtRisk), first_short: WEEKS[r.firstShortWeek].label, recommendation: [r.forecast, ...r.policies].filter(Boolean) })),
+    market: Object.values(comp.world.commodities).filter(m => m.status).map(m => `${m.name}: ${m.status}${m.prev !== m.status ? ` (was ${m.prev})` : ''}, LT ${m.lt} wks, price ${m.price > 0 ? '+' : ''}${m.price}%`),
+    events: comp.world.events.map(e => `${e.title} (${e.region || COMMODITIES[e.commodity]?.name}, ${WEEKS[e.from].label}, ${e.weeks} wks, ${Math.round(e.impact * 100)}% impact)`),
+  };
+}
+
+// ── Explain a recommendation
+async function explainPart(r, el, modeEl, srcEl) {
+  WHY_CTL = new AbortController(); const sig = WHY_CTL.signal;
+  const fallback = whyFallback(r);
+  if (AI.live) {
+    modeEl.textContent = 'Claude'; srcEl.textContent = 'Written live by Claude from the facts on this page.';
+    const prompt = `You are the planning agent in a supply-planning app for an electronics OEM. Explain this part's recommendation to a C-level executive.
+Write exactly three short paragraphs, 110 words in total, plain text with no headings, bullets or markdown:
+1) What changed in the signals (market, events, lifecycle, crosses, Resilience Rating) and why a traditional demand/supply check would or would not catch it.
+2) Why the recommended forecast adjustment and policy beat the alternatives considered (use the scores and reasons given).
+3) The cost of waiting and what accepting sets in motion.
+Use only these facts; do not invent numbers.
+
+FACTS:
+${JSON.stringify(partFacts(r))}`;
+    try {
+      el.textContent = 'Thinking…';
+      await aiCall(prompt, { signal: sig, onText: ({ text }) => { el.classList.remove('thinking'); el.textContent = text; } });
+      return;
+    } catch (e) {
+      if (e && e.code === 'cancelled') return;
+      srcEl.textContent = 'Claude was unavailable, so this explanation was assembled from the rule trace.';
+    }
+  } else srcEl.textContent = 'Demo mode: explanation assembled from the rule trace. With Claude connected, this is written live.';
+  modeEl.textContent = AI.live ? 'Claude' : 'Scripted';
+  typeInto(el, fallback, sig);
+}
+function whyFallback(r) {
+  const m = r.mkt; const parts = [];
+  const sigs = [];
+  if (m && m.status && m.status !== m.prev) sigs.push(`the ${m.name.split(' · ')[1] || m.name} market moved from ${m.prev.toLowerCase()} to ${m.status.toLowerCase()} (lead time ${m.ltPrev}→${m.lt} weeks, price ${m.price > 0 ? '+' : ''}${m.price}%)`);
+  else if (m && m.status) sigs.push(`the ${m.name.split(' · ')[1] || m.name} market is ${m.status.toLowerCase()}`);
+  for (const e of r.hits) sigs.push(`${e.title} cuts supply about ${Math.round(e.impact * 100)}% in ${wkRange(e.from, e.from + e.weeks - 1)}`);
+  if (r.part.pcn) sigs.push(`${r.part.pcn.id} moves the part to last-time buy by ${r.part.pcn.ltbDate}`);
+  if (r.part.crossNew) sigs.push(`a new pin-to-pin cross, ${r.part.bestCross.mpn} from ${r.part.bestCross.mfr}, just became available`);
+  if (r.rrDrop >= 5) sigs.push(`the Resilience Rating fell ${r.rrDrop} points to ${r.part.rr}`);
+  parts.push(`${cap(sigs.join('; ') || 'signals are stable')}. ${r.shortUnits > 0 ? `The plan now shows ${fmt(r.shortUnits)} units short starting ${WEEKS[r.firstShortWeek].label}.` : `A traditional demand/supply check still shows no gap, because supply commitments cover demand today. The signals say that cover is fragile.`}`);
+  const top = r.ranked[0], alt = r.ranked.find(c => !r.policies.includes(c.policy));
+  parts.push(`${r.forecast && r.forecast.startsWith('Adjust') ? `I recommend ${r.forecast.toLowerCase().replace('adjust forecast', 'adjusting the forecast')}: ${r.adjDir === 'pull' ? 'pulling' : 'pushing'} ${fmt(r.adjQty)} units so orders reflect the market rather than history. ` : ''}${r.policies.join(' plus ')} ranks highest (${top.score}) because ${top.why.charAt(0).toLowerCase() + top.why.slice(1)}.${alt ? ` ${alt.policy} was considered (${alt.score}) but ${alt.policy === 'MRP' ? 'conditions are not normal' : 'addresses less of the exposure'}.` : ''}`);
+  parts.push(r.revenueAtRisk > 0 ? `Waiting leaves ${money(r.revenueAtRisk)} of ${PRODUCT.name} revenue exposed. Accepting routes ${actionsFor(r).length} actions to the owning teams, and I will reassess the part as they close.` : `Acting now is cheap insurance: no revenue is at risk yet, but lead times move faster than the plan. Accepting routes ${actionsFor(r).length} action${actionsFor(r).length === 1 ? '' : 's'} to the owning teams.`);
+  return parts.join('\n\n');
+}
+
+// ── Morning briefing (built from data, so it always matches the page)
+async function briefing() {
+  const c = S.comp.ctb, a = S.ai.ctb; const pct = x => Math.round(x.built.reduce((s, v) => s + v, 0) / x.plan.reduce((s, v) => s + v, 0) * 100);
+  const pend = pendingChanged();
+  const risky = S.comp.results.filter(r => r.revenueAtRisk > 0).sort((x, y) => y.revenueAtRisk - x.revenueAtRisk);
+  const byC = {}; for (const r of risky) (byC[r.part.commodity] = byC[r.part.commodity] || []).push(r);
+  const topC = Object.entries(byC).sort((x, y) => y[1].reduce((s, r) => s + r.revenueAtRisk, 0) - x[1].reduce((s, r) => s + r.revenueAtRisk, 0))[0];
+  const gan = topC[1]; const ganSum = gan.reduce((s, r) => s + r.revenueAtRisk, 0);
+  const hero = S.comp.results.find(r => r.part.mpn === 'KPC0402X7R104K');
+  const mlccN = S.comp.results.filter(r => r.part.commodity === 'mlcc' && r.adjDir === 'pull').length;
+  const js = risky.find(r => r.hits.some(e => e.id === 'ev3'));
+  const ev3 = EVENTS.find(e => e.id === 'ev3');
+  const md = `**Today's run is done.** I checked all ${S.comp.results.length} parts on the ${PRODUCT.name} BOM against 16 market classifications, ${S.world.events.length} active events and this week's PCNs. **${pend.length} recommendations changed.** Three need your attention:
+
+1. **${COMMODITIES[topC[0]].name.split(' · ')[1]} is the biggest exposure.** Gallium licensing is squeezing supply, and ${gan.map(r => r.part.mpn).join(' and ')} go short from ${WEEKS[Math.min(...gan.map(r => r.firstShortWeek))].label}: **${money(ganSum)}** of revenue at risk. I recommend buffer builds now and moving ${gan.find(r => r.part.crossNew)?.part.mpn || gan[0].part.mpn} to its new pin-to-pin cross.
+2. **MLCC flipped to constrained.** Your plan shows no gap yet, but lead times jumped ${hero.mkt.ltPrev}→${hero.mkt.lt} weeks. I would pull demand forward on ${mlccN} MLCC parts and multi-source ${hero.part.mpn} to ${hero.part.bestCross.mpn}.
+3. **Jiangsu power rationing** hits ${js ? js.part.mpn : 'DDR4 memory'} in ${WEEKS[ev3.from].label}–${WEEKS[ev3.from + ev3.weeks - 1].iso}${js ? ` (${money(js.revenueAtRisk)} at risk)` : ''}.
+
+If you accept all ${pend.length}, clear-to-build goes from **${pct(c)}% to ${pct(a)}%** and revenue at risk falls from **${money(c.revenueAtRisk)} to ${money(a.revenueAtRisk)}**.`;
+  await sleep(700);
+  await agentType(md, [
+    { label: `Review the ${pend.length} changes`, fn: () => { S.plan.changedOnly = true; S.plan.ids = null; setView('plan'); } },
+    { label: 'Walk me through the MLCC case', fn: () => chat('Walk me through the MLCC case') },
+    { label: `Accept all and assign`, primary: true, fn: () => { const res = acceptAll(); toast(`Created ${res.actions} actions across ${res.parts} parts`); agentSay(`Done. **${res.actions} actions** are routed across four teams. I'll reassess each part as its actions close.`, [{ label: 'Open actions', fn: () => setView('actions') }]); } },
+  ], 7);
+}
+
+// ── Conversational agent
+const CHAT = { turns: [], busy: false };
+function agentTools() {
+  return [
+    { name: 'get_portfolio_summary', description: 'Returns KPIs (revenue at risk, clear-to-build, with and without the AI plan), top risks, market status by commodity and active events.', execute: () => { toolLine('<b>get_portfolio_summary</b>'); return portfolioFacts(); } },
+    { name: 'find_parts', description: 'Lists parts matching filters with their current recommendation, inventory risk and revenue at risk. Commodity keys: ' + Object.keys(COMMODITIES).join(', ') + '.', inputSchema: { type: 'object', properties: { commodity: { type: 'string' }, policy: { type: 'string', description: 'e.g. Multi-source, Buffer, Strategic buy, Long Term Supply Agreement, Life-time buy, MRP' }, region: { type: 'string' }, changed_only: { type: 'boolean' }, at_risk_only: { type: 'boolean' }, sole_source_only: { type: 'boolean' } } },
+      execute: (i) => { toolLine(`<b>find_parts</b> ${esc(JSON.stringify(i))}`); return findParts(i); } },
+    { name: 'get_part', description: 'Full facts for one part: signals, market, events, Resilience Rating, recommendation, policies considered with scores.', inputSchema: { type: 'object', properties: { mpn: { type: 'string' } }, required: ['mpn'] },
+      execute: (i) => { toolLine(`<b>get_part</b> ${esc(i.mpn)}`); const p = findPart(i.mpn); if (!p) throw new Error('Unknown part ' + i.mpn); return partFacts(S.comp.byId[p.id]); } },
+    { name: 'get_actions', description: 'Lists orchestrated actions with owner role, person, status and part.', execute: () => { toolLine('<b>get_actions</b>'); return S.actions.map(a => ({ part: a.mpn, action: a.title, owner: ROLES[a.role].name, person: ROLES[a.role].person, status: a.status, due: a.due })); } },
+    { name: 'run_scenario', description: 'Runs a what-if against the plan, shows it on the Scenarios screen and returns baseline vs scenario KPIs and parts whose recommendation changes. Use supply_impact_pct 0-90. Regions: ' + [...new Set(S.world.parts.map(p => p.region))].join(', ') + '.', inputSchema: { type: 'object', properties: { label: { type: 'string' }, demand_pct: { type: 'number' }, commodity: { type: 'string' }, lead_time_delta_weeks: { type: 'number' }, supply_impact_pct: { type: 'number' }, from_week_index: { type: 'number', description: '0 = this week' }, duration_weeks: { type: 'number' }, region: { type: 'string' }, region_impact_pct: { type: 'number' }, crosses_qualified: { type: 'boolean' } } },
+      execute: (i) => { toolLine(`<b>run_scenario</b> ${esc(i.label || '')}`); const prm = scenarioFromTool(i); runScenario(prm); setView('scenarios'); return scenarioSummary(); } },
+    { name: 'open_view', description: 'Navigates the app. view: horizon | plan | actions | scenarios | workflows. With mpn, opens the explanation drawer for that part.', inputSchema: { type: 'object', properties: { view: { type: 'string' }, mpn: { type: 'string' } } },
+      execute: (i) => { toolLine(`<b>open_view</b> ${esc(i.view || '')} ${esc(i.mpn || '')}`); if (i.view) setView(i.view); if (i.mpn) { const p = findPart(i.mpn); if (p) openWhy(p.id); } return 'ok'; } },
+    { name: 'draft_workflow', description: 'Turns a monitoring/automation instruction into a reviewable agent workflow on the Agent workflows screen.', inputSchema: { type: 'object', properties: { instruction: { type: 'string' } }, required: ['instruction'] },
+      execute: async (i) => { toolLine('<b>draft_workflow</b>'); setView('workflows'); const spec = await draftWorkflow(String(i.instruction)); return { name: spec.name, triggers: spec.triggers.map(t => t.label), scope: spec.scope.label }; } },
+    { name: 'accept_recommendations', description: 'Accepts recommendations and creates routed actions. Only call when the user explicitly asks to accept or assign. Pass mpns, or all_changed=true.', inputSchema: { type: 'object', properties: { mpns: { type: 'array', items: { type: 'string' } }, all_changed: { type: 'boolean' } } },
+      execute: (i) => { toolLine('<b>accept_recommendations</b>'); if (i.all_changed) return acceptAll(); let n = 0; for (const m of i.mpns || []) { const p = findPart(m); if (p) n += acceptRec(p.id).length; } renderView(S.view, {}); return { actions_created: n }; } },
+  ];
+}
+function findParts(i = {}) {
+  const pol = (i.policy || '').toLowerCase();
+  return S.comp.results.filter(r => (!i.commodity || r.part.commodity === i.commodity || COMMODITIES[r.part.commodity].name.toLowerCase().includes(String(i.commodity).toLowerCase()))
+    && (!pol || r.policies.some(p => p.toLowerCase().includes(pol)) || (r.forecast || '').toLowerCase().includes(pol))
+    && (!i.region || r.part.region.toLowerCase().includes(String(i.region).toLowerCase()))
+    && (!i.changed_only || isChanged(r)) && (!i.at_risk_only || r.revenueAtRisk > 0) && (!i.sole_source_only || r.sources === 1))
+    .sort((a, b) => priority(b) - priority(a)).slice(0, 15)
+    .map(r => ({ part: r.part.mpn, commodity: COMMODITIES[r.part.commodity].name, market: r.mktStatus, region: r.part.region, sources: r.sources, rr: r.part.rr, inventory_risk: r.invRisk, revenue_at_risk_usd: Math.round(r.revenueAtRisk), recommendation: [r.forecast, ...r.policies].filter(Boolean), changed: isChanged(r), status: S.accepted[r.part.id] ? 'assigned' : 'open' }));
+}
+
+async function chat(text) {
+  if (CHAT.busy) return; CHAT.busy = true;
+  setDock(true); userSay(text);
+  const el = agentMsg(); CHAT.pending = el; const body = $('.body', el); body.innerHTML = '<p class="muted"><em>Thinking…</em></p>';
+  CHAT.turns.push({ role: 'user', content: text });
+  try {
+    let reply;
+    if (AI.live) {
+      try { reply = await liveChat(body); }
+      catch (e) { if (e && e.code === 'cancelled') throw e; reply = null; }
+    }
+    if (!reply) reply = await fallbackChat(text, body);
+    body.innerHTML = mdToHtml(reply);
+    CHAT.turns.push({ role: 'assistant', content: reply });
+  } catch (e) { body.innerHTML = '<p class="muted">Stopped.</p>'; }
+  CHAT.pending = null; scrollFeed(); CHAT.busy = false;
+}
+async function liveChat(body) {
+  const rules = `You are the Planning Agent inside "Intelligent Planning", an AI-first supply-planning app for an electronics OEM building ${PRODUCT.name} (48-part BOM, weekly plan ${WEEKS[0].label}–${WEEKS[NWEEKS - 1].label}). You combine demand/supply plans with market intelligence, Resilience Rating, lifecycle PCNs, geopolitical events and cross references to recommend a market-adjusted forecast and a Plan-for-Every-Part policy per part, then route actions to owners (Design Engineer, Supply Chain Manager, Procurement/Buyer, Demand Planner) and reassess.
+The user is a C-level executive. Answer in at most 120 words of plain prose; short numbered lists and **bold** are fine; no headings. Never invent numbers: use tools for facts. When the user wants to see something, call open_view. For what-ifs, call run_scenario. For monitoring or automation requests, call draft_workflow. Only call accept_recommendations if the user explicitly asks to accept or assign.
+Current portfolio: ${JSON.stringify(portfolioFacts())}`;
+  const turns = [{ role: 'user', content: rules }, ...CHAT.turns.slice(-8)];
+  const opts = { tier: 'quick', onText: ({ text }) => { body.innerHTML = mdToHtml(text); scrollFeed(); } };
+  if (AI.tools) opts.tools = agentTools(); else opts.cache = false;
+  const text = await aiCall(turns, opts);
+  return text.replace(/\n{3,}/g, '\n\n').trim();
+}
+
+// Scripted agent for demo mode: same tools, deterministic answers
+async function fallbackChat(text, body) {
+  const t = text.toLowerCase(); await sleep(500);
+  if (/what if|what-if|scenario|lasts|extend|suppose|imagine|\bif\b.*(demand|port|constraint|closure)/.test(t)) {
+    toolLine('<b>run_scenario</b> ' + esc(text));
+    const prm = parseScenarioFallback(text); runScenario(prm); setView('scenarios');
+    return scenarioNarrativeFallback();
+  }
+  if (/every (morning|day|week)|daily|weekly|monitor|watch|alert me|notify|workflow|automat/.test(t)) {
+    toolLine('<b>draft_workflow</b>'); setView('workflows'); const spec = await draftWorkflow(text);
+    return `I drafted **${spec.name}**: ${spec.triggers.map(x => x.label.toLowerCase()).join(', ')}, scoped to ${spec.scope.label.toLowerCase()}. Review the triggers and routing on the right, then activate it or run it once now.`;
+  }
+  if (/mlcc|walk me through|kpc0402/.test(t)) {
+    const r = S.comp.results.find(x => x.part.mpn === 'KPC0402X7R104K'); toolLine('<b>get_part</b> KPC0402X7R104K'); openWhy(r.part.id);
+    return `This is the case a traditional plan misses. **${r.part.mpn}** shows supply matching demand every week, so MRP sees nothing. But the MLCC market went from stable to constrained, lead times jumped ${r.mkt.ltPrev}→${r.mkt.lt} weeks, and it's sole-sourced at ${r.part.qtyPer} per board.\n\nA pin-to-pin cross, **${r.part.bestCross.mpn}**, became available this week. So I recommend pulling ${fmt(r.adjQty)} units forward and qualifying the cross with a 60/40 quota, plus a buffer build while engineering validates it.`;
+  }
+  if (/engineer|waiting|actions|who|owner|assigned/.test(t)) {
+    toolLine('<b>get_actions</b>'); setView('actions');
+    const open = S.actions.filter(a => a.status !== 'Done'); const by = {};
+    for (const a of open) (by[a.role] = by[a.role] || []).push(a);
+    if (!open.length) return 'Nothing is open right now. Accept recommendations on the Plan screen and I will route them.';
+    return `There are **${open.length} open actions**.\n${Object.entries(by).map(([k, v]) => `- **${ROLES[k].person}** (${ROLES[k].name}): ${v.length}, e.g. ${v[0].title.toLowerCase()} for ${v[0].mpn}`).join('\n')}\n\n${by.de ? `Engineering is the long pole: cross validation gates the multi-source moves.` : ''}`;
+  }
+  const mentioned = S.world.parts.find(p => t.includes(p.mpn.toLowerCase()));
+  if (mentioned) {
+    const r = S.comp.byId[mentioned.id]; toolLine('<b>get_part</b> ' + esc(mentioned.mpn)); openWhy(mentioned.id);
+    return `${mentioned.mpn}: **${[r.forecast, ...r.policies].filter(Boolean).join(' · ')}**. ${r.revenueAtRisk ? `Waiting two weeks keeps ${money(r.revenueAtRisk)} exposed; the first shortage is ${WEEKS[r.firstShortWeek].label}, and every week of delay pushes recovery past the ${r.mkt?.lt || 'current'}-week lead time.` : `Nothing is short yet, so a two-week wait costs little today. The risk is lead time: at ${r.mkt?.lt || '—'} weeks, orders placed later land after the market tightens further.`} The full reasoning is open on the right.`;
+  }
+  if (/gan|gallium|biggest|exposure|risk/.test(t)) {
+    toolLine('<b>find_parts</b> {"at_risk_only":true}');
+    const rs = S.comp.results.filter(r => r.revenueAtRisk > 0).sort((a, b) => b.revenueAtRisk - a.revenueAtRisk);
+    if (!rs.length) return `No part has revenue at risk right now: every projected shortage has a mitigation in place. I'll keep watching the market and event feeds and flag anything that reopens a gap.`;
+    const byC = {}; for (const r of rs) (byC[r.part.commodity] = byC[r.part.commodity] || []).push(r);
+    const want = /gan|gallium/.test(t) && byC.gan ? 'gan' : Object.keys(byC).sort((x, y) => byC[y].reduce((s, r) => s + r.revenueAtRisk, 0) - byC[x].reduce((s, r) => s + r.revenueAtRisk, 0))[0];
+    const g = byC[want]; const name = COMMODITIES[want].name.split(' · ')[1] || COMMODITIES[want].name;
+    const drivers = [...new Set(g.flatMap(r => [r.mkt && CONSTRAINED(r.mkt.status) ? `the ${name} market is ${r.mkt.status.toLowerCase()} (lead time ${r.mkt.lt} wks)` : null, ...r.hits.map(e => e.title.charAt(0).toLowerCase() + e.title.slice(1)), r.sole ? 'sole sourcing' : null, r.rrDrop >= 5 ? `Resilience Rating down ${r.rrDrop} on ${r.part.mpn}` : null]).filter(Boolean))].slice(0, 3);
+    S.hz.scope = g[0].part.id; setView('horizon');
+    return `**${name} is ${money(g.reduce((s, r) => s + r.revenueAtRisk, 0))} of the ${money(rs.reduce((s, r) => s + r.revenueAtRisk, 0))} at risk.** The signals that stack up: ${drivers.join('; ')}.\n\n${g.map(r => `- **${r.part.mpn}**: short from ${WEEKS[r.firstShortWeek].label}; recommend ${r.policies.join(' + ')}`).join('\n')}\n\nI've put ${g[0].part.mpn} on the Horizon so you can see where the gap opens.`;
+  }
+  if (/change|what's new|what is new|summary|brief/.test(t)) {
+    const ch = changedResults(); const by = {}; for (const r of ch) for (const p of r.policies) by[p] = (by[p] || 0) + 1;
+    return `**${ch.length} recommendations changed** this week: ${Object.entries(by).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${v} ${shortPolicy(k)}`).join(', ')}. Most are driven by the MLCC, DRAM and GaN markets tightening and by two geopolitical events.`;
+  }
+  toolLine('<b>get_portfolio_summary</b>');
+  const f = portfolioFacts();
+  return `Across ${f.parts} parts, **${money(f.revenue_at_risk_usd)}** of revenue is at risk over 16 weeks (clear-to-build ${f.clear_to_build_pct}%). With the recommended plan it drops to ${money(f.revenue_at_risk_with_ai_plan_usd)}. ${f.awaiting_decision} changes await your decision. Try asking about a part, a what-if, or a standing instruction like “every morning, check my sole-source parts”.`;
+}
+
+// ───────────────────────── Actions: orchestration + reassess ─────────────────────────
+const NEXT_LABEL = { 'Assigned': 'Start review', 'In review': 'Approve', 'Approved': 'Mark done' };
+
+VIEWS.actions = function () {
+  const el = $('#v-actions');
+  const open = S.actions.filter(a => a.status !== 'Done');
+  const inRev = S.actions.filter(a => a.status === 'In review' || a.status === 'Approved').length;
+  const done = S.actions.filter(a => a.status === 'Done').length;
+  const protectedRev = Math.max(0, S.startRisk - S.comp.ctb.revenueAtRisk);
+  const lanes = Object.entries(ROLES).map(([k, r]) => {
+    const list = S.actions.filter(a => a.role === k).sort((a, b) => FLOW.indexOf(a.status) - FLOW.indexOf(b.status) || (a.status === 'Done' ? 0 : 0));
+    const live = list.filter(a => a.status !== 'Done'), fin = list.filter(a => a.status === 'Done');
+    return `<div class="lane"><div class="lane-h"><span class="av ${k}">${r.initials}</span><div><b>${esc(r.name)}</b><small>${esc(r.person)}</small></div><span class="cnt">${live.length} open</span></div>
+      ${live.length ? live.map(actCard).join('') : '<div class="empty">Nothing waiting.</div>'}
+      ${fin.length ? `<details><summary class="muted" style="font-size:12px;cursor:pointer">${fin.length} completed</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${fin.map(actCard).join('')}</div></details>` : ''}</div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="eyebrow">Assign · Act · Reassess</div><h2 class="section-title" style="font-size:24px;margin-top:6px">Action orchestration</h2>
+    <p class="lede">Accepted recommendations become actions routed to the owning role. When every action on a part closes, the agent re-runs the part against current signals and updates its plan.</p>
+    <div class="kpis" style="margin-top:16px">
+      <div class="card kpi"><div class="eyebrow">Open actions</div><div class="v">${open.length}</div><div class="s">${inRev} in review or approved</div></div>
+      <div class="card kpi"><div class="eyebrow">Completed</div><div class="v">${done}</div><div class="s">${Object.keys(S.resolved).length} parts reassessed</div></div>
+      <div class="card kpi"><div class="eyebrow">Revenue protected</div><div class="v" style="color:var(--good)">${money(protectedRev)}</div><div class="s">of ${money(S.startRisk)} at risk at the start of the run</div></div>
+      <div class="card kpi"><div class="eyebrow">Awaiting your decision</div><div class="v">${pendingChanged().length}</div><div class="s"><button class="why-btn" id="ac-plan">Review in Plan ›</button></div></div>
+    </div>
+    <div class="toolbar"><span class="muted" style="font-size:12.5px">Prototype control: owners' progress is simulated.</span><span class="grow"></span>
+      <button class="btn" id="ac-step" ${open.length ? '' : 'disabled'}>Simulate one day of team progress</button></div>
+    <div class="lanes">${lanes}</div>
+    <div class="twocol" style="margin-top:20px">
+      <div class="card" style="padding:16px"><div class="why-sec"><h4>Activity</h4></div><div class="feed">${S.activity.slice(0, 30).map(e => `<div class="ev ${e.cls}"><time>${e.t}</time><span class="av ${e.who === 'ai' ? 'ai' : e.who === 'you' ? 'dp' : e.who}">${e.who === 'ai' ? '✦' : e.who === 'you' ? 'You' : ROLES[e.who]?.initials || '·'}</span><p>${e.html}</p></div>`).join('')}</div></div>
+      <div class="card" style="padding:16px"><div class="why-sec"><h4>Routing rules</h4></div>
+        <p class="muted" style="font-size:12.5px;margin:0 0 8px">Default owner for each recommendation. Changes apply to new actions. Customers can add approval thresholds per role.</p>
+        <table class="routing-table"><tbody>${Object.entries(S.routing).map(([pol, [role, title]]) => `<tr><td><b style="font-size:12.5px">${esc(pol)}</b><div class="muted" style="font-size:11.5px">${esc(title)}</div></td><td style="width:48%"><select class="field" data-pol="${esc(pol)}" aria-label="Owner for ${esc(pol)}">${Object.entries(ROLES).map(([k, r]) => `<option value="${k}" ${k === role ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
+    </div>`;
+  $$('[data-adv]', el).forEach(b => b.onclick = () => advanceAction(b.dataset.adv));
+  $$('[data-why]', el).forEach(b => b.onclick = () => openWhy(b.dataset.why));
+  $$('select[data-pol]', el).forEach(s => s.onchange = () => { S.routing[s.dataset.pol][0] = s.value; logActivity('you', `Routing changed: <b>${esc(s.dataset.pol)}</b> → ${esc(ROLES[s.value].name)}.`); toast('Routing rule updated'); });
+  $('#ac-plan').onclick = () => setView('plan');
+  $('#ac-step').onclick = () => {
+    const live = S.actions.filter(a => a.status !== 'Done');
+    // advance a handful, oldest first, so reassessments happen visibly
+    const byPart = {}; for (const a of live) (byPart[a.partId] = byPart[a.partId] || []).push(a);
+    const picks = Object.values(byPart).slice(0, 4).flat();
+    for (const a of picks) advanceAction(a.id);
+    S.actions.forEach(a => a.fresh = false);
+  };
+  S.actions.forEach(a => a.fresh = false);
+};
+function actCard(a) {
+  return `<div class="act ${a.fresh ? 'fresh' : ''}"><div class="t">${esc(a.title)}</div>
+    <div><button class="why-btn mono" data-why="${a.partId}" style="font-family:var(--mono)">${esc(a.mpn)}</button> <span class="chip rec" style="margin-left:4px">${esc(shortPolicy(a.policy.replace('Adjust forecast (pull)', 'Pull forecast').replace('Adjust forecast (push)', 'Push forecast')))}</span></div>
+    <div class="muted" style="font-size:12px">${esc(a.spec)}</div>
+    <div class="meta"><span class="st ${a.status.replace(' ', '-')}">${esc(a.status)}</span><span>Due ${esc(a.due)}${a.createdBy === 'Workflow' ? ' · by workflow' : ''}</span>
+    ${a.status !== 'Done' ? `<button class="btn sm" data-adv="${a.id}">${NEXT_LABEL[a.status]} ›</button>` : ''}</div></div>`;
+}
+
+// ───────────────────────── Agent workflows: conversational configuration ─────────────────────────
+const WF = { text: 'Every morning, analyze my critical parts. Identify parts where projected supply will not meet demand or where resilience has materially deteriorated. Recommend mitigation actions and assign them to the appropriate teams.', draft: null, selected: null, busy: false, run: null, source: '' };
+const STAGES = [['sense', 'SENSE'], ['analyze', 'ANALYZE'], ['recommend', 'RECOMMEND'], ['assign', 'ASSIGN'], ['act', 'ACT'], ['reassess', 'REASSESS']];
+const TRIG_LABEL = { time: 'Time-based', gap: 'Demand / supply', event: 'Event-based', market: 'Market signal' };
+
+function seedWorkflows() {
+  S.workflows = [
+    { id: 'wf1', status: 'Active', next: 'Tomorrow 22:00', last: 'Today · 20 changes, 1 new PCN', spec: fallbackSpec('Every night, refresh the plan for all parts, re-score recommendations against market intelligence, events and PCNs, and brief me on what changed.', 'Nightly plan refresh') },
+    { id: 'wf2', status: 'Active', next: 'Mon 07:00', last: 'Last Mon · 1 LTB routed', spec: fallbackSpec('Every Monday, check for PCN and lifecycle changes on any part. When a part moves to LTB, recommend a life-time buy and assign it to the supply chain manager, and ask design engineering to validate crosses.', 'Weekly PCN & lifecycle watch') },
+  ];
+  WF.selected = 'wf1';
+}
+
+VIEWS.workflows = function () {
+  const el = $('#v-workflows');
+  const shown = WF.draft ? { spec: WF.draft, status: 'Draft' } : S.workflows.find(w => w.id === WF.selected) || S.workflows[0];
+  el.innerHTML = `
+    <div class="eyebrow">Automate</div><h2 class="section-title" style="font-size:24px;margin-top:6px">Agent workflows</h2>
+    <p class="lede">Describe what the agent should watch and do, in plain language. It turns your intent into triggers, conditions, routing and approvals that you review before activating.</p>
+    <div class="wf-grid" style="margin-top:18px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card composer">
+          <label class="eyebrow" for="wf-text">Tell the agent what to do</label>
+          <textarea id="wf-text">${esc(WF.text)}</textarea>
+          <div style="display:flex;gap:8px;align-items:center"><button class="btn primary" id="wf-build" ${WF.busy ? 'disabled' : ''}>${WF.busy ? 'Building…' : 'Build workflow'}</button><span class="muted" style="font-size:12px">${AI.live ? 'Claude drafts the configuration' : 'Demo mode: scripted parser'}</span></div>
+          <div class="eyebrow" style="margin-top:4px">Or start from</div>
+          <div class="examples">
+            <button data-ex="When a geopolitical event hits a region where any sole-source part is made, assess the impact within the hour and alert the supply chain manager.">Event-based · sole-source exposure</button>
+            <button data-ex="Alert me when open-market availability drops or prices rise more than 10% for DRAM or MCU parts, and recommend strategic buys over $50K for my approval.">Market signal · strategic buys with approval</button>
+            <button data-ex="If the projected gap exceeds 500 boards in any week, recommend mitigations, assign them, and reassess weekly until the gap closes.">Demand / supply gap threshold</button>
+          </div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Active workflows</div>
+          <div class="wf-list">${S.workflows.map(w => `<button class="card wf-item" data-wf="${w.id}" style="text-align:left;${!WF.draft && WF.selected === w.id ? 'border-color:var(--agent)' : ''}"><b>${esc(w.spec.name)}</b><small>Next ${esc(w.next)} · ${esc(w.last)}</small><span class="right"><span class="dot live"></span><span style="font-size:12px">${esc(w.status)}</span></span></button>`).join('')}</div>
+        </div>
+      </div>
+      <div class="card wf-card" id="wf-card">${specHtml(shown.spec, shown.status)}</div>
+    </div>`;
+  $('#wf-text').oninput = e => WF.text = e.target.value;
+  $('#wf-build').onclick = () => { draftWorkflow(WF.text); };
+  $$('[data-ex]', el).forEach(b => b.onclick = () => { WF.text = b.dataset.ex; draftWorkflow(WF.text); });
+  $$('[data-wf]', el).forEach(b => b.onclick = () => { WF.draft = null; WF.selected = b.dataset.wf; WF.run = null; VIEWS.workflows(); });
+  bindSpecCard();
+};
+
+function specHtml(sp, status) {
+  const run = WF.run && WF.run.name === sp.name ? WF.run : null;
+  return `
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+      <div><div class="eyebrow" style="color:${status === 'Draft' ? 'var(--warn)' : 'var(--good)'}">${status === 'Draft' ? 'Draft · review before activating' : 'Active · ' + esc(sp.schedule || '')}</div><h3>${esc(sp.name)}</h3></div>
+      ${WF.source && status === 'Draft' ? `<span class="chip agent">${esc(WF.source)}</span>` : ''}
+    </div>
+    <p class="sum">${esc(sp.summary)}</p>
+    <div class="why-sec"><h4>Triggers</h4><div class="trig">${sp.triggers.map(t => `<div class="t"><div class="ty">${esc(TRIG_LABEL[t.type] || t.type)}</div><b>${esc(t.label)}</b><small>${esc(t.detail || '')}</small></div>`).join('')}</div></div>
+    <div class="why-sec"><h4>Scope and conditions</h4><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip agent">${esc(sp.scope.label)}</span>${sp.conditions.map(c => `<span class="chip">${esc(c.label)}</span>`).join('')}</div></div>
+    <div class="why-sec"><h4>What the agent does</h4><div class="pipe">${STAGES.map(([k, n], i) => `<div class="s ${run ? (i < run.stage ? 'done' : i === run.stage ? 'run' : '') : ''}"><span class="n">${n}</span>${esc(sp.steps[k] || '')}</div>`).join('')}</div></div>
+    <div class="why-sec"><h4>Routing and approvals</h4><div class="routes">${sp.routing.map(r => { const k = roleKey(r.owner); return `<div class="route"><span class="av ${k}">${ROLES[k].initials}</span><div><b>${esc(r.recommendation)}</b>${r.approval ? `<div class="muted" style="font-size:12px">${esc(r.approval)}</div>` : ''}</div><div class="who">${esc(ROLES[k].name)}</div></div>`; }).join('')}</div></div>
+    ${sp.notify && sp.notify.length ? `<div class="why-sec"><h4>Notifications</h4><div style="display:flex;flex-wrap:wrap;gap:6px">${sp.notify.map(n => `<span class="chip">${esc(n)}</span>`).join('')}</div></div>` : ''}
+    ${run && run.findings ? `<div class="why-sec"><h4>Run results · ${run.findings.length} parts matched</h4><div class="agent-text" style="font-size:15px;margin-bottom:10px">${esc(run.text)}</div><div class="findings">${run.findings.slice(0, 10).map(f => `<div class="finding"><div><span class="mono">${esc(f.mpn)}</span> <span class="muted">· ${esc(f.reason)}</span></div><span class="red" style="font-size:12px;font-weight:500">${esc(f.rec)}</span></div>`).join('')}${run.findings.length > 10 ? `<div class="muted" style="font-size:12px">+ ${run.findings.length - 10} more</div>` : ''}</div></div>` : ''}
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${status === 'Draft' ? `<button class="btn primary" id="wf-act">Activate</button><button class="btn" id="wf-run">Run once now</button><button class="btn ghost" id="wf-disc">Discard</button>` : `<button class="btn" id="wf-run">Run now</button><button class="btn ghost" id="wf-pause">Pause</button>`}
+    </div>
+    ${status === 'Draft' ? `<div class="refine"><input class="field" id="wf-ref" placeholder="Refine: e.g. require my approval for strategic buys over $50K" aria-label="Refine workflow"><button class="btn" id="wf-ref-b">Update</button></div>` : ''}`;
+}
+function roleKey(owner) { const o = String(owner || '').toLowerCase(); return o.includes('design') ? 'de' : o.includes('procure') || o.includes('buyer') ? 'buyer' : o.includes('demand') || o.includes('planner') ? 'dp' : 'scm'; }
+function bindSpecCard() {
+  const card = $('#wf-card'); if (!card) return;
+  const sp = WF.draft || (S.workflows.find(w => w.id === WF.selected) || S.workflows[0]).spec;
+  if ($('#wf-act', card)) $('#wf-act', card).onclick = () => { const id = 'wf' + (S.workflows.length + 1); S.workflows.unshift({ id, status: 'Active', next: nextRun(sp), last: 'Not run yet', spec: sp }); WF.draft = null; WF.selected = id; logActivity('you', `Activated workflow <b>${esc(sp.name)}</b>.`); toast('Workflow activated'); VIEWS.workflows(); };
+  if ($('#wf-disc', card)) $('#wf-disc', card).onclick = () => { WF.draft = null; WF.run = null; VIEWS.workflows(); };
+  if ($('#wf-run', card)) $('#wf-run', card).onclick = () => runWorkflow(sp);
+  if ($('#wf-pause', card)) $('#wf-pause', card).onclick = () => { const w = S.workflows.find(x => x.id === WF.selected); w.status = w.status === 'Paused' ? 'Active' : 'Paused'; VIEWS.workflows(); };
+  if ($('#wf-ref-b', card)) { const go = () => { const v = $('#wf-ref').value.trim(); if (v) { WF.text = WF.text + ' ' + v; draftWorkflow(WF.text, sp); } }; $('#wf-ref-b', card).onclick = go; $('#wf-ref', card).onkeydown = e => { if (e.key === 'Enter') go(); }; }
+}
+function nextRun(sp) { const t = sp.triggers.find(t => t.type === 'time'); return t ? (/week|monday/i.test(t.label + t.detail) ? 'Mon 06:00' : 'Tomorrow 06:00') : 'On trigger'; }
+
+async function draftWorkflow(text, prior) {
+  WF.busy = true; WF.text = text; WF.run = null;
+  if (S.view === 'workflows') VIEWS.workflows();
+  let spec = null; WF.source = '';
+  if (AI.live) {
+    try {
+      const prompt = `Convert a supply-planning user's instruction into a workflow configuration for an AI planning agent. Reply with only JSON matching this shape:
+{"name": "≤6 words", "summary": "one sentence in plain English", "schedule": "e.g. Daily 06:00 or On event",
+ "triggers": [{"type": "time|gap|event|market", "label": "short", "detail": "one line"}],
+ "scope": {"label": "e.g. Critical parts (31)", "critical_only": bool, "sole_source_only": bool, "commodities": [keys from: ${Object.keys(COMMODITIES).join(', ')}]},
+ "conditions": [{"type": "gap|resilience_drop|event|market|lifecycle|cross", "label": "short", "threshold": number or null}],
+ "steps": {"sense": "...", "analyze": "...", "recommend": "...", "assign": "...", "act": "...", "reassess": "..."},
+ "routing": [{"recommendation": "e.g. Find or validate crosses", "owner": "Design Engineer|Supply Chain Manager|Procurement / Buyer|Demand Planner", "approval": "string or null"}],
+ "notify": ["short strings"]}
+Steps are one short sentence each, specific to the instruction. Default routing: crosses/multi-source → Design Engineer; buffer, strategic buy, life-time buy → Supply Chain Manager; LTSA and open-market sourcing → Procurement / Buyer; forecast adjustments → Demand Planner.
+Context: ${S.world.parts.length} parts, ${S.world.parts.filter(p => p.critical).length} flagged critical, ${S.world.parts.filter(p => p.sources === 1).length} sole-source.${prior ? '\nThe previous draft was: ' + JSON.stringify(prior) : ''}
+Instruction: ${text}`;
+      const j = await aiCall(prompt, { json: true, tier: 'quick', cache: false });
+      if (j && j.name && Array.isArray(j.triggers) && j.steps) { spec = normalizeSpec(j); WF.source = 'Drafted by Claude'; }
+    } catch (e) { /* fall back */ }
+  }
+  if (!spec) { await sleep(900); spec = fallbackSpec(text); WF.source = AI.live ? 'Scripted draft (Claude unavailable)' : 'Scripted draft'; }
+  WF.draft = spec; WF.busy = false;
+  if (S.view === 'workflows') VIEWS.workflows();
+  return spec;
+}
+function normalizeSpec(j) {
+  const scope = j.scope || {};
+  return {
+    name: String(j.name), summary: String(j.summary || ''), schedule: String(j.schedule || ''),
+    triggers: (j.triggers || []).slice(0, 4).map(t => ({ type: String(t.type || 'time'), label: String(t.label || ''), detail: String(t.detail || '') })),
+    scope: { label: String(scope.label || 'All parts'), critical_only: !!scope.critical_only, sole_source_only: !!scope.sole_source_only, commodities: Array.isArray(scope.commodities) ? scope.commodities.filter(c => COMMODITIES[c]) : [] },
+    conditions: (j.conditions || []).slice(0, 6).map(c => ({ type: String(c.type || 'gap'), label: String(c.label || c.type), threshold: c.threshold ?? null })),
+    steps: Object.fromEntries(STAGES.map(([k]) => [k, String((j.steps || {})[k] || '')])),
+    routing: (j.routing || []).slice(0, 6).map(r => ({ recommendation: String(r.recommendation || ''), owner: String(r.owner || 'Supply Chain Manager'), approval: r.approval ? String(r.approval) : null })),
+    notify: (j.notify || []).slice(0, 4).map(String),
+  };
+}
+
+function fallbackSpec(text, forcedName) {
+  const t = text.toLowerCase();
+  const triggers = [], conditions = [];
+  const daily = /every (morning|day|night)|daily|nightly/.test(t), weekly = /week|monday/.test(t), monthly = /month/.test(t);
+  if (daily || weekly || monthly) triggers.push({ type: 'time', label: daily ? (/night/.test(t) ? 'Every night, 22:00' : 'Every morning, 06:00') : weekly ? 'Every Monday, 07:00' : 'First of the month', detail: 'Runs on a schedule in your time zone' });
+  const num = (t.match(/(\d[\d,]*)\s*(boards|units)/) || [])[1];
+  if (/gap|not meet|shortage|short|exceed/.test(t)) { triggers.push({ type: 'gap', label: num ? `Projected gap > ${num} boards` : 'Projected supply < demand', detail: 'Evaluated weekly across the 16-week horizon' }); conditions.push({ type: 'gap', label: num ? `Gap above ${num} boards in any week` : 'Projected supply below demand', threshold: num ? +num.replace(/,/g, '') : null }); }
+  if (/event|geopolit|disruption|port|tariff|earthquake|region/.test(t)) { triggers.push({ type: 'event', label: 'Geopolitical or supply-chain event', detail: 'Matches events to part origin regions and suppliers' }); conditions.push({ type: 'event', label: 'Part made in an affected region', threshold: null }); }
+  if (/market|price|lead time|open-market|availability/.test(t)) { const pct = (t.match(/(\d+)\s*%/) || [])[1]; triggers.push({ type: 'market', label: pct ? `Price or availability moves > ${pct}%` : 'Market constraint or rising prices', detail: 'Open-market and commodity intelligence' }); conditions.push({ type: 'market', label: 'Commodity constrained or tightening', threshold: pct ? +pct : null }); }
+  if (/resilien|deteriorat/.test(t)) conditions.push({ type: 'resilience_drop', label: 'Resilience Rating drops ≥ 5 points', threshold: 5 });
+  if (/pcn|lifecycle|ltb|end of life|eol/.test(t)) { triggers.push({ type: 'event', label: 'New PCN or lifecycle change', detail: 'Manufacturer notifications' }); conditions.push({ type: 'lifecycle', label: 'Part moved to LTB', threshold: null }); }
+  if (/cross|alternate/.test(t) && !/pcn/.test(t)) conditions.push({ type: 'cross', label: 'New pin-to-pin cross available', threshold: null });
+  if (/refresh|re-score|all parts/.test(t)) { conditions.push({ type: 'market', label: 'Any recommendation change', threshold: null }); }
+  if (!triggers.length) triggers.push({ type: 'time', label: 'Every morning, 06:00', detail: 'Default schedule' });
+  if (!conditions.length) conditions.push({ type: 'gap', label: 'Projected supply below demand', threshold: null });
+  const comm = Object.entries({ dram: /dram|ddr4|memory/, mcu: /mcu|microcontroller/, mlcc: /mlcc|capacitor/, gan: /gan|gallium/, pmic: /pmic|regulator/, phy: /phy|ethernet/ }).filter(([, re]) => re.test(t)).map(([k]) => k);
+  const crit = /critical/.test(t), sole = /sole/.test(t);
+  const n = S.world.parts.filter(p => (!crit || p.critical) && (!sole || p.sources === 1) && (!comm.length || comm.includes(p.commodity))).length;
+  const scopeLabel = `${sole ? 'Sole-source' : crit ? 'Critical' : comm.length ? comm.map(c => COMMODITIES[c].name.split(' · ')[1] || c).join(' & ') : 'All'} parts (${n})`;
+  const approvalAmt = (t.match(/\$\s?(\d+)\s?(k|m)?/) || []);
+  const approval = /approv/.test(t) ? `Your approval required${approvalAmt[1] ? ` over $${approvalAmt[1]}${(approvalAmt[2] || '').toUpperCase()}` : ''}` : null;
+  const routing = [
+    { recommendation: 'Find or validate crosses', owner: 'Design Engineer', approval: null },
+    { recommendation: 'Buffer · strategic buy · life-time buy', owner: 'Supply Chain Manager', approval: approval || 'Auto-approve under $25K' },
+    { recommendation: 'LTSA · open-market sourcing', owner: 'Procurement / Buyer', approval: null },
+    { recommendation: 'Market-adjusted forecast', owner: 'Demand Planner', approval: null },
+  ];
+  const trigWords = triggers.map(x => x.label.toLowerCase());
+  const name = forcedName || (sole ? 'Sole-source exposure watch' : /market|price/.test(t) ? 'Market signal watch' : /gap|exceed/.test(t) && !daily ? 'Supply gap guardrail' : /event|geopolit/.test(t) ? 'Event impact watch' : crit ? 'Daily critical-parts watch' : 'Planning watch');
+  return {
+    name, schedule: triggers[0].type === 'time' ? triggers[0].label : 'On trigger',
+    summary: `${cap(trigWords.join(', and on '))}, the agent checks ${scopeLabel.toLowerCase()} for ${conditions.map(c => c.label.toLowerCase()).join(' or ')}, recommends a mitigation for each and routes it to the owning team.`,
+    triggers, scope: { label: scopeLabel, critical_only: crit, sole_source_only: sole, commodities: comm }, conditions,
+    steps: {
+      sense: 'Pull demand and supply plans, market intelligence, events, PCNs and Resilience Ratings',
+      analyze: `Project weekly balance for ${scopeLabel.toLowerCase()} and test each condition`,
+      recommend: 'Score Plan for Every Part policies and the market-adjusted forecast; explain each',
+      assign: 'Create actions for the default owner of each recommendation',
+      act: approval ? approval + '; others proceed automatically' : 'Owners review, approve and execute; agent tracks status',
+      reassess: 'Re-run each part when its actions close; alert if the gap persists',
+    },
+    routing, notify: [/alert|notify|brief|tell me/.test(t) ? 'Brief me in the agent panel' : 'Summary in the agent panel', 'Email digest to owners'],
+  };
+}
+
+async function runWorkflow(sp) {
+  WF.run = { name: sp.name, stage: 0, findings: null };
+  const rerender = () => { const card = $('#wf-card'); if (card && S.view === 'workflows') { card.innerHTML = specHtml(sp, WF.draft === sp ? 'Draft' : 'Active'); bindSpecCard(); } };
+  for (let i = 0; i < 4; i++) { WF.run.stage = i; rerender(); await sleep(450); }
+  const sc = sp.scope;
+  const inScope = S.comp.results.filter(r => (!sc.critical_only || r.part.critical) && (!sc.sole_source_only || r.sources === 1) && (!sc.commodities || !sc.commodities.length || sc.commodities.includes(r.part.commodity)));
+  const findings = [];
+  for (const r of inScope) {
+    const why = [];
+    for (const c of sp.conditions) {
+      if (c.type === 'gap' && r.shortUnits > 0 && (!c.threshold || r.shortUnits / r.part.qtyPer > c.threshold / 4)) why.push(`${fmt(r.shortUnits)} units short from ${WEEKS[r.firstShortWeek].label}`);
+      if (c.type === 'resilience_drop' && r.rrDrop >= (c.threshold || 5)) why.push(`Resilience Rating ▼${r.rrDrop}`);
+      if (c.type === 'event' && r.hits.length) why.push(r.hits[0].title);
+      if (c.type === 'market' && (CONSTRAINED(r.mktStatus) || (/change/.test(c.label) && isChanged(r)))) why.push(/change/.test(c.label) ? 'recommendation changed' : `market ${r.mktStatus.toLowerCase()}`);
+      if (c.type === 'lifecycle' && r.ltb) why.push(r.part.pcn.id + ' → LTB');
+      if (c.type === 'cross' && r.part.crossNew) why.push('new pin-to-pin cross');
+    }
+    if (why.length && (r.primary !== 'MRP' || r.adjDir)) findings.push({ id: r.part.id, mpn: r.part.mpn, reason: [...new Set(why)].slice(0, 2).join(' · '), rec: [r.adjDir ? (r.adjDir === 'pull' ? 'Pull' : 'Push') : null, ...r.policies.map(shortPolicy)].filter(Boolean).join(' + '), r });
+  }
+  findings.sort((a, b) => priority(b.r) - priority(a.r));
+  let created = 0, parts = 0;
+  for (const f of findings) { const c = acceptRec(f.id, 'Workflow'); if (c.length) { created += c.length; parts++; } }
+  WF.run.stage = 6; WF.run.findings = findings;
+  WF.run.text = findings.length ? `Checked ${inScope.length} parts; ${findings.length} met the conditions. ${created ? `Created ${created} actions for ${parts} parts that had no owner yet.` : 'All of them already have owners, so no new actions were needed.'} I'll reassess each part as its actions close.` : `Checked ${inScope.length} parts. None met the conditions today.`;
+  const w = S.workflows.find(x => x.spec === sp); if (w) w.last = `Just now · ${findings.length} matched, ${created} actions`;
+  logActivity('ai', `Workflow <b>${esc(sp.name)}</b> ran: ${findings.length} parts matched, ${created} actions created.`);
+  updateBadges(); S.dirty.plan = S.dirty.actions = S.dirty.horizon = true;
+  rerender();
+  agentSay(`**${sp.name}** ran. ${WF.run.text}`, created ? [{ label: 'Open actions', fn: () => setView('actions') }] : []);
+}
+
+// ───────────────────────── Scenarios: what-if + reassess ─────────────────────────
+const REGIONS = () => [...new Set(S.world.parts.map(p => p.region))].sort();
+const PRESETS = [
+  { label: 'MLCC constraint lasts 6 months', scp: { shock: { commodity: 'mlcc', ltDelta: 8, supplyImpact: 0.3, from: 4, weeks: 12 } } },
+  { label: 'Kaohsiung closure runs 8 weeks', scp: { region: { region: 'Taiwan', impact: 0.5, from: 1, weeks: 8 } } },
+  { label: 'Program win: demand +20%', scp: { demandPct: 20 } },
+  { label: 'New crosses qualified in 4 weeks', scp: { crossQualified: true } },
+  { label: 'DDR4 allocation cut 40%', scp: { shock: { commodity: 'dram', ltDelta: 6, supplyImpact: 0.4, from: 2, weeks: 14 } } },
+];
+function blankScp() { return { label: '', demandPct: 0, shock: { commodity: '', ltDelta: 0, supplyImpact: 0, from: 2, weeks: 8 }, region: { region: '', impact: 0, from: 1, weeks: 4 }, crossQualified: false }; }
+function mergeScp(p) { const b = blankScp(); return { ...b, ...p, shock: { ...b.shock, ...(p.shock || {}) }, region: { ...b.region, ...(p.region || {}) } }; }
+function scpToParams(scp) {
+  const prm = { label: scp.label || describeScp(scp), demandPct: scp.demandPct || 0, commodityShocks: [], regionEvents: [], crossQualified: !!scp.crossQualified };
+  if (scp.shock.commodity) prm.commodityShocks.push({ commodity: scp.shock.commodity, status: 'Constrained', ltDelta: scp.shock.ltDelta, supplyImpact: scp.shock.supplyImpact, from: scp.shock.from, weeks: scp.shock.weeks });
+  if (scp.region.region && scp.region.impact) prm.regionEvents.push({ region: scp.region.region, impact: scp.region.impact, from: scp.region.from, weeks: scp.region.weeks, title: `${scp.region.region} disruption (what-if)` });
+  return prm;
+}
+function describeScp(s) {
+  const bits = [];
+  if (s.shock.commodity) bits.push(`${COMMODITIES[s.shock.commodity].name.split(' · ')[1]} supply −${Math.round(s.shock.supplyImpact * 100)}% for ${s.shock.weeks} wks`);
+  if (s.region.region && s.region.impact) bits.push(`${s.region.region} −${Math.round(s.region.impact * 100)}% for ${s.region.weeks} wks`);
+  if (s.demandPct) bits.push(`demand ${s.demandPct > 0 ? '+' : ''}${s.demandPct}%`);
+  if (s.crossQualified) bits.push('new crosses qualified');
+  return bits.join(', ') || 'No change';
+}
+function runScenario(scp, render = true) {
+  scp = mergeScp(scp);
+  const prm = scpToParams(scp);
+  const world = scenarioWorld(S.world, prm);
+  const comp = compute(world);
+  S.scenario = { scp, label: prm.label, world, comp, ai: compute(withAllApplied(world, comp)), narrative: null };
+  S.dirty.scenarios = true; S.dirty.horizon = true;
+  if (render && S.view === 'scenarios') VIEWS.scenarios();
+}
+function refreshScenario() { const s = S.scenario; const prm = scpToParams(s.scp); s.world = scenarioWorld(S.world, prm); s.comp = compute(s.world); s.ai = compute(withAllApplied(s.world, s.comp)); s.narrative = null; }
+function scenarioSummary() {
+  const s = S.scenario, b = S.comp, sc = s.comp;
+  const changes = sc.results.filter(r => { const x = b.byId[r.part.id]; return x.policies.join('|') !== r.policies.join('|') || x.forecast !== r.forecast; });
+  const pct = x => Math.round(x.built.reduce((a, v) => a + v, 0) / x.plan.reduce((a, v) => a + v, 0) * 100);
+  return {
+    scenario: s.label,
+    baseline: { revenue_at_risk_usd: Math.round(b.ctb.revenueAtRisk), with_ai_plan_usd: Math.round(S.ai.ctb.revenueAtRisk), clear_to_build_pct: pct(b.ctb), parts_short: b.results.filter(r => r.shortUnits > 0).length },
+    scenario_result: { revenue_at_risk_usd: Math.round(sc.ctb.revenueAtRisk), with_ai_plan_usd: Math.round(s.ai.ctb.revenueAtRisk), clear_to_build_pct: pct(sc.ctb), parts_short: sc.results.filter(r => r.shortUnits > 0).length },
+    recommendation_changes: changes.slice(0, 12).map(r => ({ part: r.part.mpn, from: [b.byId[r.part.id].forecast, ...b.byId[r.part.id].policies].filter(Boolean), to: [r.forecast, ...r.policies].filter(Boolean), revenue_at_risk_usd: Math.round(r.revenueAtRisk) })),
+    changes_count: changes.length,
+  };
+}
+function scenarioFromTool(i) {
+  const s = blankScp(); s.label = i.label || '';
+  if (i.demand_pct) s.demandPct = +i.demand_pct;
+  if (i.commodity) { const k = COMMODITIES[i.commodity] ? i.commodity : Object.keys(COMMODITIES).find(k => COMMODITIES[k].name.toLowerCase().includes(String(i.commodity).toLowerCase())); if (k) s.shock = { commodity: k, ltDelta: +i.lead_time_delta_weeks || 6, supplyImpact: Math.min(0.9, (+i.supply_impact_pct || 25) / 100), from: +i.from_week_index || 2, weeks: +i.duration_weeks || 8 }; }
+  if (i.region) { const reg = REGIONS().find(r => r.toLowerCase().includes(String(i.region).toLowerCase())); if (reg) s.region = { region: reg, impact: Math.min(0.9, (+i.region_impact_pct || 50) / 100), from: +i.from_week_index || 1, weeks: +i.duration_weeks || 4 }; }
+  if (i.crosses_qualified) s.crossQualified = true;
+  return s;
+}
+function parseScenarioFallback(text) {
+  const t = text.toLowerCase(); const s = blankScp(); s.label = text.replace(/^what if\s*/i, '').replace(/\?$/, '');
+  const dur = t.match(/(\d+)\s*(weeks?|wks?|months?)/); const wks = dur ? Math.min(16, Math.round(+dur[1] * (/month/.test(dur[2]) ? 4.3 : 1))) : 8;
+  const CM = { mlcc: /mlcc|capacitor/, dram: /dram|ddr4|memory/, gan: /gan|gallium/, mcu: /mcu|microcontroller/, pmic: /pmic|regulator/, phy: /phy|ethernet/, nand: /nand|emmc|flash/, conn: /connector/ };
+  const k = Object.keys(CM).find(k => CM[k].test(t));
+  const pct = (t.match(/(\d+)\s*%/) || [])[1];
+  if (/demand|program|win|orders|volume/.test(t) && pct) s.demandPct = (/(drop|down|cut|fall|lower|decrease)/.test(t) ? -1 : 1) * +pct;
+  else if (k) s.shock = { commodity: k, ltDelta: 8, supplyImpact: pct ? +pct / 100 : 0.3, from: 3, weeks: wks };
+  const reg = REGIONS().find(r => t.includes(r.toLowerCase().split(' · ').pop())) || (/kaohsiung|port/.test(t) ? 'Taiwan' : null) || (/china/.test(t) ? 'China · Jiangsu' : null);
+  if (reg) s.region = { region: reg, impact: pct && !s.demandPct && !k ? +pct / 100 : 0.5, from: 1, weeks: wks };
+  if (/cross|qualif|alternate/.test(t)) s.crossQualified = true;
+  if (!k && !reg && !s.demandPct && !s.crossQualified) s.shock = { commodity: 'mlcc', ltDelta: 8, supplyImpact: 0.3, from: 3, weeks: wks };
+  return s;
+}
+async function parseScenarioAI(text) {
+  if (AI.live) {
+    try {
+      const j = await aiCall(`Translate this supply-planning what-if into parameters. Reply with only JSON:
+{"label": "short name", "demandPct": number (e.g. 20 or -10, 0 if none),
+ "shock": {"commodity": one of [${Object.keys(COMMODITIES).map(k => `"${k}"`).join(', ')}] or "", "ltDelta": weeks of extra lead time, "supplyImpact": 0-0.9 fraction of supply lost, "from": week index 0-15 when it starts, "weeks": duration 1-16},
+ "region": {"region": one of [${REGIONS().map(r => `"${r}"`).join(', ')}] or "", "impact": 0-0.9, "from": 0-15, "weeks": 1-16},
+ "crossQualified": boolean (true if new alternate/cross parts become qualified)}
+Commodity names: ${Object.entries(COMMODITIES).map(([k, c]) => `${k}=${c.name}`).join('; ')}. Months = 4.3 weeks. Kaohsiung is in Taiwan.
+What-if: ${text}`, { json: true, tier: 'quick', cache: false });
+      if (j && typeof j === 'object') { const s = mergeScp(j); if (s.shock.commodity && !COMMODITIES[s.shock.commodity]) s.shock.commodity = ''; if (s.region.region && !REGIONS().includes(s.region.region)) s.region.region = ''; s.label = j.label || text; return { scp: s, by: 'Claude' }; }
+    } catch (e) { /* fall back */ }
+  }
+  return { scp: parseScenarioFallback(text), by: 'scripted parser' };
+}
+
+VIEWS.scenarios = function () {
+  if (!S.scenario) { runScenario({ ...PRESETS[0].scp, label: PRESETS[0].label }, false); S.scenario.by = 'preset'; }
+  const el = $('#v-scenarios'); const s = S.scenario; const scp = s.scp; const sum = scenarioSummary();
+  const b = sum.baseline, x = sum.scenario_result;
+  const dlt = (a, c, money_ = true) => { const d = c - a; if (!d) return '<small>no change</small>'; return `<small class="${d > 0 ? 'delta-up' : 'delta-dn'}">${d > 0 ? '+' : '−'}${money_ ? money(Math.abs(d)) : Math.abs(d)}</small>`; };
+  const commOpts = `<option value="">None</option>` + Object.entries(COMMODITIES).map(([k, c]) => `<option value="${k}" ${scp.shock.commodity === k ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  const regOpts = `<option value="">None</option>` + REGIONS().map(r => `<option ${scp.region.region === r ? 'selected' : ''}>${esc(r)}</option>`).join('');
+  const wkOpts = (v) => WEEKS.map((w, i) => `<option value="${i}" ${+v === i ? 'selected' : ''}>${w.label} · ${w.date}</option>`).join('');
+  el.innerHTML = `
+    <div class="eyebrow">Reassess · what-if</div><h2 class="section-title" style="font-size:24px;margin-top:6px">Scenarios</h2>
+    <p class="lede">Ask a what-if in plain language or set the assumptions. The agent re-runs every part and shows how the plan, the risk and its recommendations change.</p>
+    <div class="sc-grid" style="margin-top:18px">
+      <div class="card sc-panel">
+        <div><label class="eyebrow" for="sc-ask">Ask the agent</label>
+          <form class="ask" id="sc-form" style="margin-top:8px"><input class="field" id="sc-ask" placeholder="What if Kaohsiung stays closed for 8 weeks?"><button class="btn primary" type="submit">Run</button></form>
+          <div class="muted" id="sc-by" style="font-size:11.5px;margin-top:6px">${s.by ? 'Assumptions set by ' + esc(s.by) : ''}</div></div>
+        <div><div class="eyebrow" style="margin-bottom:8px">Presets</div><div class="presets">${PRESETS.map((p, i) => `<button data-pre="${i}" aria-pressed="${s.label === p.label}">${esc(p.label)}</button>`).join('')}</div></div>
+        <div class="eyebrow">Assumptions</div>
+        <div class="param"><label for="sc-dem">Demand change</label><output id="o-dem">${scp.demandPct > 0 ? '+' : ''}${scp.demandPct}%</output><input type="range" id="sc-dem" min="-30" max="40" step="5" value="${scp.demandPct}"></div>
+        <div class="param"><label for="sc-com">Commodity supply shock</label><span></span><select class="field" id="sc-com">${commOpts}</select></div>
+        <div class="param"><label for="sc-imp">Supply lost</label><output id="o-imp">${Math.round(scp.shock.supplyImpact * 100)}%</output><input type="range" id="sc-imp" min="0" max="80" step="5" value="${Math.round(scp.shock.supplyImpact * 100)}"></div>
+        <div class="param"><label for="sc-lt">Extra lead time</label><output id="o-lt">+${scp.shock.ltDelta} wks</output><input type="range" id="sc-lt" min="0" max="20" step="1" value="${scp.shock.ltDelta}"></div>
+        <div class="param"><label for="sc-sw">Starts · lasts</label><output id="o-sw">${scp.shock.weeks} wks</output><select class="field" id="sc-sf">${wkOpts(scp.shock.from)}</select><input type="range" id="sc-sw" min="1" max="16" value="${scp.shock.weeks}"></div>
+        <div class="param"><label for="sc-reg">Regional disruption</label><span></span><select class="field" id="sc-reg">${regOpts}</select></div>
+        <div class="param"><label for="sc-rimp">Regional supply lost</label><output id="o-rimp">${Math.round(scp.region.impact * 100)}%</output><input type="range" id="sc-rimp" min="0" max="90" step="5" value="${Math.round(scp.region.impact * 100)}"></div>
+        <div class="param"><label for="sc-rw">Starts · lasts</label><output id="o-rw">${scp.region.weeks} wks</output><select class="field" id="sc-rf">${wkOpts(scp.region.from)}</select><input type="range" id="sc-rw" min="1" max="16" value="${scp.region.weeks}"></div>
+        <label class="toggle"><input type="checkbox" id="sc-x" ${scp.crossQualified ? 'checked' : ''}> New pin-to-pin crosses qualified</label>
+        <button class="btn" id="sc-run">Re-run with these assumptions</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="card" style="padding:16px 18px">
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
+            <div><div class="eyebrow">Scenario</div><h3 style="margin:6px 0 4px;font:600 19px/1.25 var(--cond)">${esc(s.label)}</h3><div class="muted" style="font-size:12.5px">${esc(describeScp(scp))}</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sc-hz">Explore in Horizon</button><button class="btn" id="sc-agent">Discuss with agent</button></div>
+          </div>
+          <div class="cmp" style="margin-top:14px">
+            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">Revenue at risk</div><div class="v">${money(x.revenue_at_risk_usd)}${dlt(b.revenue_at_risk_usd, x.revenue_at_risk_usd)}</div><div class="s">Current plan: ${money(b.revenue_at_risk_usd)}</div></div>
+            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">With AI plan</div><div class="v" style="color:var(--agent)">${money(x.with_ai_plan_usd)}</div><div class="s">Recovers ${money(x.revenue_at_risk_usd - x.with_ai_plan_usd)}</div></div>
+            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">Clear-to-build</div><div class="v">${x.clear_to_build_pct}%${x.clear_to_build_pct === b.clear_to_build_pct ? '<small>no change</small>' : `<small class="${x.clear_to_build_pct < b.clear_to_build_pct ? 'delta-up' : 'delta-dn'}">${x.clear_to_build_pct > b.clear_to_build_pct ? '+' : '−'}${Math.abs(x.clear_to_build_pct - b.clear_to_build_pct)} pts</small>`}</div><div class="s">Current plan: ${b.clear_to_build_pct}%</div></div>
+            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">Recommendations change</div><div class="v">${sum.changes_count}</div><div class="s">${x.parts_short} parts short (now ${b.parts_short})</div></div>
+          </div>
+          <div class="chart" style="margin-top:14px">${scenarioChart()}</div>
+          <div class="hz-legend"><span><i style="background:var(--demand)"></i>Build plan</span><span><i style="background:var(--supply)"></i>Clear-to-build today</span><span><i style="background:var(--rec)"></i>Clear-to-build in scenario</span><span><i style="background:repeating-linear-gradient(90deg,var(--agent) 0 4px,transparent 4px 7px)"></i>Scenario with AI plan</span></div>
+        </div>
+        <div class="card" style="padding:16px 18px"><div class="why-sec"><h4>Agent assessment <span class="chip agent" id="sc-mode">…</span></h4><div class="agent-text thinking" id="sc-nar">Assessing the scenario…</div></div></div>
+        <div class="card" style="padding:16px 18px"><div class="why-sec"><h4>How recommendations change · ${sum.changes_count} parts</h4></div>
+          <div class="tablewrap" style="max-height:none"><table class="grid"><thead><tr><th class="l">Part</th><th class="l">Today</th><th class="l">In this scenario</th><th>Revenue at risk</th><th></th></tr></thead><tbody>
+          ${s.comp.results.filter(r => { const y = S.comp.byId[r.part.id]; return y.policies.join('|') !== r.policies.join('|') || y.forecast !== r.forecast; }).sort((a, b2) => b2.revenueAtRisk - a.revenueAtRisk).slice(0, 25).map(r => { const y = S.comp.byId[r.part.id]; return `<tr class="grp-end"><td class="l mono">${esc(r.part.mpn)}</td><td class="l muted" style="font-size:12px">${esc([y.forecast, ...y.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</td><td class="l red" style="font-size:12px;font-weight:500">${esc([r.forecast, ...r.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</td><td class="v ${r.revenueAtRisk ? 'neg' : ''}">${r.revenueAtRisk ? money(r.revenueAtRisk) : '—'}</td><td><button class="why-btn" data-swhy="${r.part.id}">Why?</button></td></tr>`; }).join('') || '<tr><td class="l muted" colspan="5">No recommendation changes.</td></tr>'}
+          </tbody></table></div></div>
+      </div>
+    </div>`;
+  const read = () => {
+    const n = mergeScp({
+      label: '', demandPct: +$('#sc-dem').value, crossQualified: $('#sc-x').checked,
+      shock: { commodity: $('#sc-com').value, supplyImpact: +$('#sc-imp').value / 100, ltDelta: +$('#sc-lt').value, from: +$('#sc-sf').value, weeks: +$('#sc-sw').value },
+      region: { region: $('#sc-reg').value, impact: +$('#sc-rimp').value / 100, from: +$('#sc-rf').value, weeks: +$('#sc-rw').value },
+    }); n.label = describeScp(n); return n;
+  };
+  const outs = { 'sc-dem': ['o-dem', v => (v > 0 ? '+' : '') + v + '%'], 'sc-imp': ['o-imp', v => v + '%'], 'sc-lt': ['o-lt', v => '+' + v + ' wks'], 'sc-sw': ['o-sw', v => v + ' wks'], 'sc-rimp': ['o-rimp', v => v + '%'], 'sc-rw': ['o-rw', v => v + ' wks'] };
+  for (const [id, [o, f]] of Object.entries(outs)) $('#' + id).oninput = e => { $('#' + o).textContent = f(+e.target.value); };
+  $('#sc-run').onclick = () => { runScenario(read()); S.scenario.by = 'you'; };
+  $$('[data-pre]', el).forEach(bt => bt.onclick = () => { const p = PRESETS[+bt.dataset.pre]; runScenario({ ...p.scp, label: p.label }); S.scenario.by = 'preset'; VIEWS.scenarios(); });
+  $('#sc-form').onsubmit = async e => { e.preventDefault(); const q = $('#sc-ask').value.trim(); if (!q) return; $('#sc-by').textContent = 'Setting assumptions…'; const { scp: n, by } = await parseScenarioAI(q); n.label = n.label || q; runScenario(n); S.scenario.by = by; VIEWS.scenarios(); };
+  $('#sc-hz').onclick = () => { S.hz.source = 'scenario'; S.hz.scope = 'portfolio'; setView('horizon'); };
+  $('#sc-agent').onclick = () => chat(`Given the scenario "${s.label}", what should we do first?`);
+  $$('[data-swhy]', el).forEach(bt => bt.onclick = () => openWhy(bt.dataset.swhy, { comp: s.comp }));
+  narrateScenario();
+};
+
+function scenarioChart() {
+  const s = S.scenario; const W = 700, H = 200, L = 46, R = 10, T = 12, B = 26;
+  const plan = s.comp.ctb.plan, base = S.comp.ctb.built, sc = s.comp.ctb.built, ai = s.ai.ctb.built;
+  const max = Math.max(...plan, ...S.comp.ctb.plan) * 1.08;
+  const x = i => L + i * (W - L - R) / (NWEEKS - 1); const y = v => T + (1 - v / max) * (H - T - B);
+  const path = a => a.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  const area = `${path(sc)}L${x(NWEEKS - 1)},${y(0)}L${x(0)},${y(0)}Z`;
+  const ticks = [0, max / 2, max].map(v => `<text class="ax" x="${L - 6}" y="${y(v) + 3}" text-anchor="end">${kfmt(v)}</text><line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/>`).join('');
+  const lbl = WEEKS.map((w, i) => i % 2 === 0 ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="middle">${w.iso}</text>` : '').join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Clear-to-build by week">${ticks}<path d="${area}" fill="rgba(255,91,79,.1)"/><path d="${path(plan)}" fill="none" stroke="var(--demand)" stroke-width="2"/><path d="${path(base)}" fill="none" stroke="var(--supply)" stroke-width="2"/><path d="${path(sc)}" fill="none" stroke="var(--rec)" stroke-width="2.2"/><path d="${path(ai)}" fill="none" stroke="var(--agent)" stroke-width="2" stroke-dasharray="5 4"/><circle cx="${x(NWEEKS - 1)}" cy="${y(sc[NWEEKS - 1])}" r="3.5" fill="var(--rec)"/>${lbl}<text class="ax" x="${L}" y="${T - 2}">boards / week</text></svg>`;
+}
+
+let SC_CTL = null;
+async function narrateScenario() {
+  const s = S.scenario; const el = $('#sc-nar'), mode = $('#sc-mode'); if (!el) return;
+  if (s.narrative) { el.classList.remove('thinking'); el.textContent = s.narrative.text; mode.textContent = s.narrative.by; return; }
+  SC_CTL?.abort(); SC_CTL = new AbortController(); const sig = SC_CTL.signal; const key = s;
+  if (AI.live) {
+    mode.textContent = 'Claude';
+    try {
+      const text = await aiCall(`You are the planning agent. Assess this what-if for a C-level executive in 3 short paragraphs, 100 words total, plain text, no headings or bullets: what the scenario does to revenue and clear-to-build, which parts and policies drive the change, and the first decision leadership should make. Use only these facts.\n${JSON.stringify(scenarioSummary())}`, { signal: sig, onText: ({ text }) => { if (S.scenario === key) { el.classList.remove('thinking'); el.textContent = text; } } });
+      if (S.scenario === key) s.narrative = { text, by: 'Claude' };
+      return;
+    } catch (e) { if (e && e.code === 'cancelled') return; }
+  }
+  const text = scenarioNarrativeFallback();
+  mode.textContent = 'Scripted'; s.narrative = { text, by: 'Scripted' };
+  typeInto(el, text, sig);
+}
+function scenarioNarrativeFallback() {
+  const sm = scenarioSummary(); const b = sm.baseline, x = sm.scenario_result;
+  const pols = {}; for (const c of sm.recommendation_changes) for (const p of c.to) if (!/Hold|MRP/.test(p) && !c.from.includes(p)) pols[p] = (pols[p] || 0) + 1;
+  const topPol = Object.entries(pols).sort((a, c) => c[1] - a[1]).slice(0, 2).map(([p, n]) => `${n} to ${p.replace('Adjust forecast (pull)', 'pull the forecast forward').replace('Adjust forecast (push)', 'push the forecast out').replace('Long Term Supply Agreement', 'LTSA')}`).join(' and ');
+  const lead = sm.recommendation_changes.filter(c => c.revenue_at_risk_usd > 0)[0];
+  const up = x.revenue_at_risk_usd - b.revenue_at_risk_usd;
+  return `In the scenario “${sm.scenario}”, revenue at risk ${up > 0 ? `rises from ${money(b.revenue_at_risk_usd)} to ${money(x.revenue_at_risk_usd)}` : up < 0 ? `falls from ${money(b.revenue_at_risk_usd)} to ${money(x.revenue_at_risk_usd)}` : `stays at ${money(x.revenue_at_risk_usd)}`}, and clear-to-build moves from ${b.clear_to_build_pct}% to ${x.clear_to_build_pct}%.
+
+${sm.changes_count} parts change recommendation${topPol ? `, mostly ${topPol}` : ''}.${lead ? ` ${lead.part} becomes the largest exposure at ${money(lead.revenue_at_risk_usd)}.` : ''}
+
+With the AI plan applied, risk falls to ${money(x.with_ai_plan_usd)}. The first decision: ${x.with_ai_plan_usd < x.revenue_at_risk_usd ? 'approve the buffer and strategic buys now, because their lead times are longer than the window before the gap opens.' : 'no new spend is needed; keep the current plan and watch the trigger.'}`;
+}
+
+// ───────────────────────── Boot ─────────────────────────
+(function boot() {
+  S.world = makeWorld();
+  S.lastWeek = compute(prevWorld(S.world));
+  S.comp = compute(S.world);
+  S.ai = compute(withAllApplied(S.world, S.comp));
+  S.startRisk = S.comp.ctb.revenueAtRisk;
+  seedHistory(); seedWorkflows();
+  initShell();
+  updateBadges();
+  setView('horizon');
+  initAI();
+  briefing();
+})();
+</script>
+
+</body></html>
