@@ -47,12 +47,12 @@ input, select, textarea { font: inherit; color: var(--text); }
 #app { height: 100%; display: grid; grid-template-rows: auto 1fr; }
 header.top { display: flex; align-items: center; gap: 20px; padding: 0 16px; min-height: 58px; border-bottom: 1px solid var(--line); background: var(--deep); position: relative; z-index: 20; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex-shrink: 0; }
-.brand-mark { width: 26px; height: 26px; flex-shrink: 0; }
+.brand-mark { width: 32px; height: 32px; flex-shrink: 0; }
 .brand-name { font: 600 15px/1.1 var(--cond); letter-spacing: .02em; }
 .brand-ctx { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
 nav.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
 nav.tabs::-webkit-scrollbar { display: none; }
-.tab { background: none; border: 0; padding: 9px 12px 8px; border-radius: 6px; text-align: left; white-space: nowrap; border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
+.tab { background: none; border: 0; padding: 18px 12px 16px; border-radius: 6px; text-align: left; white-space: nowrap; border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
 .tab .stage { display: block; font: 600 9.5px/1 var(--cond); letter-spacing: .14em; color: var(--faint); margin-bottom: 4px; }
 .tab .tname { font-weight: 500; color: var(--soft); }
 .tab:hover .tname { color: var(--text); }
@@ -112,7 +112,7 @@ body.dock-closed main.body { grid-template-columns: 1fr 0; }
 .toggle input { accent-color: var(--agent); width: 15px; height: 15px; }
 
 /* ── Horizon (3D corridor) */
-#v-horizon { overflow: hidden; background: radial-gradient(120% 70% at 50% 36%, #132034 0%, var(--ink) 62%); }
+#v-horizon { display: flex; flex-direction: column; overflow: hidden; background: radial-gradient(120% 70% at 50% 36%, #132034 0%, var(--ink) 62%); }
 #hz-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 #hz-canvas.drag { cursor: grabbing; }
 #hz-cards { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
@@ -133,17 +133,27 @@ body.dock-closed main.body { grid-template-columns: 1fr 0; }
 .hz-card .foot b { color: var(--rec); font: 500 12px var(--mono); }
 .hz-card .newtag { margin-left: auto; font: 700 9px/1 var(--cond); letter-spacing: .1em; color: var(--ink); background: var(--warn); padding: 2px 5px; border-radius: 3px; }
 
-.hz-top { position: absolute; z-index: 2; left: 16px; right: 16px; top: 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; pointer-events: none; flex-wrap: wrap; }
-.hz-top > * { pointer-events: auto; }
-.hz-title { max-width: 420px; }
-.hz-title h1 { margin: 0; font: 600 26px/1.1 var(--cond); letter-spacing: .01em; }
-.hz-title p { margin: 6px 0 0; color: var(--soft); max-width: 46ch; font-size: 13px; }
-.hz-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.hz-top { position: relative; z-index: 3; flex-shrink: 0; padding: 14px 16px 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px 24px; flex-wrap: wrap; background: var(--deep); border-bottom: 1px solid var(--line); }
+.hz-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.hz-right { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; min-width: 0; }
+.hz-lgd { border-collapse: collapse; font-size: 10.5px; color: var(--soft); }
+.hz-lgd th { text-align: left; font: 600 9px/1 var(--cond); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 3px 12px 3px 0; white-space: nowrap; }
+.hz-lgd td { padding: 2px 12px 2px 0; white-space: nowrap; }
+.hz-lgd .lg { display: inline-flex; align-items: center; gap: 6px; }
+.hz-lgd i { display: inline-block; flex-shrink: 0; }
+.hz-lgd i.ln-dem, .hz-lgd i.ln-sup, .hz-lgd i.ln-gap, .hz-lgd i.ln-lane { width: 16px; height: 3px; border-radius: 2px; }
+.hz-lgd i.ln-dem { background: var(--demand); } .hz-lgd i.ln-sup { background: var(--supply); } .hz-lgd i.ln-gap { background: var(--rec); height: 8px; opacity: .7; } .hz-lgd i.ln-lane { background: #F29BD0; opacity: .7; }
+.hz-lgd i[class^="d-"] { width: 8px; height: 8px; border-radius: 50%; }
+.hz-lgd i.d-dis { background: var(--rec); } .hz-lgd i.d-hol { background: var(--demand); } .hz-lgd i.d-dem { background: #F29BD0; } .hz-lgd i.d-life { background: var(--agent); } .hz-lgd i.d-tar { background: var(--warn); } .hz-lgd i.d-comp { background: #D5DCE6; } .hz-lgd i.d-price { background: var(--supply); }
+.hz-title { max-width: 520px; min-width: 0; }
+.hz-title h1 { margin: 0; font: 600 22px/1.1 var(--cond); letter-spacing: .01em; }
+.hz-title p { margin: 4px 0 0; color: var(--soft); max-width: 62ch; font-size: 12.5px; }
+.hz-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
 .hz-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11.5px; color: var(--soft); margin-top: 10px; }
 .hz-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .hz-legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
-.hz-kpis { display: flex; gap: 10px; flex-wrap: wrap; }
-.hz-kpi { max-width: 290px; background: rgba(15,23,33,.82); border: 1px solid var(--line); border-radius: 9px; padding: 10px 14px; min-width: 140px; backdrop-filter: blur(6px); }
+.hz-kpis { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.hz-kpi { max-width: 290px; background: rgba(15,23,33,.82); border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; min-width: 118px; backdrop-filter: blur(6px); }
 .hz-kpi .v { font: 500 20px/1.1 var(--mono); margin-top: 6px; font-variant-numeric: tabular-nums; }
 .hz-kpi .v s { color: var(--faint); font-size: 14px; margin-right: 6px; }
 .hz-kpi .s { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
@@ -192,7 +202,12 @@ table.grid td.v.ev { box-shadow: inset 0 -2px 0 var(--warn); }
 .partcell button { background: none; border: 0; padding: 0; font: 600 12.5px var(--mono); color: var(--text); text-align: left; }
 .partcell button:hover { color: var(--agent); }
 .partcell small { color: var(--muted); font-size: 11px; }
+table.grid tr.cgrp td { background: var(--panel); }
+table.grid tr.cgrp td.stick { background: var(--panel); }
+.partcell .tog { font: 600 13px var(--sans); display: flex; align-items: center; gap: 4px; }
+.partcell .tog .caret { display: inline-block; width: 14px; color: var(--muted); font-size: 11px; }
 .recs { display: flex; flex-direction: column; gap: 2px; color: var(--rec); font-size: 12px; font-weight: 500; text-align: left; min-width: 190px; }
+.recs span { white-space: normal; }
 .recs .was { color: var(--faint); font-weight: 400; text-decoration: line-through; font-size: 11px; }
 .recs .ok { color: var(--good); font-weight: 400; }
 .chg { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); margin-right: 6px; vertical-align: 1px; }
@@ -332,7 +347,8 @@ aside.dock { border-left: 1px solid var(--line); background: var(--deep); displa
 body.dock-closed aside.dock { visibility: hidden; }
 .dock-h { padding: 14px 16px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
 .dock-h .glyph { width: 30px; height: 30px; border-radius: 8px; background: var(--agent-soft); border: 1px solid rgba(183,167,255,.35); display: grid; place-items: center; }
-.dock-h b { font-size: 14px; } .dock-h small { display: block; color: var(--muted); font-size: 11.5px; }
+.dock-h b { font-size: 14px; } .dock-h small { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11.5px; }
+.dock-h small .dot { width: 7px; height: 7px; }
 .dock-h .x { margin-left: auto; background: none; border: 1px solid var(--line2); border-radius: 6px; width: 30px; height: 30px; color: var(--soft); }
 .feedwrap { flex: 1; overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
 .msg.agent .body { font: 400 15px/1.55 var(--serif); color: var(--text); }
@@ -358,6 +374,8 @@ body.dock-closed aside.dock { visibility: hidden; }
 .dock-in textarea:focus { border-color: var(--agent); outline: none; }
 .send { width: 42px; height: 42px; border-radius: 9px; border: 0; background: var(--agent); color: #150F2E; display: grid; place-items: center; flex-shrink: 0; }
 .fab { display: none; }
+body.dock-closed .hz-bottom { right: 130px; }
+body.dock-closed .fab { display: flex; position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 45; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 24px; background: var(--agent); color: #150F2E; border: 0; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--panel2); border: 1px solid var(--agent); color: var(--text); padding: 10px 16px; border-radius: 9px; z-index: 60; font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: calc(100% - 32px); }
 
 @media (max-width: 1100px) {
@@ -377,30 +395,125 @@ body.dock-closed aside.dock { visibility: hidden; }
   .view.pad { padding: 16px 16px 90px; }
   .twocol { grid-template-columns: 1fr; }
   .hz-kpis { display: none; }
+  .hz-right { align-items: flex-start; } .hz-lgd-wrap, #hz-legend { overflow-x: auto; max-width: 100%; }
   .hz-title p { display: none; }
   .hz-card { width: 210px; }
   .recbox { grid-template-columns: 1fr; }
-  .agent-pill { display: none; }
   .hz-strip button span { display: none; }
   .hz-bottom { bottom: 80px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+.hz-card.k-dis .k i { background: var(--rec); }
+.hz-card.k-hol .k i { background: var(--demand); }
+.hz-card.k-life .k i { background: var(--agent); }
+.hz-card.k-tar .k i { background: var(--warn); }
+.hz-card.k-price .k i { background: var(--supply); }
+.hz-card.k-dis { border-top: 2px solid var(--rec); } .hz-card.k-hol { border-top: 2px solid var(--demand); } .hz-card.k-life { border-top: 2px solid var(--agent); } .hz-card.k-tar { border-top: 2px solid var(--warn); } .hz-card.k-price { border-top: 2px solid var(--supply); }
+.hz-legend .dotk::before { content: ''; width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--faint); }
+.hz-legend .dotk.k-dis::before { background: var(--rec); } .hz-legend .dotk.k-hol::before { background: var(--demand); } .hz-legend .dotk.k-life::before { background: var(--agent); } .hz-legend .dotk.k-tar::before { background: var(--warn); } .hz-legend .dotk.k-price::before { background: var(--supply); }
+.hz-card.k-comp .k i { background: #D5DCE6; } .hz-card.k-comp { border-top: 2px solid #D5DCE6; }
+.hz-card.k-dem .k i { background: #F29BD0; } .hz-card.k-dem { border-top: 2px solid #F29BD0; }
+.hz-legend .dotk.k-comp::before { background: #D5DCE6; } .hz-legend .dotk.k-dem::before { background: #F29BD0; border-radius: 2px; width: 12px; height: 4px; }
+.hz-pop p b { font-weight: 600; color: var(--text); }
+
+#hz-lgbtn { display: none; }
+/* compact Roadmap: small laptops or when the agent panel is open */
+#v-horizon .hz-top { padding: 8px 14px 8px; gap: 8px 16px; align-items: center; }
+#v-horizon .hz-title .eyebrow, #v-horizon .hz-title p { display: none; }
+#v-horizon .hz-title h1 { font-size: 17px; }
+#v-horizon .hz-controls { margin-top: 6px; gap: 6px; }
+#v-horizon .hz-controls .seg button { padding: 5px 9px; font-size: 11.5px; }
+#v-horizon .hz-controls .field { padding: 5px 8px; font-size: 12px; }
+#v-horizon #hz-lgbtn { display: inline-flex; }
+#v-horizon .hz-right { flex-direction: row; align-items: center; }
+#v-horizon .hz-kpis { flex-wrap: nowrap; gap: 6px; }
+#v-horizon .hz-kpi { min-width: 0; padding: 5px 9px; }
+#v-horizon .hz-kpi .eyebrow { font-size: 8.5px; letter-spacing: .1em; }
+#v-horizon .hz-kpi .v { font-size: 14px; margin-top: 3px; }
+#v-horizon .hz-kpi .s { display: none; }
+#v-horizon #hz-legend { display: none; }
+#v-horizon.lg-open #hz-legend { display: block; position: absolute; right: 14px; top: calc(100% + 6px); z-index: 6; background: var(--panel); border: 1px solid var(--line2); border-radius: 8px; padding: 8px 10px; box-shadow: 0 12px 30px rgba(0,0,0,.45); }
+.hz-compact .hz-hint { display: none; }
+.hz-compact .hz-bottom { bottom: 16px; }
+.hz-compact .hz-strip button { height: 18px; }
+.hz-compact .hz-strip button span { top: 21px; font-size: 9px; }
+.hz-compact .hz-nav button { height: 20px; width: 28px; }
+.hz-compact .hz-card { width: 220px; padding: 9px 11px 10px; }
+.hz-compact .hz-card .t { font-size: 13px; }
+.hz-compact .hz-card .d { -webkit-line-clamp: 2; }
+#v-horizon .hz-title { max-width: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+#v-horizon .hz-title h1 { white-space: nowrap; }
+#v-horizon .hz-right { gap: 6px; flex-shrink: 0; }
+#v-horizon .hz-controls { margin-top: 0; }
+
+#v-horizon .hz-top { flex-wrap: nowrap; }
+#v-horizon .hz-title { flex: 1; min-width: 0; }
+@media (max-width: 1100px) { #v-horizon .hz-top { flex-wrap: wrap; } }
+#v-horizon #hz-scope { width: auto; max-width: 180px; }
+#v-horizon .hz-title { gap: 6px 10px; }
+#v-horizon .hz-title h1 { font-size: 16px; }
+#v-horizon .hz-top { gap: 8px 12px; }
+#v-horizon .hz-kpi { padding: 4px 8px; }
+#v-horizon .hz-kpi .eyebrow { font-size: 8px; }
+table.grid td.v.pos { color: var(--good); }
+/* ── Scenarios: executive briefing */
+.brief { display: flex; flex-direction: column; gap: 14px; }
+.brief-hero { padding: 4px 0 2px; }
+.brief-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--rec); color: #fff; font: 700 11px/1 var(--cond); letter-spacing: .16em; text-transform: uppercase; padding: 6px 10px; border-radius: 3px; }
+.brief-tag .live { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: pulse 1.6s infinite; }
+.brief-meta { display: inline-block; margin-left: 10px; color: var(--muted); font-size: 12px; }
+.brief-h { font: 500 clamp(24px, 3vw, 34px)/1.15 var(--serif); margin: 12px 0 6px; max-width: 34ch; text-wrap: balance; }
+.brief-dek { color: var(--soft); font-size: 14.5px; max-width: 80ch; margin: 0; }
+.ticker { display: flex; align-items: stretch; border: 1px solid var(--line2); border-radius: 6px; overflow: hidden; background: var(--deep); }
+.tk-lab { background: var(--agent); color: #150F2E; font: 700 11px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; padding: 10px 12px; display: flex; align-items: center; flex-shrink: 0; }
+.tk-track { overflow: hidden; flex: 1; min-width: 0; position: relative; }
+.tk-run { display: inline-flex; white-space: nowrap; gap: 14px; padding: 9px 14px; animation: tick 70s linear infinite; font-size: 12.5px; color: var(--soft); }
+.ticker:hover .tk-run { animation-play-state: paused; }
+@keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.tk b { font-weight: 600; color: var(--text); margin: 0 3px; }
+.tk.dn b { color: var(--rec); } .tk.up b { color: var(--good); }
+.tk-sep { color: var(--faint); }
+.score { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.sc-tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.sc-tile .v { font: 500 26px/1.1 var(--mono); margin-top: 8px; font-variant-numeric: tabular-nums; }
+.sc-tile .s { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.brief-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 14px; align-items: start; }
+.brief-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.story { padding: 16px 20px; }
+.story-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.st-sec { padding: 10px 0; border-top: 1px solid var(--line); }
+.st-sec:first-child { border-top: 0; }
+.st-sec h5 { margin: 0 0 4px; font: 600 11px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--agent); }
+.st-sec p, .st-ai { margin: 0; font: 400 16.5px/1.55 var(--serif); color: var(--text); max-width: 75ch; }
+.st-ai p { margin: 0 0 10px; }
+.sim { padding: 16px; display: flex; flex-direction: column; gap: 14px; position: sticky; top: 0; }
+.sim-h { display: flex; justify-content: space-between; align-items: flex-start; }
+.sim-h h3 { margin: 4px 0 0; font: 600 18px/1.2 var(--cond); }
+.lev-group { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.lev-t { font: 600 11px/1 var(--cond); letter-spacing: .14em; text-transform: uppercase; color: var(--soft); }
+.econ { background: var(--deep); border: 1px solid rgba(183,167,255,.3); border-radius: 9px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.econ-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--soft); }
+.econ-row b { font: 500 13.5px var(--mono); color: var(--text); }
+.econ-row b.good { color: var(--good); } .econ-row b.bad { color: var(--rec); }
+.econ-row.big { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 2px; }
+.econ-row.big b { color: var(--agent); font-size: 15px; }
+@media (max-width: 1250px) { .score { grid-template-columns: repeat(3, minmax(0, 1fr)); } .brief-grid { grid-template-columns: 1fr; } .sim { position: static; } }
+@media (max-width: 600px) { .score { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>
 <div id="app">
   <header class="top">
     <div class="brand">
-      <svg class="brand-mark" viewBox="0 0 26 26" aria-hidden="true"><path d="M2 20 L13 6 L24 20" fill="none" stroke="#B7A7FF" stroke-width="2"/><path d="M7 20 L13 12.5 L19 20" fill="none" stroke="#4CCFB2" stroke-width="2"/><circle cx="13" cy="6" r="2.4" fill="#FF5B4F"/></svg>
-      <div><div class="brand-name">Intelligent Planning</div><div class="brand-ctx" id="ctx"></div></div>
+      <svg class="brand-mark" role="img" aria-label="Intelligent Planning" viewBox="0 0 26 26"><path d="M2 20 L13 6 L24 20" fill="none" stroke="#B7A7FF" stroke-width="2"/><path d="M7 20 L13 12.5 L19 20" fill="none" stroke="#4CCFB2" stroke-width="2"/><circle cx="13" cy="6" r="2.4" fill="#FF5B4F"/></svg>
+      
     </div>
     <nav class="tabs" role="tablist" aria-label="Views">
-      <button class="tab" role="tab" data-view="horizon"><span class="stage">SENSE</span><span class="tname">Horizon</span></button>
-      <button class="tab" role="tab" data-view="plan"><span class="stage">ANALYZE · RECOMMEND</span><span class="tname">Plan</span><span class="badge" id="b-plan"></span></button>
-      <button class="tab" role="tab" data-view="actions"><span class="stage">ASSIGN · ACT</span><span class="tname">Actions</span><span class="badge" id="b-actions" hidden></span></button>
-      <button class="tab" role="tab" data-view="scenarios"><span class="stage">REASSESS · WHAT-IF</span><span class="tname">Scenarios</span></button>
-      <button class="tab" role="tab" data-view="workflows"><span class="stage">AUTOMATE</span><span class="tname">Agent workflows</span></button>
+      <button class="tab" role="tab" data-view="horizon"><span class="tname">Roadmap</span></button>
+      <button class="tab" role="tab" data-view="plan"><span class="tname">Plan</span><span class="badge" id="b-plan"></span></button>
+      <button class="tab" role="tab" data-view="actions"><span class="tname">Actions</span><span class="badge" id="b-actions" hidden></span></button>
+      <button class="tab" role="tab" data-view="scenarios"><span class="tname">Scenarios</span></button>
+      <button class="tab" role="tab" data-view="workflows"><span class="tname">Agent workflows</span></button>
     </nav>
-    <button class="agent-pill" id="agent-pill" title="Show or hide the planning agent"><span class="dot" id="agent-dot"></span><span id="agent-state">Connecting agent…</span></button>
-  </header>
+      </header>
   <main class="body">
     <div class="views">
       <section class="view" id="v-horizon" data-view="horizon"></section>
@@ -412,7 +525,7 @@ body.dock-closed aside.dock { visibility: hidden; }
     <aside class="dock" id="dock" aria-label="Planning agent">
       <div class="dock-h">
         <div class="glyph"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B7A7FF"/></svg></div>
-        <div><b>Planning agent</b><small id="dock-sub">Monitors 48 parts · 2 active workflows</small></div>
+        <div><b>Planning agent</b><small id="dock-sub"><span class="dot" id="agent-dot"></span><span id="agent-state">Connecting…</span> · 48 parts · 2 workflows</small></div>
         <button class="x" id="dock-x" aria-label="Hide agent">✕</button>
       </div>
       <div class="feedwrap" id="feed" aria-live="polite"></div>
@@ -569,6 +682,66 @@ const DEFAULT_ROUTING = {
   'Adjust forecast (push)': ['dp', 'Push demand out', 'Apply market-adjusted demand to the weekly plan'],
 };
 
+// Time-phased calendar for the Roadmap. Holiday dates are real 2026–27 dates;
+// tariff, price and lifecycle items are sample data like the rest of the prototype.
+const CALENDAR = [
+  { id: 'h2', kind: 'Holiday', title: 'Taiwan: National Day', date: 'Oct 10', week: 1, regions: ['Taiwan'], detail: 'Public holiday, observed Friday Oct 9. Adds to the Kaohsiung port backlog.' },
+  { id: 'h3', kind: 'Holiday', title: 'India: Deepavali (Diwali)', date: 'Nov 8', week: 5, global: true, geo: 'India', detail: 'Major festival and public holiday across India; Indian suppliers, distributors and logistics run reduced schedules around it.' },
+  { id: 'h4', kind: 'Holiday', title: 'Mexico: Revolution Day', date: 'Nov 16', week: 7, global: true, detail: `${PRODUCT.site} is closed: one fewer build day for ${PRODUCT.name}.` },
+  { id: 'h5', kind: 'Holiday', title: 'United States: Thanksgiving', date: 'Nov 26–27', week: 8, regions: ['United States'], detail: 'US suppliers and distribution centers closed or on skeleton crews.' },
+  { id: 'h7', kind: 'Holiday', title: 'Japan: New Year holidays', date: 'Dec 29 – Jan 3', week: 13, regions: ['Japan'], detail: 'Japanese manufacturers close; orders placed after Dec 22 ship in January.' },
+  { id: 't1', kind: 'Tariff', title: 'Tariff +10% on China-origin magnetics and connectors', date: 'Effective Jan 1', week: 13, regions: ['China · Jiangsu'], commodities: ['ind', 'conn'], detail: 'Sample tariff schedule change. Shipments clearing customs on or after Jan 1 pay the higher rate.' },
+  { id: 'pc1', kind: 'Price change', title: 'Kestrel Passives MLCC price increase +8%', date: 'Effective Nov 1', week: 4, mfr: 'Kestrel Passives', commodities: ['mlcc'], detail: 'Announced list-price increase on all MLCC orders scheduled to ship after Nov 1.' },
+  { id: 'pc2', kind: 'Price change', title: 'DDR4 contract price +12%', date: 'Effective Dec 1', week: 9, commodities: ['dram'], detail: 'Quarterly contract reset for DDR4; open orders re-price on Dec 1.' },
+  { id: 'l3', kind: 'PCN', title: 'CNX-PHY8211 last-time-buy notice', date: 'Received Sep 28', week: 0, parts: ['CNX-PHY8211'], detail: 'LTB orders are due Mar 31, 2027, beyond this 16-week view.' },
+  { id: 'l1', kind: 'LTB', title: 'VAL-OPA2140 last-time-buy deadline', date: 'Dec 15', week: 11, parts: ['VAL-OPA2140'], detail: 'Final non-cancellable orders must be placed by this date.' },
+  { id: 'l2', kind: 'EOL', title: 'VAL-OPA2140 end of life', date: 'Jan 15', week: 15, parts: ['VAL-OPA2140'], detail: 'Final shipments from the manufacturer; no supply after this date.' },
+];
+
+// Global Technology Supply Chain Strategic Calendar (from the planning team's workbook).
+// view: 'in' = inside the 16-week Roadmap (week/weeks set), 'later' = after it, 'before' = ended as it starts, 'ongoing' = continuous or as issued.
+const SEMIS = ['mcu', 'dram', 'nand', 'gan', 'pmic', 'mosfet', 'phy', 'opamp', 'diode', 'rf'];
+const EAST_ASIA = ['China · Jiangsu', 'Taiwan', 'Korea', 'Japan'];
+const STRATEGIC = [
+  ['Jan 1-3', 'Holidays & Factory Shutdowns', 'Global New Year Holiday', 'Global', 'Reduced manufacturing, logistics, and customs capacity', 'Review inventory buffers and expedite critical shipments', 'Annual / recurring', null, { view: 'in', week: 13, weeks: 1, global: true }],
+  ['January', 'Trade & Tariff Milestones', 'Annual tariff schedule and customs code updates', 'Global', 'Potential landed-cost changes and sourcing impacts', 'Update sourcing, classification, and pricing assumptions', 'Annual / monitor jurisdiction notices', null, { view: 'in', week: 13, weeks: 1, global: true }],
+  ['January', 'Export Control & Compliance Changes', 'New export-control regulations and sanctions updates', 'Global', 'Potential product eligibility and compliance impacts', 'Validate screening, classifications, and controls', 'Monitor official notices', null, { view: 'in', week: 14, weeks: 1, global: true }],
+  ['Jan-Feb (varies)', 'Holidays & Factory Shutdowns', 'Chinese New Year / Spring Festival', 'China and East Asia', 'Major electronics manufacturing and labor disruption', 'Build inventory and place backlog orders before shutdown', 'Annual / lunar calendar', null, { view: 'in', week: 15, weeks: 1, regions: EAST_ASIA, note: 'Starts Feb 6, 2027, just after this view' }],
+  ['Jan-Feb', 'Demand & Seasonal Cycles', 'Corporate budget activation cycle', 'Global', 'Enterprise infrastructure, networking, and AI demand may increase', 'Align supplier capacity and demand forecasts', 'Seasonal', null, { view: 'in', week: 13, weeks: 3, global: true, lane: true }],
+  ['Feb-Mar', 'Holidays & Factory Shutdowns', 'Post-Chinese New Year recovery', 'China and East Asia', 'Labor-return and production-ramp variability', 'Monitor supplier recovery and shipment execution', 'Seasonal', null, { view: 'later' }],
+  ['March', 'Demand & Seasonal Cycles', 'Q1 fiscal close', 'Global', 'Accelerated bookings and shipment activity', 'Review fulfillment, inventory, and logistics plans', 'Quarterly', null, { view: 'later' }],
+  ['Q1', 'Trade & Tariff Milestones', 'Section 232 reviews and tariff actions', 'United States', 'Potential semiconductor, electronics, metals, and material cost exposure', 'Assess country-of-origin, classification, and sourcing scenarios', 'Monitor official actions', null, { view: 'later' }],
+  ['Quarterly / as issued', 'Export Control & Compliance Changes', 'Entity-list and export-control updates', 'United States and other jurisdictions', 'Supplier, customer, destination, or product restrictions', 'Refresh screening and impacted-party reviews', 'Continuous monitoring', null, { view: 'ongoing' }],
+  ['As issued', 'Trade & Tariff Milestones', 'Anti-dumping and countervailing-duty rulings', 'Global', 'Potential duties, sourcing disruption, and retroactive exposure', 'Review affected classifications and alternative suppliers', 'Case-specific', null, { view: 'ongoing' }],
+  ['Apr-Jun', 'Demand & Seasonal Cycles', 'Consumer tax-refund spending cycle', 'Selected markets', 'Potential increase in consumer electronics demand', 'Monitor sell-through and channel inventory', 'Seasonal', null, { view: 'later' }],
+  ['Late Apr-Early May', 'Holidays & Factory Shutdowns', 'Japan Golden Week', 'Japan', 'Reduced semiconductor, component, and industrial output', 'Increase inventory coverage and confirm supplier schedules', 'Annual', null, { view: 'later' }],
+  ['Early May', 'Holidays & Factory Shutdowns', 'China Labor Day holiday', 'China', 'Manufacturing and logistics slowdown', 'Advance production and critical shipments', 'Annual', null, { view: 'later' }],
+  ['June (varies)', 'Holidays & Factory Shutdowns', 'Dragon Boat Festival', 'China', 'Short regional factory and shipment interruptions', 'Validate supplier and carrier schedules', 'Annual / lunar calendar', null, { view: 'later' }],
+  ['Mid-year', 'Trade & Tariff Milestones', 'Tariff and customs revisions', 'Multiple jurisdictions', 'Potential duty-rate and classification changes', 'Recalculate landed cost and update master data', 'Monitor official schedules', null, { view: 'later' }],
+  ['Jun-Sep', 'Demand & Seasonal Cycles', 'Government procurement cycle', 'Selected markets', 'Potential technology infrastructure demand increase', 'Position inventory and strategic suppliers', 'Seasonal / jurisdiction-specific', null, { view: 'later' }],
+  ['Jul-Sep', 'Demand & Seasonal Cycles', 'Back-to-school demand season', 'Global consumer markets', 'Higher PC, notebook, display, and networking demand', 'Monitor component availability and channel inventory', 'Seasonal', null, { view: 'before' }],
+  ['Jul-Sep', 'Demand & Seasonal Cycles', 'Semiconductor allocation planning', 'Global', 'Capacity reservation and forecast-lock decisions', 'Secure wafer, substrate, memory, and component commitments', 'Planning cycle', null, { view: 'in', week: 0, weeks: 1, global: true, note: 'Closes Sep 30' }],
+  ['Aug-Nov', 'Demand & Seasonal Cycles', 'Peak ocean freight season', 'Global trade lanes', 'Capacity constraints, congestion, and freight-cost pressure', 'Secure capacity and review routing alternatives', 'Seasonal', null, { view: 'in', week: 0, weeks: 10, global: true, lane: true }],
+  ['Aug-Oct', 'Demand & Seasonal Cycles', 'Holiday production ramp', 'Global', 'Elevated semiconductor and component demand', 'Review allocation, inventory, and supplier commitments', 'Seasonal', null, { view: 'in', week: 0, weeks: 5, global: true, lane: true }],
+  ['September (varies)', 'Holidays & Factory Shutdowns', 'Mid-Autumn Festival', 'China and East Asia', 'Temporary production and logistics slowdown', 'Complete critical shipments early', 'Annual / lunar calendar', null, { view: 'before', note: 'Sep 25, 2026' }],
+  ['Sept-Nov', 'Demand & Seasonal Cycles', 'Retail inventory build', 'Global consumer markets', 'Higher factory utilization and material demand', 'Monitor lead times and inventory exposure', 'Seasonal', null, { view: 'in', week: 0, weeks: 10, global: true, lane: true }],
+  ['Oct 1-7', 'Holidays & Factory Shutdowns', 'China National Day / Golden Week', 'China', 'Significant factory and logistics shutdowns', 'Build safety stock and pull in orders', 'Annual', null, { view: 'in', week: 0, weeks: 1, regions: ['China · Jiangsu'] }],
+  ['Oct-Dec', 'Trade & Tariff Milestones', 'Government budgets and industrial-policy announcements', 'Major economies', 'Potential changes to incentives, procurement, and strategic-sector policy', 'Assess market, sourcing, and capacity implications', 'Jurisdiction-specific', null, { view: 'in', week: 0, weeks: 14, global: true, lane: true }],
+  ['Nov-Dec', 'Demand & Seasonal Cycles', 'Year-end enterprise spending', 'Global', 'Potential increase in server, networking, storage, and software demand', 'Monitor key-account demand signals', 'Seasonal', null, { view: 'in', week: 4, weeks: 10, global: true, lane: true }],
+  ['Dec 4, 2026', 'Trade & Tariff Milestones', 'U.S. polysilicon tariff and minimum import pricing effective date', 'United States', 'Potential semiconductor, wafer, solar, and upstream-material cost impacts', 'Review classification, sourcing, contract, and cost exposure', 'Specific milestone', 'https://www.whitehouse.gov/presidential-actions/2026/08/adjusting-imports-of-polysilicon-and-its-derivatives-into-the-united-states/', { view: 'in', week: 9, weeks: 1, commodities: SEMIS }],
+  ['December', 'Demand & Seasonal Cycles', 'Q4 fiscal close', 'Global', 'High concentration of annual shipments and bookings', 'Execute revenue, inventory, and logistics plans', 'Quarterly / annual', null, { view: 'in', week: 9, weeks: 5, global: true, lane: true }],
+  ['Dec 20-Jan 2', 'Holidays & Factory Shutdowns', 'Global year-end shutdown period', 'Global', 'Reduced manufacturing, logistics, customs, and support capacity', 'Prioritize critical orders and establish escalation coverage', 'Annual', null, { view: 'in', week: 11, weeks: 3, global: true }],
+  ['Dec 31 / as specified', 'Trade & Tariff Milestones', 'Tariff exclusion and duty-waiver expirations', 'Global', 'Potential sudden landed-cost increases', 'Review expiry exposure and mitigation plans', 'Program-specific', null, { view: 'in', week: 13, weeks: 1, global: true }],
+  ['Continuous', 'Export Control & Compliance Changes', 'Forced-labor compliance enforcement', 'Multiple jurisdictions', 'Supplier qualification, detention, and traceability risk', 'Maintain origin evidence and supplier traceability', 'Continuous', null, { view: 'ongoing' }],
+  ['Continuous', 'Export Control & Compliance Changes', 'ESG and supply-chain disclosure requirements', 'Multiple jurisdictions', 'Supplier-data and regulatory-reporting obligations', 'Maintain supplier reporting and evidence processes', 'Continuous', null, { view: 'ongoing' }],
+  ['2026-2027', 'Trade & Tariff Milestones', 'USMCA review cycle', 'North America', 'Potential rules-of-origin and regional-sourcing changes', 'Review North American sourcing and origin documentation', 'Formal review cycle', null, { view: 'ongoing' }],
+  ['From Jan 1, 2026', 'Export Control & Compliance Changes', 'EU CBAM definitive regime', 'European Union', 'Carbon-related authorization, reporting, certificate, and import obligations for covered goods', 'Assess scope, importer readiness, supplier emissions data, and cost exposure', 'Effective', 'https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-definitive-regime_en', { view: 'ongoing' }],
+  ['Sept 30, 2027', 'Export Control & Compliance Changes', 'First EU CBAM declaration and certificate surrender deadline', 'European Union', 'Financial and reporting obligations for covered 2026 imports', 'Ensure verified data, declaration, and certificate readiness', 'Specific milestone', 'https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-definitive-regime_en', { view: 'later' }],
+].map(([timing, category, title, geo, risk, action, status, url, m], i) => ({
+  id: 'sc' + i, timing, category, title, geo, risk, action, status, url, ...m,
+  kind: { 'Holidays & Factory Shutdowns': 'Holiday', 'Trade & Tariff Milestones': 'Tariff', 'Export Control & Compliance Changes': 'Compliance', 'Demand & Seasonal Cycles': 'Demand cycle' }[category],
+}));
+
 // ───────────────────────── Recommendation engine ─────────────────────────
 // Deterministic rules (section 3 + 4 of the concept) produce repeatable,
 // explainable recommendations. The AI layer synthesizes, prioritizes and explains.
@@ -635,8 +808,9 @@ function evaluatePart(world, part) {
   const sources = a.multi ? Math.max(2, part.sources) : part.sources;
   const sole = sources === 1;
   const mitig = a.multi ? 0.4 : 1;
-  const supply = part.supplyPlan.map((s, w) => Math.round(s * dmult * (1 - imp[w] * mitig)));
-  let inv = part.onHand + (a.buffer ? Math.round(part.onHand * 0 + avgOf(baseDemand) * 3) : 0) + (a.strategic ? Math.round(avgOf(baseDemand) * 6) : 0) + (a.ltb ? Math.round(avgOf(baseDemand) * 20) : 0);
+  const boost = world.boost && world.boost.pct && (world.boost.commodity === 'all' || world.boost.commodity === part.commodity) ? world.boost.pct / 100 : 0;
+  const supply = part.supplyPlan.map((s, w) => Math.round(s * dmult * (1 - imp[w] * mitig) * (w >= 2 ? 1 + boost : 1)));
+  let inv = part.onHand + Math.round((world.bufferWeeks || 0) * avgOf(baseDemand)) + (a.buffer ? Math.round(part.onHand * 0 + avgOf(baseDemand) * 3) : 0) + (a.strategic ? Math.round(avgOf(baseDemand) * 6) : 0) + (a.ltb ? Math.round(avgOf(baseDemand) * 20) : 0);
   const startInv = inv;
   const balance = [], short = [];
   for (let w = 0; w < NWEEKS; w++) {
@@ -777,10 +951,20 @@ function scenarioWorld(base, prm) {
   }
   for (const e of prm.regionEvents || []) w.events.push({ id: 'sr' + e.region, kind: 'Scenario', title: e.title || `${e.region} disruption`, detail: 'What-if assumption.', region: e.region, from: e.from || 0, weeks: e.weeks || 4, impact: e.impact || 0.5, isNew: true, source: 'Scenario' });
   for (const x of prm.eventOverrides || []) { const ev = w.events.find(e => e.id === x.id); if (ev) Object.assign(ev, x); }
+  w.boost = prm.boost || null; w.bufferWeeks = prm.bufferWeeks || 0;
   if (prm.crossQualified) for (const p of w.parts) if (p.crossNew) { p.applied = p.applied || {}; p.applied.multi = true; }
   return w;
 }
 
+// Plain-language basis for the forecast recommendation (no quantities: that belongs to MRP)
+function forecastBasis(mkt) {
+  if (!mkt || !mkt.status) return 'No market intelligence for this commodity classification';
+  const lt = mkt.lt !== mkt.ltPrev ? `lead time ${mkt.ltPrev}→${mkt.lt} wks` : `lead time ${mkt.lt} wks`;
+  const pr = `price ${mkt.price > 0 ? '+' : ''}${mkt.price}%`;
+  if (CONSTRAINED(mkt.status)) return `Market ${mkt.status.toLowerCase()} (${lt}, ${pr}): pull demand forward so orders are placed ahead of the constraint`;
+  if (mkt.status === 'Surplus') return `Market in surplus (${lt}, ${pr}): push demand out and buy closer to need`;
+  return `Market stable (${lt}, ${pr}): keep the statistical forecast`;
+}
 // ── formatting helpers
 function wkRange(a, b) { b = Math.min(NWEEKS - 1, b); return WEEKS[b].iso > WEEKS[a].iso ? `${WEEKS[a].label}–${WEEKS[b].iso}` : `${WEEKS[a].label} – ${WEEKS[b].label}`; }
 function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
@@ -801,7 +985,7 @@ const S = {
   actions: [], activity: [], workflows: [], routing: clone(DEFAULT_ROUTING),
   accepted: {}, dismissed: {}, resolved: {},
   scenario: null,
-  hz: { scope: 'portfolio', showAI: true, source: 'base' },
+  hz: { group: 'commodity', scope: 'portfolio', source: 'base' },
   dirty: {},
 };
 let ACT_SEQ = 1;
@@ -829,7 +1013,6 @@ function updateBadges() {
   const b = $('#b-plan'); b.textContent = n; b.hidden = !n;
   const open = S.actions.filter(a => a.status !== 'Done').length;
   const ba = $('#b-actions'); ba.textContent = open; ba.hidden = !open; ba.style.background = 'var(--agent)'; ba.style.color = '#150F2E';
-  $('#ctx').textContent = `${PRODUCT.name} · ${S.world.parts.length} parts · ${PRODUCT.site}`;
 }
 
 // ── Views
@@ -839,7 +1022,7 @@ function setView(v, opts = {}) {
   $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === v)));
   $$('.view').forEach(el => { el.hidden = el.dataset.view !== v; });
   S.dirty[v] = true; renderView(v, opts);
-  if (v === 'horizon') HZ_wake();
+  if (v === 'horizon') { if (!opts.keepDock && window.innerWidth < 1400 && !document.body.classList.contains('dock-closed') && !S.dockAutoClosed) { S.dockAutoClosed = true; setDock(false); } HZ_wake(); }
 }
 function renderView(v, opts) { if (S.view !== v || !VIEWS[v]) return; if (S.dirty[v] || opts) { S.dirty[v] = false; VIEWS[v](opts || {}); } }
 
@@ -861,7 +1044,7 @@ function actionsFor(r) {
     if (pol === 'Strategic buy') spec = `Approve buy of ${fmt(avgOf(r.demand) * 6)} units (~${money(avgOf(r.demand) * 6 * r.part.price * (1 + (r.mkt?.price || 0) / 100))})`;
     if (pol === 'Life-time buy') spec = `Size LTB before ${r.part.pcn?.ltbDate}: ~${fmt(avgOf(r.demand) * 20)} units`;
     if (pol === 'Long Term Supply Agreement') spec = `12-month LTSA; lock lead time at ${r.mkt?.ltPrev ?? '—'} wks`;
-    if (pol.startsWith('Adjust')) spec = `${r.adjDir === 'pull' ? 'Pull' : 'Push'} ${fmt(r.adjQty)} units ${r.adjDir === 'pull' ? 'into Wk ' + WEEKS[0].iso + '–' + WEEKS[3].iso : 'out to Wk ' + WEEKS[8].iso + '–' + WEEKS[11].iso}`;
+    if (pol.startsWith('Adjust')) spec = `Review the ${COMMODITIES[r.part.commodity].name.split(' · ')[1] || ''} forecast: ${r.adjDir === 'pull' ? 'pull demand forward' : 'push demand out'} in the next MRP run`;
     return { pol, role, title, spec };
   });
 }
@@ -949,7 +1132,6 @@ function setDock(open) { document.body.classList.toggle('dock-closed', !open); s
 
 function initShell() {
   $$('.tab').forEach(t => t.onclick = () => setView(t.dataset.view));
-  $('#agent-pill').onclick = () => setDock(document.body.classList.contains('dock-closed'));
   $('#dock-x').onclick = () => setDock(false);
   $('#fab').onclick = () => setDock(true);
   if (matchMedia('(max-width: 860px)').matches) document.body.classList.add('dock-closed');
@@ -957,7 +1139,7 @@ function initShell() {
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#ask').requestSubmit(); } });
   ta.addEventListener('input', () => { ta.style.height = '42px'; ta.style.height = Math.min(120, ta.scrollHeight) + 'px'; });
   $('#ask').addEventListener('submit', e => { e.preventDefault(); const v = ta.value.trim(); if (!v) return; ta.value = ''; ta.style.height = '42px'; chat(v); });
-  const sugg = ['Why is GaN our biggest exposure?', 'What if the MLCC constraint lasts 6 months?', 'Every morning, check my sole-source parts and assign mitigations', 'What is waiting on engineering?', 'Walk me through the MLCC case'];
+  const sugg = ['Why is GaN our biggest exposure?', 'Give me the one-minute CEO briefing', 'What if we expedite 20% more supply?', 'Every morning, check my sole-source parts and assign mitigations', 'What is waiting on engineering?', 'Walk me through the MLCC case'];
   $('#sugg').innerHTML = sugg.map(s => `<button type="button">${esc(s)}</button>`).join('');
   $$('#sugg button').forEach(b => b.onclick = () => chat(b.textContent));
 }
@@ -979,60 +1161,72 @@ function seedHistory() {
   );
 }
 
-// ───────────────────────── Horizon: 3D signal corridor ─────────────────────────
+// ───────────────────────── Roadmap: 3D time-phased corridor ─────────────────────────
 const HZ = { cam: -3.2, camT: -0.25, raf: 0, w: 0, h: 0, dpr: 1, cards: [], built: false, drag: null, series: null, lastInteract: 0 };
 const ZD = 12, CAMH = 4.2, WALL = 6.6, GATE_X = 8.6, GATE_H = 5.6, BAND = 2.7, CAM_OFF = 0.25;
+const KIND_CLS = { 'Disruption': 'k-dis', 'What-if': 'k-dis', 'Holiday': 'k-hol', 'LTB': 'k-life', 'EOL': 'k-life', 'PCN': 'k-life', 'Tariff': 'k-tar', 'Price change': 'k-price', 'Compliance': 'k-comp', 'Demand cycle': 'k-dem' };
+const KIND_RGB = { 'Demand cycle': '242,155,208', 'Tariff': '243,179,76', 'Compliance': '213,220,230', 'Holiday': '126,176,255' };
+const LEFT_KINDS = ['Disruption', 'What-if', 'Holiday', 'Demand cycle'];
 
 function hzSource() {
-  if (S.hz.source === 'scenario' && S.scenario) return { comp: S.scenario.comp, ai: S.scenario.ai, label: S.scenario.label };
-  return { comp: S.comp, ai: S.ai, label: 'Current plan' };
+  if (S.hz.source === 'scenario' && S.scenario) return { comp: S.scenario.comp, label: S.scenario.label, scenario: true };
+  return { comp: S.comp, label: 'Current plan', scenario: false };
+}
+function hzScopeResults(comp) {
+  const sc = S.hz.scope;
+  if (sc === 'portfolio') return comp.results;
+  if (sc.startsWith('c:')) return comp.results.filter(r => r.part.commodity === sc.slice(2));
+  return comp.results.filter(r => r.part.id === sc);
 }
 
 VIEWS.horizon = function () {
   const el = $('#v-horizon');
   if (!HZ.built) {
     el.innerHTML = `
-      <canvas id="hz-canvas" aria-label="Three-dimensional timeline of demand, supply, signals and recommendations"></canvas>
-      <div id="hz-cards"></div>
       <div class="hz-top">
         <div class="hz-title">
-          <div class="eyebrow">Sense · next 16 weeks</div>
+          <div class="eyebrow">Roadmap · next 16 weeks</div>
           <h1 id="hz-h1">The road ahead</h1>
           <p id="hz-sub"></p>
           <div class="hz-controls">
-            <select class="field" id="hz-scope" aria-label="Scope"></select>
-            <select class="field" id="hz-src" aria-label="Plan source" hidden></select>
-            <label class="toggle"><input type="checkbox" id="hz-ai" checked> Show AI-recommended plan</label>
+            <div class="seg" role="group" aria-label="Group by"><button data-hg="commodity">By commodity</button><button data-hg="part">By part</button></div>
+            <select class="field" id="hz-scope" aria-label="Commodity or part"></select>
+            <button class="btn sm" id="hz-cal">Calendar · ${STRATEGIC.length}</button>
+            <span id="hz-scn"></span>
           </div>
-          <div class="hz-legend" id="hz-legend"></div>
         </div>
-        <div class="hz-kpis" id="hz-kpis"></div>
+        <div class="hz-right"><div class="hz-kpis" id="hz-kpis"></div><button class="btn sm" id="hz-lgbtn" aria-expanded="false">Legend</button><div id="hz-legend"></div></div>
       </div>
-      <div class="hz-hint" id="hz-hint">Scroll or drag to travel through time · click any card</div>
-      <div class="hz-bottom">
-        <div class="hz-nav"><button id="hz-prev" aria-label="Previous week">‹</button><button id="hz-next" aria-label="Next week">›</button></div>
-        <div class="hz-strip" id="hz-strip"></div>
+      <div class="hz-stage">
+        <canvas id="hz-canvas" aria-label="Three-dimensional roadmap of weekly demand, supply and dated events"></canvas>
+        <div id="hz-cards"></div>
+        <div class="hz-hint" id="hz-hint">Scroll or drag to travel through time · click any card</div>
+        <div class="hz-bottom">
+          <div class="hz-nav"><button id="hz-prev" aria-label="Previous week">‹</button><button id="hz-next" aria-label="Next week">›</button></div>
+          <div class="hz-strip" id="hz-strip"></div>
+        </div>
       </div>`;
     HZ.built = true;
     HZ.canvas = $('#hz-canvas'); HZ.ctx = HZ.canvas.getContext('2d'); HZ.cardLayer = $('#hz-cards');
     bindHorizon();
     new ResizeObserver(() => HZ_resize()).observe(el);
   }
-  $('#hz-ai').checked = S.hz.showAI;
-  // scope options
+  $$('[data-hg]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.hg === S.hz.group)));
   const src = hzSource();
-  const parts = src.comp.results.slice().sort((a, b) => priority(b) - priority(a));
-  const scopeSel = $('#hz-scope');
-  scopeSel.innerHTML = `<option value="portfolio">Portfolio · ${esc(PRODUCT.name)} clear-to-build</option>` +
-    `<optgroup label="Parts with changed recommendations">${parts.filter(isChangedSrc).map(r => `<option value="${r.part.id}">${esc(r.part.mpn)} · ${esc(r.policies.map(shortPolicy).join(' + '))}</option>`).join('')}</optgroup>` +
-    `<optgroup label="All other parts">${parts.filter(r => !isChangedSrc(r)).map(r => `<option value="${r.part.id}">${esc(r.part.mpn)}</option>`).join('')}</optgroup>`;
-  scopeSel.value = S.hz.scope;
-  const srcSel = $('#hz-src');
-  srcSel.hidden = !S.scenario;
-  if (S.scenario) { srcSel.innerHTML = `<option value="base">Current plan</option><option value="scenario">Scenario: ${esc(S.scenario.label)}</option>`; srcSel.value = S.hz.source; }
+  const sel = $('#hz-scope');
+  if (S.hz.group === 'commodity') {
+    const counts = {}; for (const r of src.comp.results) counts[r.part.commodity] = (counts[r.part.commodity] || 0) + 1;
+    sel.innerHTML = `<option value="portfolio">All commodities</option>` + Object.entries(COMMODITIES).filter(([k]) => counts[k]).map(([k, c]) => `<option value="c:${k}">${esc(c.name)} (${counts[k]})</option>`).join('');
+    if (!(S.hz.scope === 'portfolio' || S.hz.scope.startsWith('c:'))) S.hz.scope = 'portfolio';
+  } else {
+    sel.innerHTML = `<option value="portfolio">All parts</option>` + src.comp.results.slice().sort((a, b) => a.part.mpn.localeCompare(b.part.mpn)).map(r => `<option value="${r.part.id}">${esc(r.part.mpn)}</option>`).join('');
+    if (S.hz.scope.startsWith('c:')) S.hz.scope = 'portfolio';
+  }
+  sel.value = S.hz.scope;
+  $('#hz-scn').innerHTML = src.scenario ? `<span class="chip agent">Scenario: ${esc(src.label)}</span> <button class="why-btn" id="hz-base">Back to current plan</button>` : '';
+  if ($('#hz-base')) $('#hz-base').onclick = () => { S.hz.source = 'base'; VIEWS.horizon(); };
   buildSeries(); buildCards(); renderHzChrome(); HZ_resize();
 };
-function isChangedSrc(r) { const p = S.lastWeek.byId[r.part.id]; return p && (p.policies.join('|') !== r.policies.join('|') || p.forecast !== r.forecast); }
 
 function bindHorizon() {
   const c = HZ.canvas;
@@ -1043,9 +1237,10 @@ function bindHorizon() {
   c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end);
   $('#hz-prev').onclick = () => setCam(Math.round(HZ.camT + CAM_OFF) - 1 - CAM_OFF);
   $('#hz-next').onclick = () => setCam(Math.round(HZ.camT + CAM_OFF) + 1 - CAM_OFF);
-  $('#hz-scope').onchange = e => { S.hz.scope = e.target.value; buildSeries(); buildCards(); renderHzChrome(); setCam(-CAM_OFF); };
-  $('#hz-src').onchange = e => { S.hz.source = e.target.value; VIEWS.horizon(); };
-  $('#hz-ai').onchange = e => { S.hz.showAI = e.target.checked; renderHzChrome(); HZ_wake(); };
+  $('#hz-scope').onchange = e => { S.hz.scope = e.target.value; closePop(); buildSeries(); buildCards(); renderHzChrome(); setCam(-CAM_OFF); };
+  $('#hz-cal').onclick = openStrategicCalendar;
+  $('#hz-lgbtn').onclick = () => { const v = $('#v-horizon'); const on = !v.classList.contains('lg-open'); v.classList.toggle('lg-open', on); $('#hz-lgbtn').setAttribute('aria-expanded', String(on)); };
+  $$('[data-hg]').forEach(b => b.onclick = () => { if (S.hz.group === b.dataset.hg) return; S.hz.group = b.dataset.hg; S.hz.scope = 'portfolio'; closePop(); VIEWS.horizon(); });
   document.addEventListener('keydown', e => {
     if (S.view !== 'horizon' || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return;
     if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); $('#hz-next').click(); }
@@ -1057,137 +1252,126 @@ function setCam(v) { HZ.camT = Math.max(-2.2, Math.min(NWEEKS - 3.5, v)); HZ.las
 
 function HZ_resize() {
   if (!HZ.canvas) return;
+  // compact layout when the Roadmap has little room (small laptop, agent panel open)
+  const v = $('#v-horizon'); const vr = v.getBoundingClientRect();
+  const compact = vr.width < 1180 || vr.height < 720;
+  if (compact !== v.classList.contains('hz-compact')) { v.classList.toggle('hz-compact', compact); }
+  HZ.compact = compact;
   const r = HZ.canvas.getBoundingClientRect(); HZ.dpr = Math.min(2, window.devicePixelRatio || 1);
   HZ.w = r.width; HZ.h = r.height; HZ.canvas.width = Math.max(1, r.width * HZ.dpr); HZ.canvas.height = Math.max(1, r.height * HZ.dpr);
   HZ_wake();
 }
 function HZ_wake() { if (!HZ.raf && HZ.canvas) HZ.raf = requestAnimationFrame(hzFrame); }
 
-// ── Data series for the band
+// ── Weekly demand / supply for the selected scope
 function buildSeries() {
   const src = hzSource();
   if (S.hz.scope === 'portfolio') {
-    const c = src.comp.ctb, a = src.ai.ctb;
-    HZ.series = { unit: 'boards', demand: c.plan, supply: c.built, ai: a.built, adj: null, short: c.shortBoards, max: Math.max(...c.plan) * 1.05 };
+    const c = src.comp.ctb;
+    HZ.series = { unit: 'boards', demand: c.plan, supply: c.built, short: c.shortBoards, max: Math.max(...c.plan) * 1.05 };
   } else {
-    const r = src.comp.byId[S.hz.scope], ar = src.ai.byId[S.hz.scope];
-    if (!r) { S.hz.scope = 'portfolio'; return buildSeries(); }
-    const aiSupply = ar.supply.map((s, w) => s + (w === 0 ? Math.max(0, ar.startInv - r.startInv) : 0));
-    HZ.series = { unit: 'units', demand: r.demand, supply: r.supply.map((s, w) => s), ai: ar.short.map((s, w) => r.demand[w] - s), adj: r.adjDir ? r.adjDemand : null, short: r.short, max: Math.max(...r.demand, ...r.adjDemand, ...r.supply) * 1.08, r };
-    void aiSupply;
+    const list = hzScopeResults(src.comp);
+    if (!list.length) { S.hz.scope = 'portfolio'; return buildSeries(); }
+    const sum = key => WEEKS.map((_, w) => list.reduce((s, r) => s + r[key][w], 0));
+    const demand = sum('demand'), supply = sum('supply'), short = sum('short');
+    HZ.series = { unit: 'units', demand, supply, short, max: Math.max(...demand, ...supply) * 1.08 };
   }
 }
 
-// ── Cards (signals left wall, recommendations right wall)
+// ── Time-phased items: disruptions and holidays on the left wall; lifecycle, tariffs and price changes on the right
+function roadmapItems(comp) {
+  const items = comp.world.events.map(e => ({ id: e.id, kind: e.kind === 'Scenario' ? 'What-if' : 'Disruption', title: e.title, date: e.weeks > 1 ? `${WEEKS[e.from].date} · ${e.weeks} wks` : WEEKS[e.from].date, week: e.from, regions: e.region ? [e.region] : null, commodities: e.commodity ? [e.commodity] : null, detail: `${e.detail} About ${Math.round(e.impact * 100)}% supply impact.`, isNew: e.isNew }));
+  const strat = STRATEGIC.filter(x => x.view === 'in' && !x.lane).map(x => ({ id: x.id, kind: x.kind, title: x.title, date: x.note || x.timing, week: x.week, weeks: x.weeks, global: x.global, regions: x.regions, commodities: x.commodities, detail: `${x.risk}. Action: ${x.action}.`, risk: x.risk, action: x.action, geo: x.geo, url: x.url, source: 'Strategic calendar' }));
+  return items.concat(CALENDAR.map(c => ({ ...c })), strat);
+}
+function itemParts(it, results) {
+  if (it.global) return results;
+  return results.filter(r => (it.regions && it.regions.includes(r.part.region)) || (it.commodities && it.commodities.includes(r.part.commodity) && (!it.mfr || r.part.mfr === it.mfr)) || (it.parts && it.parts.includes(r.part.mpn)));
+}
 function buildCards() {
-  const src = hzSource(); const cards = [];
-  if (S.hz.scope === 'portfolio') {
-    const world = src.comp.world;
-    for (const [k, c] of Object.entries(world.commodities)) {
-      if (!c.status || c.status === c.prev) continue;
-      const n = world.parts.filter(p => p.commodity === k).length;
-      const wk = Math.min(NWEEKS - 1, Math.max(0, Math.round(Math.abs((c.lt || 0) - (c.ltPrev || 0)) / 2)));
-      cards.push({ side: -1, week: wk, cls: 'hzsig ' + (CONSTRAINED(c.status) ? 'bad' : c.status === 'Surplus' ? 'good' : 'neutral'), kind: 'Market shift', isNew: true, title: `${c.name.split(' · ')[1]}: ${c.prev} → ${c.status}`, detail: `Lead time ${c.ltPrev}→${c.lt} wks · price ${c.price > 0 ? '+' : ''}${c.price}%. ${c.note}`, foot: `${n} part${n > 1 ? 's' : ''} affected`, pop: { type: 'commodity', key: k } });
-    }
-    for (const e of world.events) {
-      const n = world.parts.filter(p => (e.region && p.region === e.region) || (e.commodity && p.commodity === e.commodity)).length;
-      cards.push({ side: -1, week: e.from, cls: 'hzsig bad', kind: e.kind === 'Scenario' ? 'What-if assumption' : 'Geopolitical event', isNew: e.isNew, title: e.title, detail: e.detail, foot: `${n} part${n !== 1 ? 's' : ''} exposed · ${Math.round(e.impact * 100)}% impact`, pop: { type: 'event', id: e.id } });
-    }
-    for (const r of src.comp.results) {
-      if (r.part.pcn && r.part.pcn.isNew) cards.push({ side: -1, week: 0, cls: 'hzsig bad', kind: 'Lifecycle · PCN', isNew: true, title: `${r.part.mpn} moved to last-time buy`, detail: `${r.part.pcn.id}: final orders due ${r.part.pcn.ltbDate}. ${r.part.crossesP2P} pin-to-pin alternate available.`, foot: 'Open part ›', pop: { type: 'part', id: r.part.id } });
-      if (r.part.crossNew) cards.push({ side: -1, week: 1, cls: 'hzsig good', kind: 'Cross reference', isNew: true, title: `New pin-to-pin cross for ${r.part.mpn}`, detail: `${r.part.bestCross.mpn} (${r.part.bestCross.mfr}) now matches form-fit-function. Opens a second source.`, foot: 'Open part ›', pop: { type: 'part', id: r.part.id } });
-    }
-    const recs = src.comp.results.filter(r => isChangedSrc(r) && r.primary !== 'MRP').sort((a, b) => priority(b) - priority(a)).slice(0, 12);
-    for (const r of recs) {
-      const sig = r.hits[0];
-      const wk = r.firstShortWeek >= 0 ? Math.max(0, r.firstShortWeek - 1) : sig ? sig.from : r.part.crossNew ? 1 : 2;
-      const pols = [r.adjDir ? (r.adjDir === 'pull' ? 'Pull forecast' : 'Push forecast') : null, ...r.policies.map(shortPolicy)].filter(Boolean);
-      cards.push({ side: 1, week: wk, cls: 'recm', kind: S.accepted[r.part.id] ? 'Recommendation · assigned' : 'Recommendation', isNew: false, title: r.part.mpn, pols, detail: r.ranked[0].why, foot: r.revenueAtRisk > 0 ? `<b>${money(r.revenueAtRisk)}</b> at risk` : 'Pre-emptive: no gap yet', pop: { type: 'why', id: r.part.id } });
-    }
-  } else {
-    const r = src.comp.byId[S.hz.scope];
-    for (const s of r.signals) {
-      const wk = s.week != null ? s.week : s.kind === 'Supply' ? Math.max(0, r.firstShortWeek) : s.kind === 'Market' ? 1 : 0;
-      cards.push({ side: -1, week: wk, cls: 'hzsig ' + s.tone, kind: s.kind, isNew: s.isNew, title: s.title, detail: s.detail, foot: s.source, pop: { type: 'why', id: r.part.id } });
-    }
-    if (r.adjDir) cards.push({ side: 1, week: 0, cls: 'recm', kind: 'Market-adjusted plan', title: r.forecast, pols: [], detail: `${r.adjDir === 'pull' ? 'Pull' : 'Push'} ${fmt(r.adjQty)} units ${r.adjDir === 'pull' ? `into ${WEEKS[0].label}–${WEEKS[3].iso}` : `out to ${WEEKS[8].label}–${WEEKS[11].iso}`} so orders reflect the market, not history.`, foot: 'Why ›', pop: { type: 'why', id: r.part.id } });
-    r.policies.forEach((p, i) => { if (p === 'MRP') return; const c = r.cands.find(c => c.policy === p); cards.push({ side: 1, week: r.firstShortWeek > 0 ? r.firstShortWeek - 1 : 1 + i, cls: 'recm', kind: 'Plan for every part', title: p, pols: [], detail: c.why, foot: r.revenueAtRisk > 0 ? `<b>${money(r.revenueAtRisk)}</b> at risk` : 'Why ›', pop: { type: 'why', id: r.part.id } }); });
-    if (r.primary === 'MRP' && !r.adjDir) cards.push({ side: 1, week: 1, cls: 'hzsig good', kind: 'Plan for every part', title: 'MRP · no change', pols: [], detail: r.ranked[0].why, foot: 'Why ›', pop: { type: 'why', id: r.part.id } });
+  const src = hzSource(); const scoped = hzScopeResults(src.comp); const cards = [];
+  for (const it of roadmapItems(src.comp)) {
+    const parts = itemParts(it, scoped);
+    if (!parts.length) continue;
+    const left = LEFT_KINDS.includes(it.kind);
+    cards.push({ side: left ? -1 : 1, week: it.week, cls: KIND_CLS[it.kind] || '', kind: it.kind, isNew: !!it.isNew, title: it.title, detail: it.detail, foot: it.geo ? it.geo : it.global ? 'All parts' : `${parts.length} part${parts.length > 1 ? 's' : ''} affected`, date: it.date, item: it, parts });
   }
-  // de-collide: at most 2 cards per wall per week
   const used = {};
   cards.sort((a, b) => a.week - b.week || (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
   for (const c of cards) {
-    let w = c.week; while ((used[c.side + ':' + w] || 0) >= 2 && w < NWEEKS - 1) w++;
+    let w = c.week; while ((used[c.side + ':' + w] || 0) >= 3 && w < NWEEKS - 1) w++;
     c.slot = used[c.side + ':' + w] || 0; used[c.side + ':' + w] = c.slot + 1; c.week = w;
   }
+  const lanes = STRATEGIC.filter(x => x.view === 'in' && x.lane && itemParts(x, scoped).length);
+  const li = { l: 0, r: 0 };
+  HZ.lanes = lanes.map(x => { const left = LEFT_KINDS.includes(x.kind); const k = left ? li.l++ : li.r++; return { ...x, side: left ? -1 : 1, idx: k }; });
   HZ.cardLayer.innerHTML = '';
   HZ.cards = cards.map(c => {
     const el = h(`<div class="hz-card ${c.cls}" role="button" tabindex="0">
       <div class="k"><i></i>${esc(c.kind)}${c.isNew ? '<span class="newtag">NEW</span>' : ''}</div>
       <div class="t">${esc(c.title)}</div>
-      ${c.pols && c.pols.length ? `<div class="pols">${c.pols.map(p => `<span class="chip rec">${esc(p)}</span>`).join('')}</div>` : ''}
       <div class="d">${esc(c.detail)}</div>
-      <div class="foot"><span>${c.foot}</span><span>${esc(WEEKS[c.week].label)}</span></div></div>`);
+      <div class="foot"><span>${esc(c.foot)}</span><span>${esc(c.date)}</span></div></div>`);
     el.onclick = (e) => { e.stopPropagation(); cardClick(c, el); };
     el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cardClick(c, el); } };
     HZ.cardLayer.append(el);
-    return { ...c, el, z: (c.week + 0.3 + c.slot * 0.45) * ZD, y: 2.5 + c.slot * 1.5 };
+    return { ...c, el, z: (c.week + 0.3 + c.slot * 0.34) * ZD, y: 2.3 + c.slot * 1.45 };
   });
   HZ_wake();
 }
 
 function cardClick(c, el) {
-  const p = c.pop; closePop();
-  if (p.type === 'why' || p.type === 'part') return openWhy(p.id);
-  const src = hzSource(); const world = src.comp.world;
-  let parts = [], title = '', text = '';
-  if (p.type === 'commodity') { const cm = world.commodities[p.key]; parts = src.comp.results.filter(r => r.part.commodity === p.key); title = cm.name; text = cm.note; }
-  if (p.type === 'event') { const e = world.events.find(x => x.id === p.id); parts = src.comp.results.filter(r => (e.region && r.part.region === e.region) || (e.commodity && r.part.commodity === e.commodity)); title = e.title; text = e.detail; }
-  const pop = h(`<div class="hz-pop" role="dialog" aria-label="${esc(title)}"><button class="x" aria-label="Close">×</button>
-    <div class="eyebrow">${esc(c.kind)}</div><h3>${esc(title)}</h3><p>${esc(text)}</p>
-    <div class="eyebrow" style="margin-bottom:6px">Exposed parts and what the agent recommends</div>
-    <ul>${parts.map(r => `<li><button data-id="${r.part.id}" class="mono">${esc(r.part.mpn)}</button><span class="red" style="font-size:12px">${esc([r.adjDir ? (r.adjDir === 'pull' ? 'Pull' : 'Push') : null, ...r.policies.map(shortPolicy)].filter(Boolean).join(' + '))}</span></li>`).join('')}</ul>
-    <button class="btn sm" id="pop-plan">Open these parts in Plan</button></div>`);
+  closePop();
+  const it = c.item;
+  if (c.parts.length === 1 && !it.global && !it.source) return openWhy(c.parts[0].part.id);
+  const parts = c.parts;
+  const body = it.source
+    ? `<p><b>Risk or opportunity:</b> ${esc(it.risk)}</p><p><b>Executive action:</b> ${esc(it.action)}</p><p class="muted" style="font-size:12px">${esc(it.geo)} · ${esc(it.source)}${it.url ? ` · <a href="${esc(it.url)}" target="_blank" rel="noopener" style="color:var(--agent)">Source</a>` : ''}</p>`
+    : `<p>${esc(c.detail)}</p>`;
+  const list = it.global
+    ? `<p class="muted" style="font-size:12px;margin-top:-4px">Applies to all ${parts.length} parts on the ${esc(PRODUCT.name)} BOM.</p>`
+    : `<div class="eyebrow" style="margin-bottom:6px">Affected parts</div><ul>${parts.map(r => `<li><button data-id="${r.part.id}" class="mono">${esc(r.part.mpn)}</button><span class="muted" style="font-size:12px">${esc(COMMODITIES[r.part.commodity].name.split(' · ')[1] || '')} · ${esc(r.part.region)}</span></li>`).join('')}</ul><button class="btn sm" id="pop-plan">Open these parts in Plan</button>`;
+  const pop = h(`<div class="hz-pop" role="dialog" aria-label="${esc(c.title)}"><button class="x" aria-label="Close">×</button>
+    <div class="eyebrow">${esc(c.kind)} · ${esc(c.date)}</div><h3>${esc(c.title)}</h3>${body}${list}</div>`);
   const rect = el.getBoundingClientRect(), host = $('#v-horizon').getBoundingClientRect();
   pop.style.left = Math.min(host.width - 336, Math.max(16, rect.left - host.left)) + 'px';
   pop.style.top = Math.min(host.height - 360, Math.max(80, rect.top - host.top)) + 'px';
   $('#v-horizon').append(pop);
   $('.x', pop).onclick = closePop;
   $$('li button', pop).forEach(b => b.onclick = () => { closePop(); openWhy(b.dataset.id); });
-  $('#pop-plan', pop).onclick = () => { closePop(); S.plan.changedOnly = false; S.plan.q = ''; S.plan.commodity = p.type === 'commodity' ? p.key : ''; S.plan.ids = parts.map(r => r.part.id); setView('plan'); };
+  if ($('#pop-plan', pop)) $('#pop-plan', pop).onclick = () => { closePop(); S.plan.changedOnly = false; S.plan.ids = parts.map(r => r.part.id); setView('plan'); };
   HZ.pop = pop;
 }
 function closePop() { if (HZ.pop) { HZ.pop.remove(); HZ.pop = null; } }
 
 function renderHzChrome() {
-  const src = hzSource(); const sc = S.hz.scope === 'portfolio';
-  const c = src.comp.ctb, a = src.ai.ctb;
-  const pct = x => Math.round(x.built.reduce((s, v) => s + v, 0) / x.plan.reduce((s, v) => s + v, 0) * 100) + '%';
-  const nChanged = src.comp.results.filter(isChangedSrc).length;
-  $('#hz-h1').textContent = sc ? (S.hz.source === 'scenario' ? 'Scenario: ' + src.label : 'The road ahead') : src.comp.byId[S.hz.scope].part.mpn;
-  const r = sc ? null : src.comp.byId[S.hz.scope];
-  $('#hz-sub').textContent = sc
-    ? `Demand is the build plan for ${PRODUCT.name}. Supply is what every part lets you build. Signals arrive on the left; the agent's recommendations appear in red on the right.`
-    : `${r.part.desc} · ${r.part.mfr} · ${r.mkt?.name || ''}. Demand vs. projected supply in units, with the market-adjusted plan dashed.`;
-  $('#hz-legend').innerHTML = `<span><i style="background:var(--demand)"></i>${sc ? 'Build plan (demand)' : 'Demand'}</span><span><i style="background:var(--supply)"></i>${sc ? 'Clear-to-build (supply)' : 'Projected supply'}</span><span><i style="background:var(--rec)"></i>Gap</span>${!sc && r.adjDir ? '<span><i style="background:repeating-linear-gradient(90deg,var(--rec) 0 4px,transparent 4px 7px)"></i>Market-adjusted demand</span>' : ''}${S.hz.showAI ? '<span><i style="background:repeating-linear-gradient(90deg,var(--agent) 0 4px,transparent 4px 7px)"></i>With AI plan</span>' : ''}`;
-  if (sc) {
-    $('#hz-kpis').innerHTML = `
-      <div class="hz-kpi"><div class="eyebrow">Revenue at risk · 16 wks</div><div class="v"><span class="red">${money(c.revenueAtRisk)}</span></div><div class="s">${money(a.revenueAtRisk)} with AI plan</div></div>
-      <div class="hz-kpi"><div class="eyebrow">Clear-to-build</div><div class="v">${pct(c)}</div><div class="s">${pct(a)} with AI plan</div></div>
-      <div class="hz-kpi"><div class="eyebrow">Changed this week</div><div class="v">${nChanged}<small style="font-size:13px;color:var(--muted)"> / ${src.comp.results.length}</small></div><div class="s">${pendingChanged().length} awaiting your decision</div></div>`;
-  } else {
-    $('#hz-kpis').innerHTML = `
-      <div class="hz-kpi"><div class="eyebrow">Recommendation</div><div class="v red" style="font:600 15px/1.3 var(--sans)">${esc([r.forecast, ...r.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</div><div class="s">Was ${esc([S.lastWeek.byId[r.part.id].forecast, ...S.lastWeek.byId[r.part.id].policies.map(shortPolicy)].filter(Boolean).join(' · '))}</div></div>
-      <div class="hz-kpi"><div class="eyebrow">Resilience Rating</div><div class="v">${r.part.rr}<small style="font-size:13px;color:${r.rrDrop > 0 ? 'var(--rec)' : 'var(--muted)'}"> ${r.rrDrop > 0 ? '▼' + r.rrDrop : ''}</small></div><div class="s">${r.sources} approved source${r.sources > 1 ? 's' : ''} · ${r.part.region}</div></div>
-      <div class="hz-kpi"><div class="eyebrow">Revenue at risk</div><div class="v ${r.revenueAtRisk ? 'red' : ''}">${money(r.revenueAtRisk)}</div><div class="s"><button class="why-btn" id="hz-why">Why? ›</button></div></div>`;
-    $('#hz-why').onclick = () => openWhy(r.part.id);
-  }
-  // strip
-  const s = HZ.series;
+  const src = hzSource(); const s = HZ.series; const port = S.hz.scope === 'portfolio';
+  const scoped = hzScopeResults(src.comp);
+  const tot = a => a.reduce((x, y) => x + y, 0);
+  const dem = tot(s.demand), sup = tot(s.supply), short = tot(s.short);
+  const otd = dem ? Math.round((1 - short / dem) * 1000) / 10 : 100;
+  const invUnits = scoped.reduce((x, r) => x + r.part.onHand, 0), invVal = scoped.reduce((x, r) => x + r.part.onHand * r.part.price, 0);
+  const one = !port && !S.hz.scope.startsWith('c:') ? scoped[0] : null;
+  $('#hz-h1').textContent = port ? (src.scenario ? 'Scenario: ' + src.label : 'The road ahead') : one ? one.part.mpn : COMMODITIES[S.hz.scope.slice(2)].name;
+  $('#hz-sub').textContent = port
+    ? `Weekly build plan and clear-to-build for ${PRODUCT.name}, with dated events along the way: disruptions and holidays on the left, lifecycle deadlines, tariffs and price changes on the right.`
+    : one ? `${one.part.desc} · ${one.part.mfr} · ${one.part.region}. Weekly demand and projected supply in units, with dated events that affect this part.`
+    : `${scoped.length} parts. Weekly demand and projected supply in units, with dated events that affect this commodity.`;
+  const sw = (cls, label) => `<span class="lg"><i class="${cls}"></i>${label}</span>`;
+  $('#hz-legend').innerHTML = `<table class="hz-lgd" aria-label="Legend"><tbody>
+    <tr><th>Road</th><td>${sw('ln-dem', port ? 'Build plan (demand)' : 'Demand')}</td><td>${sw('ln-sup', port ? 'Clear-to-build (supply)' : 'Supply')}</td><td>${sw('ln-gap', 'Gap')}</td><td>${sw('ln-lane', 'Season lane')}</td></tr>
+    <tr><th>Left wall</th><td>${sw('d-dis', 'Disruption')}</td><td>${sw('d-hol', 'Holiday')}</td><td>${sw('d-dem', 'Demand cycle')}</td><td></td></tr>
+    <tr><th>Right wall</th><td>${sw('d-life', 'LTB / EOL / PCN')}</td><td>${sw('d-tar', 'Trade &amp; tariff')}</td><td>${sw('d-comp', 'Compliance')}</td><td>${sw('d-price', 'Price change')}</td></tr>
+  </tbody></table>`;
+  const u = port ? 'boards' : 'units';
+  $('#hz-kpis').innerHTML = `
+    <div class="hz-kpi"><div class="eyebrow">On-time delivery</div><div class="v ${otd < 95 ? 'red' : ''}">${otd}%</div><div class="s">${short ? fmt(short) + ' ' + u + ' late' : 'All demand met on time'}</div></div>
+    <div class="hz-kpi"><div class="eyebrow">Total demand</div><div class="v">${kfmt(dem)}</div><div class="s">${u} · 16 weeks</div></div>
+    <div class="hz-kpi"><div class="eyebrow">Total supply</div><div class="v">${kfmt(sup)}</div><div class="s">${port ? 'boards buildable' : 'units projected'}</div></div>
+    <div class="hz-kpi"><div class="eyebrow">Total inventory</div><div class="v">${port ? money(invVal) : kfmt(invUnits)}</div><div class="s">${port ? 'on hand across ' + scoped.length + ' parts' : 'units on hand · ' + money(invVal)}</div></div>`;
   $('#hz-strip').innerHTML = WEEKS.map((w, i) => {
     const frac = s.short[i] / (s.demand[i] || 1);
-    return `<button class="${frac > 0.05 ? 'red' : frac > 0 ? 'amber' : ''}" data-i="${i}" title="${w.label} · ${w.date}${s.short[i] ? ' · short ' + fmt(s.short[i]) + ' ' + s.unit : ''}"><span>${w.iso}</span></button>`;
+    return `<button class="${frac > 0.05 ? 'red' : frac > 0 ? 'amber' : ''}" data-i="${i}" title="${w.label} · ${w.date} · demand ${fmt(s.demand[i])}, supply ${fmt(s.supply[i])}"><span>${w.iso}</span></button>`;
   }).join('');
   $$('#hz-strip button').forEach(b => b.onclick = () => setCam(+b.dataset.i - CAM_OFF));
 }
@@ -1234,9 +1418,22 @@ function drawHorizon() {
     if (hd > hsBand + 0.01) { quad(hsBand, hd, z0, z1, `rgba(255,91,79,${0.5 * f})`); quad(-hd, -hsBand, z0, z1, `rgba(255,91,79,${0.5 * f})`); }
     line(hsBand, z0, z1, `rgba(76,207,178,${0.95 * f})`, 2); line(-hsBand, z0, z1, `rgba(76,207,178,${0.95 * f})`, 2);
     line(hd, z0, z1, `rgba(126,176,255,${0.95 * f})`, 1.6); line(-hd, z0, z1, `rgba(126,176,255,${0.95 * f})`, 1.6);
-    if (s.adj) { const ha = hw(s.adj[i]); line(ha, z0, z1, `rgba(255,91,79,${f})`, 1.6, [6, 5]); line(-ha, z0, z1, `rgba(255,91,79,${f})`, 1.6, [6, 5]); }
-    if (S.hz.showAI && s.ai && Math.abs(s.ai[i] - (s.demand[i] - s.short[i])) > 0.5) { const hai = hw(s.ai[i]); line(hai, z0, z1, `rgba(183,167,255,${f})`, 2, [3, 4]); line(-hai, z0, z1, `rgba(183,167,255,${f})`, 2, [3, 4]); }
     void hs;
+  }
+  // seasonal lanes (multi-week calendar windows) along the road edges
+  ctx.textAlign = 'center';
+  for (const ln of HZ.lanes || []) {
+    const x = ln.side * (BAND + 0.75 + ln.idx * 0.55), rgb = KIND_RGB[ln.kind] || '183,167,255';
+    let z0 = ln.week * ZD, z1 = (ln.week + ln.weeks) * ZD;
+    if (z1 <= camZ + NEAR) continue; z0 = Math.max(z0, camZ + NEAR);
+    const f = fog(z0 - camZ);
+    quad(x - 0.09, x + 0.09, z0, Math.min(z1, zMax + 20), `rgba(${rgb},${0.4 * f})`);
+    // label: at the lane start, or just ahead of the camera once the start has passed
+    const lz = Math.max(ln.week * ZD, camZ + 16);
+    if (lz < z1 - 4) {
+      const g = P(x + ln.side * 0.3, 0.2 + ln.idx * 0.6, lz), ts = Math.min(12.5, 170 / g[2]);
+      if (ts >= 7) { ctx.textAlign = ln.side < 0 ? 'right' : 'left'; ctx.fillStyle = `rgba(${rgb},${0.95 * fog(g[2])})`; ctx.font = `600 ${ts}px 'IBM Plex Sans Condensed', sans-serif`; ctx.fillText(`${ln.title} · ${ln.timing}`, g[0], g[1]); ctx.textAlign = 'center'; }
+    }
   }
   // gates + labels
   ctx.textAlign = 'center';
@@ -1260,10 +1457,24 @@ function drawHorizon() {
     ctx.fillText((isNow ? 'NOW · ' : '') + WEEKS[i].label.toUpperCase(), top[0], top[1]);
     ctx.fillStyle = `rgba(132,148,171,${f})`; ctx.font = `400 ${sz * 0.72}px 'IBM Plex Mono', monospace`;
     ctx.fillText(WEEKS[i].date, top[0], top[1] + sz * 0.95);
-    if (short && sz > 8) {
-      const g = P(0, 0.25, z + ZD * 0.5);
-      ctx.fillStyle = `rgba(255,120,110,${f})`; ctx.font = `600 ${sz * 0.9}px 'IBM Plex Mono', monospace`;
-      ctx.fillText(`−${fmt(s.short[i])} ${s.unit}`, g[0], g[1]);
+    // weekly demand / supply summary on the road
+    const g = P(0, 0, z + ZD * 0.3), gdz = g[2];
+    const ts = Math.min(20, 240 / gdz);
+    const fa = fog(gdz) * Math.max(0, Math.min(1, (gdz - 9) / 5));
+    if (ts >= 7.5 && fa > 0.05) {
+      const dmd = s.demand[i], sup = s.demand[i] - s.short[i], dl = sup - dmd;
+      const nf = v => s.unit === 'boards' ? fmt(v) : kfmt(v);
+      const rows = [['DEMAND', nf(dmd), '231,237,244'], ['SUPPLY', nf(sup), '231,237,244'], ['DELTA', (dl > 0 ? '+' : dl < 0 ? '−' : '') + nf(Math.abs(dl)), dl < 0 ? '255,120,110' : '94,211,154']];
+      const lh = ts * 1.22; let y = g[1] - lh * rows.length - ts * 0.2;
+      ctx.save();
+      for (const [lab, val, rgb] of rows) {
+        y += lh;
+        ctx.textAlign = 'right'; ctx.fillStyle = `rgba(185,198,214,${0.9 * fa})`; ctx.font = `600 ${ts * 0.62}px 'IBM Plex Sans Condensed', sans-serif`;
+        ctx.fillText(lab, g[0] - ts * 0.35, y);
+        ctx.textAlign = 'left'; ctx.fillStyle = `rgba(${rgb},${fa})`; ctx.font = `600 ${ts}px 'IBM Plex Mono', monospace`;
+        ctx.fillText(val, g[0] + ts * 0.1, y);
+      }
+      ctx.restore();
     }
   }
   // cards
@@ -1277,7 +1488,7 @@ function drawHorizon() {
     c.el.style.visibility = 'visible';
     const cw = c.el.offsetWidth, ch = c.el.offsetHeight;
     c.el.style.opacity = op.toFixed(3);
-    c.el.style.transform = `translate(${(sx - cw / 2).toFixed(1)}px, ${(sy - ch / 2).toFixed(1)}px) scale(${Math.min(1.0, sc).toFixed(3)})`;
+    c.el.style.transform = `translate(${(sx - cw / 2).toFixed(1)}px, ${(sy - ch / 2).toFixed(1)}px) scale(${Math.min(HZ.compact ? 0.82 : 1.0, sc * (HZ.compact ? 0.85 : 1)).toFixed(3)})`;
     c.el.style.zIndex = String(1000 - Math.round(dz));
     c.el.tabIndex = op > 0.5 ? 0 : -1; c.el.style.pointerEvents = op > 0.3 ? 'auto' : 'none';
   }
@@ -1286,24 +1497,59 @@ function drawHorizon() {
   $$('#hz-strip button').forEach((b, i) => b.classList.toggle('cur', i === cur));
 }
 
-// ───────────────────────── Plan: weekly grid + summary by part ─────────────────────────
-function planRows() {
-  const f = S.plan; const q = f.q.trim().toUpperCase();
-  return S.comp.results.filter(r => {
-    if (f.ids && !f.ids.includes(r.part.id)) return false;
-    if (f.changedOnly && !isChanged(r)) return false;
-    if (f.commodity && r.part.commodity !== f.commodity) return false;
-    if (f.policy && !r.policies.includes(f.policy) && r.forecast !== f.policy) return false;
-    if (q && !(r.part.mpn.toUpperCase().includes(q) || r.part.mfr.toUpperCase().includes(q) || r.part.desc.toUpperCase().includes(q))) return false;
-    return true;
-  }).sort((a, b) => priority(b) - priority(a));
+// ── Strategic calendar panel: every entry, including those outside the 16-week view
+function openStrategicCalendar() {
+  closeWhy(); closePop();
+  const sec = (label, list, note) => list.length ? `<div class="why-sec"><h4>${label} · ${list.length}</h4>${note ? `<p class="muted" style="font-size:12px;margin:-4px 0 8px">${note}</p>` : ''}<div class="siglist">${list.map(x => `
+    <div class="sig neutral" style="grid-template-columns:110px 1fr"><div class="kind" style="color:rgb(${KIND_RGB[x.kind] || '183,167,255'})">${esc(x.timing)}<span class="src">${esc(x.kind)} · ${esc(x.geo)}</span></div>
+    <div><b>${esc(x.title)}</b>${x.note ? ` <span class="muted" style="font-size:12px">(${esc(x.note)})</span>` : ''}<p><b style="font-size:12px;font-weight:600">Risk:</b> ${esc(x.risk)}</p><p><b style="font-size:12px;font-weight:600">Action:</b> ${esc(x.action)}</p>
+    <p style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px"><span class="muted" style="font-size:11.5px">${esc(x.status)}</span>${x.view === 'in' ? `<button class="why-btn" data-go="${x.week}">Show on Roadmap · ${esc(WEEKS[x.week].label)}</button>` : ''}${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:var(--agent);font-size:12px">Source</a>` : ''}</p></div></div>`).join('')}</div></div>` : '';
+  const by = v => STRATEGIC.filter(x => x.view === v);
+  const bg = h(`<div class="drawer-bg"></div>`); bg.onclick = closeWhy;
+  const d = h(`<div class="drawer" role="dialog" aria-modal="true" aria-label="Strategic calendar">
+    <header><div class="eyebrow">Global technology supply chain</div><h2 style="font-family:var(--sans)">Strategic calendar</h2>
+      <div class="muted" style="font-size:13px">Shutdowns, trade policy, compliance changes and demand cycles. Entries inside ${WEEKS[0].label}–${WEEKS[NWEEKS - 1].label} appear on the Roadmap.</div>
+      <button class="x" aria-label="Close">✕</button></header>
+    <div class="scroll">
+      ${sec('On the Roadmap now', by('in').sort((a, b) => a.week - b.week))}
+      ${sec('Later in the year', by('later'), 'After ' + WEEKS[NWEEKS - 1].date + ', beyond the 16-week plan.')}
+      ${sec('Ongoing or as issued', by('ongoing'), 'No fixed date; the agent monitors these continuously.')}
+      ${sec('Just ended', by('before'))}
+    </div></div>`);
+  document.body.append(bg, d);
+  $('.x', d).onclick = closeWhy; $('.x', d).focus();
+  d.addEventListener('keydown', e => { if (e.key === 'Escape') closeWhy(); });
+  $$('[data-go]', d).forEach(b => b.onclick = () => { closeWhy(); setCam(+b.dataset.go - CAM_OFF); });
 }
-function recHtml(r, withWas = true) {
-  const p = lastRec(r.part.id); const ch = isChanged(r);
-  const fc = r.forecast ? (r.forecast.startsWith('Adjust') ? `<span>${esc(r.forecast)}</span>` : `<span class="ok">${esc(r.forecast)}</span>`) : '<span class="ok" title="No market coverage">—</span>';
-  const pol = r.primary === 'MRP' ? `<span class="ok">MRP</span>` : r.policies.map(x => `<span>${esc(x)}</span>`).join('');
-  const was = withWas && ch ? `<span class="was">${esc([p.forecast, ...p.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</span>` : '';
-  return `<div class="recs">${fc}${pol}${was}</div>`;
+
+// ───────────────────────── Plan: Intelligent Plan (forecast) + Plan For Every Part (supply policy) ─────────────────────────
+// Intelligent Plan = planner view: market-adjusted forecast recommendation only.
+// Plan For Every Part = procurement view: supply / replenishment policy only.
+const kfmt = n => { const a = Math.abs(n); return a >= 10000 ? (n / 1000).toFixed(0) + 'K' : a >= 1000 ? (n / 1000).toFixed(1) + 'K' : String(Math.round(n)); };
+const fcChanged = r => lastRec(r.part.id).forecast !== r.forecast;
+const polChanged = r => lastRec(r.part.id).policies.join('|') !== r.policies.join('|');
+const modeChanged = r => (S.plan.mode === 'grid' ? fcChanged(r) : polChanged(r));
+const fcPriority = r => ({ 'Adjust forecast (pull)': 3, 'Adjust forecast (push)': 2, 'Hold forecast': 1 }[r.forecast] || 0);
+
+function planRows() {
+  const f = S.plan;
+  return S.comp.results.filter(r => (!f.ids || f.ids.includes(r.part.id)) && (!f.changedOnly || modeChanged(r)))
+    .sort((a, b) => f.mode === 'grid' ? (fcChanged(b) - fcChanged(a)) || (fcPriority(b) - fcPriority(a)) || (priority(b) - priority(a)) : priority(b) - priority(a));
+}
+function planGroups(rows) {
+  const g = {};
+  for (const r of rows) (g[r.part.commodity] = g[r.part.commodity] || []).push(r);
+  const order = k => { const c = COMMODITIES[k]; return (c.status !== c.prev ? 100 : 0) + ({ Constrained: 4, Tightening: 3, Surplus: 2, Stable: 1 }[c.status] || 0); };
+  return Object.entries(g).sort((a, b) => order(b[0]) - order(a[0]) || b[1].length - a[1].length);
+}
+function forecastHtml(fc, was) {
+  const main = fc ? (fc.startsWith('Adjust') ? `<span>${esc(fc)}</span>` : `<span class="ok">${esc(fc)}</span>`) : '<span class="ok" title="No market intelligence for this commodity">— no market data</span>';
+  return `<div class="recs">${main}${was !== undefined && was !== fc ? `<span class="was">${esc(was || 'No recommendation')}</span>` : ''}</div>`;
+}
+function policyHtml(r) {
+  const p = lastRec(r.part.id);
+  const now = r.primary === 'MRP' ? `<span class="ok">MRP</span>` : r.policies.map(x => `<span>${esc(x)}</span>`).join('');
+  return `<div class="recs">${now}${polChanged(r) ? `<span class="was">${esc(p.policies.join(' + '))}</span>` : ''}</div>`;
 }
 function statusHtml(r) {
   const id = r.part.id;
@@ -1313,88 +1559,111 @@ function statusHtml(r) {
   if (isChanged(r) && needsDecision(r)) return `<span class="chip warn">Awaiting decision</span>`;
   return '<span class="muted">—</span>';
 }
-const kfmt = n => { const a = Math.abs(n); return a >= 10000 ? (n / 1000).toFixed(0) + 'K' : a >= 1000 ? (n / 1000).toFixed(1) + 'K' : String(Math.round(n)); };
+function mktLine(c) { return c.status ? `<span class="mkt ${c.status}">${esc(c.status)}</span>${c.lt != null ? ` <small class="muted">· LT ${c.ltPrev === c.lt ? c.lt : c.ltPrev + '→' + c.lt} wks · price ${c.price > 0 ? '+' : ''}${c.price}%</small>` : ''}` : '<span class="mkt">No coverage</span>'; }
 
 VIEWS.plan = function () {
   const el = $('#v-plan'); const f = S.plan;
+  f.group = f.group || 'commodity'; f.open = f.open || {}; f.openP = f.openP || {};
+  const openMap = f.mode === 'grid' ? f.open : f.openP; const isOpen = k => f.mode === 'grid' ? !!f.open[k] : f.openP[k] !== false;
   const rows = planRows();
-  const pend = pendingChanged();
-  const shortPend = pend.filter(r => r.revenueAtRisk > 0);
-  const commOpts = Object.entries(COMMODITIES).map(([k, c]) => `<option value="${k}" ${f.commodity === k ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
-  const polOpts = ['Adjust forecast (pull)', 'Adjust forecast (push)', 'Multi-source', 'Buffer', 'Strategic buy', 'Long Term Supply Agreement', 'Life-time buy', 'MRP'].map(p => `<option ${f.policy === p ? 'selected' : ''}>${p}</option>`).join('');
+  const ip = f.mode === 'grid';
   el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end">
-      <div><div class="eyebrow">Analyze · Recommend</div><h2 class="section-title" style="font-size:24px;margin-top:6px">Part plans</h2>
-      <p class="lede">Weekly demand and supply for each part, with the agent's market-adjusted forecast and Plan for Every Part policy in red. Last week's recommendation is struck through.</p></div>
-    </div>
-    <div class="card" style="margin-top:16px;padding:14px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-color:rgba(183,167,255,.3);background:linear-gradient(90deg,var(--agent-soft),transparent)">
-      <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true" style="flex-shrink:0"><path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B7A7FF"/></svg>
-      <div style="flex:1;min-width:240px;font:400 15.5px/1.5 var(--serif)">${pend.length
-        ? `<b>${pend.length} recommendations</b> changed and are waiting on you. ${shortPend.length} address a projected shortage worth <b class="red">${money(shortPend.reduce((a, r) => a + r.revenueAtRisk, 0))}</b>; the other ${pend.length - shortPend.length} are pre-emptive, driven by market and event signals before any gap appears.`
-        : 'Every changed recommendation has an owner. The agent will reassess each part as its actions close.'}</div>
-      ${pend.length ? `<button class="btn primary" id="pl-all">Accept all ${pend.length} and assign</button>` : `<button class="btn" id="pl-acts">Open actions</button>`}
-    </div>
+    <div class="eyebrow">${ip ? 'Market-adjusted planning · demand planner' : 'Plan For Every Part · procurement'}</div>
+    <h2 class="section-title" style="font-size:24px;margin-top:6px">${ip ? 'Intelligent Plan' : 'Plan For Every Part'}</h2>
+    <p class="lede">${ip
+      ? 'Weekly demand and supply with the agent’s forecast recommendation for each commodity and part, based on current market conditions. Last week’s recommendation is struck through.'
+      : 'The supply and replenishment policy the agent recommends for each part, based on market, risk and lifecycle signals. Last week’s policy is struck through.'}</p>
     <div class="toolbar">
-      <div class="seg" role="group" aria-label="Layout"><button aria-pressed="${f.mode === 'grid'}" data-m="grid">Weekly plan</button><button aria-pressed="${f.mode === 'sum'}" data-m="sum">Summary by part</button></div>
-      <label class="toggle"><input type="checkbox" id="pl-ch" ${f.changedOnly ? 'checked' : ''}> Only parts whose recommendation changed</label>
+      <div class="seg" role="group" aria-label="View"><button aria-pressed="${ip}" data-m="grid">Intelligent Plan</button><button aria-pressed="${!ip}" data-m="sum">Plan For Every Part</button></div>
+      <div class="seg" role="group" aria-label="Group by"><button aria-pressed="${f.group === 'commodity'}" data-g="commodity">Grouped by commodity</button><button aria-pressed="${f.group === 'part'}" data-g="part">Grouped by part</button></div>
+      <label class="toggle"><input type="checkbox" id="pl-ch" ${f.changedOnly ? 'checked' : ''}> Only changed recommendations</label>
       <span class="grow"></span>
-      <input class="field" id="pl-q" placeholder="Search part or maker" value="${esc(f.q)}" style="width:190px" aria-label="Search parts">
-      <select class="field" id="pl-c" aria-label="Commodity"><option value="">All commodities</option>${commOpts}</select>
-      <select class="field" id="pl-p" aria-label="Recommendation"><option value="">All recommendations</option>${polOpts}</select>
-      <span class="muted" style="font-size:12px">${rows.length} of ${S.comp.results.length} parts${f.ids ? ` · <button class="why-btn" id="pl-clr">Clear selection</button>` : ''}</span>
+      <span class="muted" style="font-size:12px">${rows.length} of ${S.comp.results.length} parts${f.ids ? ` · <button class="why-btn" id="pl-clr">Clear selection</button>` : ''}${f.group === 'commodity' ? ` · <button class="why-btn" id="pl-exp">${planGroups(rows).some(([k]) => isOpen(k)) ? 'Collapse all' : 'Expand all'}</button>` : ''}</span>
     </div>
-    <div class="tablewrap" id="pl-table">${f.mode === 'grid' ? gridTable(rows) : sumTable(rows)}</div>`;
-  $$('.seg button', el).forEach(b => b.onclick = () => { f.mode = b.dataset.m; VIEWS.plan(); });
+    <div class="tablewrap" id="pl-table">${ip ? ipTable(rows) : pfepTable(rows)}</div>`;
+  $$('[data-m]', el).forEach(b => b.onclick = () => { f.mode = b.dataset.m; VIEWS.plan(); });
+  $$('[data-g]', el).forEach(b => b.onclick = () => { f.group = b.dataset.g; VIEWS.plan(); });
   $('#pl-ch').onchange = e => { f.changedOnly = e.target.checked; VIEWS.plan(); };
-  $('#pl-q').oninput = e => { f.q = e.target.value; const pos = e.target.selectionStart; VIEWS.plan(); const n = $('#pl-q'); n.focus(); n.setSelectionRange(pos, pos); };
-  $('#pl-c').onchange = e => { f.commodity = e.target.value; VIEWS.plan(); };
-  $('#pl-p').onchange = e => { f.policy = e.target.value; VIEWS.plan(); };
-  if ($('#pl-clr')) $('#pl-clr').onclick = () => { f.ids = null; f.commodity = ''; VIEWS.plan(); };
-  if ($('#pl-all')) $('#pl-all').onclick = () => { const res = acceptAll(); toast(`Created ${res.actions} actions across ${res.parts} parts`); agentSay(`Done. I routed **${res.actions} actions** for ${res.parts} parts to Design Engineering, Supply Chain, Procurement and Demand Planning. I'll reassess each part as its actions close.`, [{ label: 'Open actions', fn: () => setView('actions') }]); };
-  if ($('#pl-acts')) $('#pl-acts').onclick = () => setView('actions');
+  if ($('#pl-clr')) $('#pl-clr').onclick = () => { f.ids = null; VIEWS.plan(); };
+  if ($('#pl-exp')) $('#pl-exp').onclick = () => { const anyOpen = planGroups(rows).some(([k]) => isOpen(k)); for (const [k] of planGroups(rows)) openMap[k] = !anyOpen; VIEWS.plan(); };
+  $$('[data-tog]', el).forEach(b => b.onclick = () => { openMap[b.dataset.tog] = !isOpen(b.dataset.tog); VIEWS.plan(); });
   $$('[data-why]', el).forEach(b => b.onclick = () => openWhy(b.dataset.why));
+  $$('[data-cwhy]', el).forEach(b => b.onclick = () => openCommodityWhy(b.dataset.cwhy));
 };
 
-function gridTable(rows) {
-  if (!rows.length) return `<p class="muted" style="padding:20px">No parts match these filters.</p>`;
-  const head = `<thead><tr><th class="l stick">Part</th><th class="l">Recommendation</th><th>Inv.</th><th>RR</th><th class="l">Plan</th>${WEEKS.map(w => `<th>${w.label}<span class="dt">${w.date}</span></th>`).join('')}</tr></thead>`;
-  const body = rows.map(r => {
-    const ev = (w) => r.hits.some(e => w >= e.from && w < e.from + e.weeks);
-    const lines = [
-      ['Demand', r.demand.map((v, w) => `<td class="v">${kfmt(v)}</td>`)],
-      r.adjDir ? ['Mkt-adj. demand', r.adjDemand.map((v, w) => { const d = v - r.demand[w]; return `<td class="v ${d ? 'adj ' + (d > 0 ? 'up' : 'dn') : ''}">${kfmt(v)}</td>`; })] : null,
-      ['Supply', r.supply.map((v, w) => `<td class="v ${ev(w) ? 'ev' : ''}" ${ev(w) ? `title="${esc(r.hits.map(e => e.title).join('; '))}"` : ''}>${kfmt(v)}</td>`)],
-      ['Proj. balance', r.balance.map(v => `<td class="v ${v < 0 ? 'neg' : ''}">${kfmt(v)}</td>`)],
-    ].filter(Boolean);
-    const n = lines.length;
-    return lines.map((ln, i) => `<tr class="${i === n - 1 ? 'grp-end' : 'grp'}">${i === 0 ? `
-      <td class="l stick" rowspan="${n}"><div class="partcell">${isChanged(r) ? '' : ''}<button data-why="${r.part.id}">${isChanged(r) ? '<span class="chg" title="Changed this week"></span>' : ''}${esc(r.part.mpn)}</button><small>${esc(r.part.mfr)}</small><small>${esc(COMMODITIES[r.part.commodity].name)}</small><small><span class="mkt ${r.mktStatus || ''}">${esc(r.mktStatus || 'No coverage')}</span></small></div></td>
-      <td class="l" rowspan="${n}">${recHtml(r)}<div style="margin-top:6px"><button class="why-btn" data-why="${r.part.id}">Why?</button></div></td>
-      <td rowspan="${n}" class="v">${kfmt(r.part.onHand)}</td>
-      <td rowspan="${n}" class="rr">${r.part.rr}${r.rrDrop > 0 ? `<small class="dn">▼${r.rrDrop}</small>` : ''}</td>` : ''}
-      <td class="metric">${ln[0]}</td>${ln[1].join('')}</tr>`).join('');
+// ── Intelligent Plan: forecast recommendation + Demand / Supply / Projected balance
+function weekHead() { return WEEKS.map(w => `<th>${w.label}<span class="dt">${w.date}</span></th>`).join(''); }
+function metricRows(lines, lead) {
+  const n = lines.length;
+  return lines.map((ln, i) => `<tr class="${ln.cls || ''} ${i === n - 1 ? 'grp-end' : 'grp'}">${i === 0 ? lead(n) : ''}<td class="metric">${ln.name}</td>${ln.vals.map(v => `<td class="v ${ln.neg && v < 0 ? 'neg' : ln.neg && v > 0 ? 'pos' : ''}">${kfmt(v)}</td>`).join('')}</tr>`).join('');
+}
+function partLines(r) { return [{ name: 'Demand', vals: r.demand }, { name: 'Supply', vals: r.supply }, { name: 'Proj. balance', vals: r.balance, neg: true }]; }
+function ipPartRows(r, nested) {
+  return metricRows(partLines(r), n => `
+    <td class="l stick" rowspan="${n}"><div class="partcell" style="${nested ? 'padding-left:18px' : ''}"><button data-why="${r.part.id}">${esc(r.part.mpn)}</button><small>${esc(r.part.mfr)}</small>${nested ? '' : `<small>${esc(COMMODITIES[r.part.commodity].name)}</small><small><span class="mkt ${r.mktStatus || ''}">${esc(r.mktStatus || 'No coverage')}</span></small>`}</div></td>
+    <td class="l" rowspan="${n}">${forecastHtml(r.forecast, lastRec(r.part.id).forecast)}<div style="margin-top:6px"><button class="why-btn" data-why="${r.part.id}">Why?</button></div></td>
+    <td rowspan="${n}" class="v">${kfmt(r.part.onHand)}</td>
+    <td rowspan="${n}" class="rr">${r.part.rr}${r.rrDrop > 0 ? `<small class="dn">▼${r.rrDrop}</small>` : ''}</td>`);
+}
+function ipTable(rows) {
+  if (!rows.length) return `<p class="muted" style="padding:20px">No parts match.</p>`;
+  const head = `<thead><tr><th class="l stick">${S.plan.group === 'commodity' ? 'Commodity · part' : 'Part'}</th><th class="l">Forecast recommendation</th><th>Inv.</th><th>RR</th><th class="l">Plan</th>${weekHead()}</tr></thead>`;
+  if (S.plan.group === 'part') return `<table class="grid">${head}<tbody>${rows.map(r => ipPartRows(r, false)).join('')}</tbody></table>`;
+  const body = planGroups(rows).map(([k, list]) => {
+    const c = COMMODITIES[k]; const r0 = list[0]; const open = !!S.plan.open[k];
+    const sum = key => WEEKS.map((_, w) => list.reduce((s, r) => s + r[key][w], 0));
+    const inv = list.reduce((s, r) => s + r.part.onHand, 0);
+    const head = metricRows([{ name: 'Demand', vals: sum('demand'), cls: 'cgrp' }, { name: 'Supply', vals: sum('supply'), cls: 'cgrp' }, { name: 'Proj. balance', vals: sum('balance'), neg: true, cls: 'cgrp' }], n => `
+      <td class="l stick" rowspan="${n}"><div class="partcell"><button class="tog" data-tog="${k}" aria-expanded="${open}"><span class="caret">${open ? '▾' : '▸'}</span>${esc(c.name)}</button><small>${list.length} part${list.length > 1 ? 's' : ''}</small><small>${mktLine(c)}</small></div></td>
+      <td class="l" rowspan="${n}">${forecastHtml(r0.forecast, lastRec(r0.part.id).forecast)}<div style="margin-top:6px"><button class="why-btn" data-cwhy="${k}">Why?</button></div></td>
+      <td rowspan="${n}" class="v">${kfmt(inv)}</td><td rowspan="${n}" class="rr muted">—</td>`);
+    return head + (open ? list.map(r => ipPartRows(r, true)).join('') : '');
   }).join('');
   return `<table class="grid">${head}<tbody>${body}</tbody></table>`;
 }
 
-function sumTable(rows) {
-  if (!rows.length) return `<p class="muted" style="padding:20px">No parts match these filters.</p>`;
-  const head = `<thead><tr><th class="l stick">Part</th><th class="l">Commodity · market</th><th>RR</th><th class="l">Lifecycle</th><th>Sources</th><th class="l">Inventory risk</th><th class="l">Market-adjusted plan</th><th class="l">Plan for Every Part</th><th class="l">Last week</th><th>Revenue at risk</th><th class="l">Status</th><th></th></tr></thead>`;
-  const body = rows.map(r => {
-    const p = lastRec(r.part.id);
-    return `<tr class="grp-end">
-      <td class="l stick"><div class="partcell"><button data-why="${r.part.id}">${isChanged(r) ? '<span class="chg"></span>' : ''}${esc(r.part.mpn)}</button><small>${esc(r.part.mfr)}</small></div></td>
-      <td class="l"><div>${esc(COMMODITIES[r.part.commodity].name)}</div><span class="mkt ${r.mktStatus || ''}">${esc(r.mktStatus || 'No coverage')}</span></td>
-      <td class="rr">${r.part.rr}${r.rrDrop > 0 ? `<small class="dn">▼${r.rrDrop}</small>` : ''}</td>
-      <td class="l">${r.ltb ? `<span class="chip bad">LTB · ${esc(r.part.pcn.ltbDate)}</span>` : 'Active'}</td>
-      <td class="v">${r.sources}${r.part.crossesP2P ? `<small class="muted"> +${r.part.crossesP2P}×</small>` : ''}</td>
-      <td class="l"><span class="pill ${r.invRisk}">${r.invRisk}</span></td>
-      <td class="l red" style="font-weight:500">${r.forecast ? (r.forecast.startsWith('Adjust') ? esc(r.forecast) : `<span class="muted">${esc(r.forecast)}</span>`) : '<span class="muted">—</span>'}</td>
-      <td class="l red" style="font-weight:500">${r.primary === 'MRP' ? '<span class="muted">MRP</span>' : esc(r.policies.join(' + '))}</td>
-      <td class="l muted" style="font-size:11.5px">${isChanged(r) ? `<s>${esc([p.forecast, ...p.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</s>` : 'No change'}</td>
-      <td class="v ${r.revenueAtRisk ? 'neg' : ''}">${r.revenueAtRisk ? money(r.revenueAtRisk) : '—'}</td>
-      <td class="l">${statusHtml(r)}</td>
-      <td><button class="why-btn" data-why="${r.part.id}">Why?</button></td></tr>`;
+// ── Plan For Every Part: supply / replenishment policy per part
+// The five highest-impact risk factors, in place of the composite Resilience Rating
+function riskFactors(r) {
+  const m = r.mkt, a = r.part.applied || {};
+  const ltDelta = m && m.lt != null ? m.lt - m.ltPrev : 0;
+  return {
+    lifecycle: r.ltb ? ['High', `LTB · final orders ${r.part.pcn.ltbDate}`] : r.part.lifecycle === 'NRND' ? ['Medium', 'Not recommended for new designs'] : ['Low', 'Active'],
+    market: !m || !m.status ? [null, 'No market coverage'] : m.status === 'Constrained' ? ['High', 'Market constrained'] : m.status === 'Tightening' ? ['Medium', 'Market tightening'] : ['Low', `Market ${m.status.toLowerCase()}`],
+    inventory: [r.invRisk, r.invRisk === 'High' ? `Projected shortage from ${WEEKS[r.firstShortWeek].label}` : r.invRisk === 'Medium' ? 'Cover drops below half a week' : 'Supply covers demand'],
+    leadTime: !m || m.lt == null ? (r.hits.length ? ['Medium', 'Event delays'] : [null, 'No lead-time data']) : (ltDelta >= 6 || m.lt >= 26) ? ['High', `Lead time ${m.ltPrev}→${m.lt} wks`] : (ltDelta >= 3 || m.lt >= 18 || r.hits.length) ? ['Medium', `Lead time ${m.ltPrev}→${m.lt} wks${r.hits.length ? ' · event delays' : ''}`] : ['Low', `Lead time ${m.lt} wks`],
+    sourcing: r.sources >= 2 ? ['Low', `${r.sources} approved sources`] : r.part.crossesP2P ? ['Medium', `Sole source · ${r.part.crossesP2P} pin-to-pin cross${r.part.crossesP2P > 1 ? 'es' : ''}`] : ['High', 'Sole source, no crosses'],
+  };
+}
+const RISK_KEYS = [['lifecycle', 'Lifecycle'], ['market', 'Market risk'], ['inventory', 'Inventory risk'], ['leadTime', 'Lead time risk'], ['sourcing', 'Sourcing risk']];
+const RANK = { High: 3, Medium: 2, Low: 1 };
+function riskPill([lvl, tip]) { return lvl ? `<span class="pill ${lvl}" title="${esc(tip)}">${lvl}</span>` : `<span class="muted" title="${esc(tip)}">—</span>`; }
+function spend(r) { return r.demand.reduce((a, b) => a + b, 0) * r.part.price; }
+
+function pfepRow(r, nested) {
+  const rf = riskFactors(r);
+  return `<tr class="grp-end">
+    <td class="l stick"><div class="partcell" style="${nested ? 'padding-left:18px' : ''}"><button data-why="${r.part.id}">${esc(r.part.mpn)}</button><small>${esc(r.part.mfr)}</small></div></td>
+    <td class="l" style="font-size:12px">${esc(COMMODITIES[r.part.commodity].name)}</td>
+    <td class="v">${money(spend(r))}</td>
+    ${RISK_KEYS.map(([k]) => `<td class="l">${riskPill(rf[k])}</td>`).join('')}
+    <td class="l">${policyHtml(r)}</td>
+    <td><button class="why-btn" data-why="${r.part.id}">Why?</button></td></tr>`;
+}
+function pfepTable(rows) {
+  if (!rows.length) return `<p class="muted" style="padding:20px">No parts match.</p>`;
+  const byC = S.plan.group === 'commodity';
+  const head = `<thead><tr><th class="l stick">${byC ? 'Commodity · part' : 'Part'}</th><th class="l">Commodity</th><th title="Forecasted demand × unit price over 16 weeks">Forecasted spend</th>${RISK_KEYS.map(([, n]) => `<th class="l">${n}</th>`).join('')}<th class="l">Recommended policy</th><th></th></tr></thead>`;
+  if (!byC) return `<table class="grid">${head}<tbody>${rows.map(r => pfepRow(r, false)).join('')}</tbody></table>`;
+  const body = planGroups(rows).map(([k, list]) => {
+    const c = COMMODITIES[k]; const open = S.plan.openP[k] !== false;
+    const mix = {}; for (const r of list) for (const p of r.policies) mix[p] = (mix[p] || 0) + 1;
+    const worst = key => { const lv = list.map(r => riskFactors(r)[key]).filter(x => x[0]).sort((a, b) => RANK[b[0]] - RANK[a[0]]); if (!lv.length) return riskPill([null, 'No data']); const n = lv.filter(x => x[0] === lv[0][0]).length; return `${riskPill([lv[0][0], `Highest in group: ${lv[0][1]}`])}${list.length > 1 ? ` <small class="muted">${n}/${list.length}</small>` : ''}`; };
+    return `<tr class="cgrp grp-end"><td class="l stick"><div class="partcell"><button class="tog" data-tog="${k}" aria-expanded="${!!open}"><span class="caret">${open ? '▾' : '▸'}</span>${esc(c.name)}</button><small>${list.length} part${list.length > 1 ? 's' : ''} · ${mktLine(c)}</small></div></td>
+      <td class="l" style="font-size:12px">${esc(c.name)}</td>
+      <td class="v">${money(list.reduce((s2, r) => s2 + spend(r), 0))}</td>
+      ${RISK_KEYS.map(([key]) => `<td class="l">${worst(key)}</td>`).join('')}
+      <td class="l"><div class="recs">${Object.entries(mix).sort((a, b) => b[1] - a[1]).map(([p, n]) => `<span>${n} × ${esc(shortPolicy(p))}</span>`).join('')}</div></td><td></td></tr>` + (open ? list.map(r => pfepRow(r, true)).join('') : '');
   }).join('');
   return `<table class="grid">${head}<tbody>${body}</tbody></table>`;
 }
@@ -1428,8 +1697,8 @@ function openWhy(partId, opts = {}) {
     </header>
     <div class="scroll">
       <div class="recbox">
-        <div><div class="lbl">Market-adjusted plan</div><div class="val">${r.forecast ? esc(r.forecast) : '<span class="muted">No recommendation</span>'}</div>
-          <div class="sub">${r.adjDir ? `${r.adjDir === 'pull' ? 'Pull' : 'Push'} ${fmt(r.adjQty)} units ${r.adjDir === 'pull' ? `into ${WEEKS[0].label}–${WEEKS[3].iso}` : `out to ${WEEKS[8].label}–${WEEKS[11].iso}`}` : r.forecast ? 'Market is stable; keep the statistical forecast' : 'No market intelligence for this classification'}</div>
+        <div><div class="lbl">Forecast recommendation</div><div class="val">${r.forecast ? esc(r.forecast) : '<span class="muted">No recommendation</span>'}</div>
+          <div class="sub">${esc(forecastBasis(r.mkt))}</div>
           ${ch ? `<div class="was">Last week: ${esc(p.forecast || '—')}</div>` : ''}</div>
         <div><div class="lbl">Plan for Every Part</div><div class="val">${esc(r.policies.join(' + '))}</div>
           <div class="sub">${r.revenueAtRisk ? `${money(r.revenueAtRisk)} revenue at risk from ${WEEKS[r.firstShortWeek].label}` : 'No shortage projected yet: pre-emptive'}</div>
@@ -1437,7 +1706,7 @@ function openWhy(partId, opts = {}) {
       </div>
       <div class="why-sec"><h4>Agent reasoning <span class="chip agent" id="why-mode">…</span></h4><div class="agent-text thinking" id="why-ai">Reading the signals…</div><div class="agent-src" id="why-src"></div></div>
       <div class="why-sec"><h4>Demand vs. supply · ${esc(r.part.mpn)}</h4><div class="chart">${whyChart(r)}</div>
-        <div class="hz-legend" style="margin-top:6px"><span><i style="background:var(--demand)"></i>Demand</span>${r.adjDir ? '<span><i style="background:repeating-linear-gradient(90deg,var(--rec) 0 4px,transparent 4px 7px)"></i>Market-adjusted</span>' : ''}<span><i style="background:var(--supply)"></i>Projected supply</span><span><i style="background:var(--rec)"></i>Shortage</span></div></div>
+        <div class="hz-legend" style="margin-top:6px"><span><i style="background:var(--demand)"></i>Demand</span><span><i style="background:var(--supply)"></i>Projected supply</span><span><i style="background:var(--rec)"></i>Shortage</span></div></div>
       <div class="why-sec"><h4>Signals the agent combined</h4><div class="siglist">${r.signals.map(s => `<div class="sig ${s.tone}"><div class="kind">${esc(s.kind)}<span class="src">${esc(s.source)}</span></div><div><b>${esc(s.title)}</b>${s.isNew ? ' <span class="chip new" style="padding:1px 4px;border:0;background:none"></span>' : ''}<p>${esc(s.detail)}</p></div></div>`).join('')}</div></div>
       <div class="why-sec"><h4>Decision logic · every policy the rules considered</h4>
         <table class="rules"><tbody>${r.cands.slice().sort((a, b) => b.score - a.score).map(c => `<tr class="${r.policies.includes(c.policy) ? 'pick' : ''}"><td class="pn">${esc(c.policy)}${r.policies[0] === c.policy ? ' <span class="muted" style="font-weight:400;font-size:11px">primary</span>' : r.policies.includes(c.policy) ? ' <span class="muted" style="font-weight:400;font-size:11px">secondary</span>' : ''}<div class="bar"><i style="width:${Math.min(100, c.score)}%"></i></div></td><td class="el ${c.eligible ? 'y' : 'n'}">${c.eligible ? 'eligible · ' + c.score : 'not eligible'}</td><td class="rs">${esc(c.why)}</td></tr>`).join('')}</tbody></table>
@@ -1463,7 +1732,7 @@ function openWhy(partId, opts = {}) {
 
 function whyChart(r) {
   const W = 600, H = 190, L = 44, R = 10, T = 12, B = 26;
-  const max = Math.max(...r.demand, ...r.adjDemand, ...r.supply) * 1.1;
+  const max = Math.max(...r.demand, ...r.supply) * 1.1;
   const x = i => L + (i + 0.5) * (W - L - R) / NWEEKS, bw = (W - L - R) / NWEEKS * 0.56;
   const y = v => T + (1 - v / max) * (H - T - B);
   const path = arr => arr.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
@@ -1471,7 +1740,40 @@ function whyChart(r) {
   const bars = r.supply.map((v, i) => `<rect x="${(x(i) - bw / 2).toFixed(1)}" y="${y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H - B - y(v)).toFixed(1)}" fill="rgba(76,207,178,.45)" rx="2"/>`).join('');
   const shorts = r.short.map((s, i) => s > 0 ? `<rect x="${(x(i) - bw / 2).toFixed(1)}" y="${y(r.demand[i]).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(2, y(r.demand[i] - s) - y(r.demand[i])).toFixed(1)}" fill="var(--rec)" opacity=".85" rx="2"/>` : '').join('');
   const lbl = WEEKS.map((w, i) => i % 2 === 0 ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="middle">${w.iso}</text>` : '').join('');
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly demand and projected supply">${ticks}${bars}${shorts}<path d="${path(r.demand)}" fill="none" stroke="var(--demand)" stroke-width="2"/>${r.adjDir ? `<path d="${path(r.adjDemand)}" fill="none" stroke="var(--rec)" stroke-width="2" stroke-dasharray="5 4"/>` : ''}${lbl}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly demand and projected supply">${ticks}${bars}${shorts}<path d="${path(r.demand)}" fill="none" stroke="var(--demand)" stroke-width="2"/>${lbl}</svg>`;
+}
+
+// ── Commodity-level forecast explanation (Intelligent Plan grouped by commodity)
+function openCommodityWhy(k) {
+  closeWhy();
+  const c = COMMODITIES[k]; const list = S.comp.results.filter(r => r.part.commodity === k);
+  const r0 = list[0]; const was = lastRec(r0.part.id).forecast;
+  const evs = S.world.events.filter(e => e.commodity === k || list.some(r => r.part.region === e.region));
+  const rules = [
+    ['Constrained or tightening', 'Supply constraint, lead time or price increase', 'Adjust forecast (pull)', CONSTRAINED(c.status)],
+    ['Surplus', 'Lead time or price decrease', 'Adjust forecast (push)', c.status === 'Surplus'],
+    ['Stable', 'Normal market conditions', 'Hold forecast', c.status === 'Stable'],
+    ['No coverage', 'No market intelligence for the classification', 'Blank', !c.status],
+  ];
+  const bg = h(`<div class="drawer-bg"></div>`); bg.onclick = closeWhy;
+  const d = h(`<div class="drawer" role="dialog" aria-modal="true" aria-label="Why ${esc(c.name)}">
+    <header><div class="eyebrow">Explain forecast recommendation · commodity</div><h2 style="font-family:var(--sans)">${esc(c.name)}</h2>
+      <div class="chips"><span class="chip ${CONSTRAINED(c.status) ? 'bad' : c.status === 'Surplus' ? 'good' : ''}">Market: ${esc(c.status || 'no coverage')}${c.prev !== c.status && c.status ? ' (was ' + esc(c.prev) + ')' : ''}</span>${c.lt != null ? `<span class="chip">Lead time ${c.ltPrev}→${c.lt} wks</span><span class="chip">Price ${c.price > 0 ? '+' : ''}${c.price}%</span>` : ''}<span class="chip">${list.length} parts on this BOM</span></div>
+      <button class="x" aria-label="Close">✕</button></header>
+    <div class="scroll">
+      <div class="recbox" style="grid-template-columns:1fr"><div><div class="lbl">Forecast recommendation</div><div class="val">${esc(r0.forecast || 'No recommendation')}</div><div class="sub">${esc(forecastBasis(c))}</div>${was !== r0.forecast ? `<div class="was">Last week: ${esc(was || 'No recommendation')}</div>` : ''}</div></div>
+      <div class="why-sec"><h4>Agent reasoning <span class="chip agent" id="why-mode">…</span></h4><div class="agent-text thinking" id="why-ai">Reading the market…</div><div class="agent-src" id="why-src"></div></div>
+      <div class="why-sec"><h4>Market signals</h4><div class="siglist"><div class="sig ${CONSTRAINED(c.status) ? 'bad' : c.status === 'Surplus' ? 'good' : 'neutral'}"><div class="kind">Market<span class="src">Market intelligence</span></div><div><b>${esc(c.status ? c.name + ': ' + c.status : 'No coverage')}</b><p>${esc(c.note)}</p></div></div>${evs.map(e => `<div class="sig bad"><div class="kind">${esc(e.kind)}<span class="src">${esc(e.source)}</span></div><div><b>${esc(e.title)}</b><p>${esc(e.detail)}</p></div></div>`).join('')}</div></div>
+      <div class="why-sec"><h4>Decision rule</h4><table class="rules"><tbody>${rules.map(([s, sig, rec, hit]) => `<tr class="${hit ? 'pick' : ''}"><td class="pn">${esc(s)}</td><td class="rs">${esc(sig)}</td><td class="pn">${esc(rec)}</td></tr>`).join('')}</tbody></table></div>
+      <div class="why-sec"><h4>Parts that inherit this recommendation</h4><div class="routes">${list.map(r => `<button class="route" data-p="${r.part.id}" style="text-align:left;color:inherit"><span class="mono" style="font-weight:600">${esc(r.part.mpn)}</span><span class="muted" style="font-size:12px">${esc(r.part.desc)}</span><span class="who">${r.revenueAtRisk ? `<span class="red">${money(r.revenueAtRisk)} at risk</span>` : 'No gap'}</span></button>`).join('')}</div></div>
+    </div>
+    <footer><span style="flex:1"></span><button class="btn" id="w-ask">Ask the agent about ${esc(c.name.split(' · ')[1] || c.name)}</button></footer></div>`);
+  document.body.append(bg, d);
+  $('.x', d).onclick = closeWhy; $('.x', d).focus();
+  d.addEventListener('keydown', e => { if (e.key === 'Escape') closeWhy(); });
+  $$('[data-p]', d).forEach(b => b.onclick = () => openWhy(b.dataset.p));
+  $('#w-ask', d).onclick = () => { closeWhy(); setDock(true); chat(`Why should we ${r0.adjDir === 'push' ? 'push out' : r0.adjDir === 'pull' ? 'pull forward' : 'hold'} the ${c.name} forecast?`); };
+  explainCommodity(k, c, list, $('#why-ai', d), $('#why-mode', d), $('#why-src', d));
 }
 
 // ───────────────────────── AI layer ─────────────────────────
@@ -1490,8 +1792,8 @@ async function initAI() {
 function setAgentState(st) {
   AI.state = st; const dot = $('#agent-dot'), lab = $('#agent-state');
   dot.className = 'dot ' + (st === 'live' ? 'live' : st === 'demo' ? 'demo' : '');
-  lab.textContent = st === 'live' ? 'Agent live · Claude' : st === 'demo' ? 'Agent · demo mode' : 'Connecting agent…';
-  $('#agent-pill').title = st === 'live' ? 'Recommendations are explained live by Claude. Click to show or hide the agent.' : 'Claude is not available in this view, so the agent uses scripted explanations built from the same data.';
+  lab.textContent = st === 'live' ? 'Live · Claude' : st === 'demo' ? 'Demo mode' : 'Connecting…';
+  $('#dock-sub').title = st === 'live' ? 'Recommendations are explained live by Claude. Click to show or hide the agent.' : 'Claude is not available in this view, so the agent uses scripted explanations built from the same data.';
 }
 async function aiCall(input, opts = {}) {
   if (!AI.live || !AI.sample) throw { code: 'offline' };
@@ -1524,7 +1826,7 @@ function partFacts(r) {
     market: r.mkt && r.mkt.status ? { status: r.mkt.status, last_week: r.mkt.prev, lead_time_weeks: r.mkt.lt, lead_time_last_week: r.mkt.ltPrev, price_change_pct: r.mkt.price, note: r.mkt.note } : 'no coverage',
     events: r.hits.map(e => ({ title: e.title, weeks: wkRange(e.from, e.from + e.weeks - 1), supply_impact_pct: Math.round(e.impact * 100) })),
     inventory_risk: r.invRisk, units_short_16wks: r.shortUnits, first_short_week: r.firstShortWeek >= 0 ? WEEKS[r.firstShortWeek].label : null, revenue_at_risk_usd: Math.round(r.revenueAtRisk),
-    recommendation: { forecast: r.forecast || 'none (no market data)', forecast_adjustment_units: r.adjDir ? `${r.adjDir} ${r.adjQty}` : null, policy: r.policies },
+    recommendation: { forecast: r.forecast || 'none (no market data)', forecast_basis: forecastBasis(r.mkt), policy: r.policies },
     last_week_recommendation: { forecast: p.forecast, policy: p.policies },
     policies_considered: r.cands.map(c => ({ policy: c.policy, eligible: c.eligible, score: c.score, reason: c.why })),
   };
@@ -1537,6 +1839,8 @@ function portfolioFacts(comp = S.comp, ai = S.ai) {
     recommendations_changed_this_week: comp.results.filter(isChanged).length, awaiting_decision: pendingChanged().length, open_actions: S.actions.filter(x => x.status !== 'Done').length,
     top_risks: comp.results.filter(r => r.revenueAtRisk > 0).sort((x, y) => y.revenueAtRisk - x.revenueAtRisk).slice(0, 6).map(r => ({ part: r.part.mpn, commodity: COMMODITIES[r.part.commodity].name, revenue_at_risk_usd: Math.round(r.revenueAtRisk), first_short: WEEKS[r.firstShortWeek].label, recommendation: [r.forecast, ...r.policies].filter(Boolean) })),
     market: Object.values(comp.world.commodities).filter(m => m.status).map(m => `${m.name}: ${m.status}${m.prev !== m.status ? ` (was ${m.prev})` : ''}, LT ${m.lt} wks, price ${m.price > 0 ? '+' : ''}${m.price}%`),
+    strategic_calendar_next_16_weeks: STRATEGIC.filter(x => x.view === 'in').map(x => `${x.timing}: ${x.title} (${x.geo}) · action: ${x.action}`),
+    strategic_calendar_later: STRATEGIC.filter(x => x.view === 'later').map(x => `${x.timing}: ${x.title}`),
     events: comp.world.events.map(e => `${e.title} (${e.region || COMMODITIES[e.commodity]?.name}, ${WEEKS[e.from].label}, ${e.weeks} wks, ${Math.round(e.impact * 100)}% impact)`),
   };
 }
@@ -1579,7 +1883,7 @@ function whyFallback(r) {
   if (r.rrDrop >= 5) sigs.push(`the Resilience Rating fell ${r.rrDrop} points to ${r.part.rr}`);
   parts.push(`${cap(sigs.join('; ') || 'signals are stable')}. ${r.shortUnits > 0 ? `The plan now shows ${fmt(r.shortUnits)} units short starting ${WEEKS[r.firstShortWeek].label}.` : `A traditional demand/supply check still shows no gap, because supply commitments cover demand today. The signals say that cover is fragile.`}`);
   const top = r.ranked[0], alt = r.ranked.find(c => !r.policies.includes(c.policy));
-  parts.push(`${r.forecast && r.forecast.startsWith('Adjust') ? `I recommend ${r.forecast.toLowerCase().replace('adjust forecast', 'adjusting the forecast')}: ${r.adjDir === 'pull' ? 'pulling' : 'pushing'} ${fmt(r.adjQty)} units so orders reflect the market rather than history. ` : ''}${r.policies.join(' plus ')} ranks highest (${top.score}) because ${top.why.charAt(0).toLowerCase() + top.why.slice(1)}.${alt ? ` ${alt.policy} was considered (${alt.score}) but ${alt.policy === 'MRP' ? 'conditions are not normal' : 'addresses less of the exposure'}.` : ''}`);
+  parts.push(`${r.forecast && r.forecast.startsWith('Adjust') ? `For the demand plan I recommend ${r.adjDir === 'pull' ? 'pulling demand forward' : 'pushing demand out'}, so orders reflect the market rather than history. ` : ''}${r.policies.join(' plus ')} ranks highest (${top.score}) because ${top.why.charAt(0).toLowerCase() + top.why.slice(1)}.${alt ? ` ${alt.policy} was considered (${alt.score}) but ${alt.policy === 'MRP' ? 'conditions are not normal' : 'addresses less of the exposure'}.` : ''}`);
   parts.push(r.revenueAtRisk > 0 ? `Waiting leaves ${money(r.revenueAtRisk)} of ${PRODUCT.name} revenue exposed. Accepting routes ${actionsFor(r).length} actions to the owning teams, and I will reassess the part as they close.` : `Acting now is cheap insurance: no revenue is at risk yet, but lead times move faster than the plan. Accepting routes ${actionsFor(r).length} action${actionsFor(r).length === 1 ? '' : 's'} to the owning teams.`);
   return parts.join('\n\n');
 }
@@ -1621,7 +1925,7 @@ function agentTools() {
     { name: 'get_part', description: 'Full facts for one part: signals, market, events, Resilience Rating, recommendation, policies considered with scores.', inputSchema: { type: 'object', properties: { mpn: { type: 'string' } }, required: ['mpn'] },
       execute: (i) => { toolLine(`<b>get_part</b> ${esc(i.mpn)}`); const p = findPart(i.mpn); if (!p) throw new Error('Unknown part ' + i.mpn); return partFacts(S.comp.byId[p.id]); } },
     { name: 'get_actions', description: 'Lists orchestrated actions with owner role, person, status and part.', execute: () => { toolLine('<b>get_actions</b>'); return S.actions.map(a => ({ part: a.mpn, action: a.title, owner: ROLES[a.role].name, person: ROLES[a.role].person, status: a.status, due: a.due })); } },
-    { name: 'run_scenario', description: 'Runs a what-if against the plan, shows it on the Scenarios screen and returns baseline vs scenario KPIs and parts whose recommendation changes. Use supply_impact_pct 0-90. Regions: ' + [...new Set(S.world.parts.map(p => p.region))].join(', ') + '.', inputSchema: { type: 'object', properties: { label: { type: 'string' }, demand_pct: { type: 'number' }, commodity: { type: 'string' }, lead_time_delta_weeks: { type: 'number' }, supply_impact_pct: { type: 'number' }, from_week_index: { type: 'number', description: '0 = this week' }, duration_weeks: { type: 'number' }, region: { type: 'string' }, region_impact_pct: { type: 'number' }, crosses_qualified: { type: 'boolean' } } },
+    { name: 'run_scenario', description: 'Runs a what-if on the Scenarios briefing: stress tests (demand, commodity shock, regional disruption) and plays to increase supply (expedite %, air freight, safety stock, second sources, approve agent plan). Returns baseline vs simulated on-time delivery, revenue at risk, cost and ROI. Use supply_impact_pct 0-90. Regions: ' + [...new Set(S.world.parts.map(p => p.region))].join(', ') + '.', inputSchema: { type: 'object', properties: { label: { type: 'string' }, demand_pct: { type: 'number' }, commodity: { type: 'string' }, lead_time_delta_weeks: { type: 'number' }, supply_impact_pct: { type: 'number' }, from_week_index: { type: 'number', description: '0 = this week' }, duration_weeks: { type: 'number' }, region: { type: 'string' }, region_impact_pct: { type: 'number' }, crosses_qualified: { type: 'boolean' }, supply_boost_pct: { type: 'number', description: 'extra supply via expedite / spot buys, 0-40' }, supply_boost_commodity: { type: 'string', description: 'commodity key, omit for all' }, air_freight: { type: 'boolean', description: 'air-freight around the Kaohsiung port congestion' }, buffer_weeks: { type: 'number', description: 'extra safety stock, 0-6 weeks' }, approve_ai_plan: { type: 'boolean', description: 'approve all agent recommendations' } } },
       execute: (i) => { toolLine(`<b>run_scenario</b> ${esc(i.label || '')}`); const prm = scenarioFromTool(i); runScenario(prm); setView('scenarios'); return scenarioSummary(); } },
     { name: 'open_view', description: 'Navigates the app. view: horizon | plan | actions | scenarios | workflows. With mpn, opens the explanation drawer for that part.', inputSchema: { type: 'object', properties: { view: { type: 'string' }, mpn: { type: 'string' } } },
       execute: (i) => { toolLine(`<b>open_view</b> ${esc(i.view || '')} ${esc(i.mpn || '')}`); if (i.view) setView(i.view); if (i.mpn) { const p = findPart(i.mpn); if (p) openWhy(p.id); } return 'ok'; } },
@@ -1672,10 +1976,14 @@ Current portfolio: ${JSON.stringify(portfolioFacts())}`;
 // Scripted agent for demo mode: same tools, deterministic answers
 async function fallbackChat(text, body) {
   const t = text.toLowerCase(); await sleep(500);
-  if (/what if|what-if|scenario|lasts|extend|suppose|imagine|\bif\b.*(demand|port|constraint|closure)/.test(t)) {
+  if (/briefing|ceo|one.minute|executive summary|big picture/.test(t)) {
+    toolLine('<b>open_view</b> scenarios'); setView('scenarios'); const st = buildStory();
+    return `**${st.headline}.** ${st.dek}\n\n${st.sections.map(([h, p]) => `**${h}.** ${p}`).join('\n\n')}`;
+  }
+  if (/what if|what-if|scenario|lasts|extend|suppose|imagine|simulat|increase supply|expedite|air.?freight|safety stock|\bif\b.*(demand|port|constraint|closure)/.test(t)) {
     toolLine('<b>run_scenario</b> ' + esc(text));
     const prm = parseScenarioFallback(text); runScenario(prm); setView('scenarios');
-    return scenarioNarrativeFallback();
+    const st = buildStory(); return `**${st.headline}.** ${st.dek}\n\n**What to decide.** ${st.sections[3][1]}`;
   }
   if (/every (morning|day|week)|daily|weekly|monitor|watch|alert me|notify|workflow|automat/.test(t)) {
     toolLine('<b>draft_workflow</b>'); setView('workflows'); const spec = await draftWorkflow(text);
@@ -1683,7 +1991,7 @@ async function fallbackChat(text, body) {
   }
   if (/mlcc|walk me through|kpc0402/.test(t)) {
     const r = S.comp.results.find(x => x.part.mpn === 'KPC0402X7R104K'); toolLine('<b>get_part</b> KPC0402X7R104K'); openWhy(r.part.id);
-    return `This is the case a traditional plan misses. **${r.part.mpn}** shows supply matching demand every week, so MRP sees nothing. But the MLCC market went from stable to constrained, lead times jumped ${r.mkt.ltPrev}→${r.mkt.lt} weeks, and it's sole-sourced at ${r.part.qtyPer} per board.\n\nA pin-to-pin cross, **${r.part.bestCross.mpn}**, became available this week. So I recommend pulling ${fmt(r.adjQty)} units forward and qualifying the cross with a 60/40 quota, plus a buffer build while engineering validates it.`;
+    return `This is the case a traditional plan misses. **${r.part.mpn}** shows supply matching demand every week, so MRP sees nothing. But the MLCC market went from stable to constrained, lead times jumped ${r.mkt.ltPrev}→${r.mkt.lt} weeks, and it's sole-sourced at ${r.part.qtyPer} per board.\n\nA pin-to-pin cross, **${r.part.bestCross.mpn}**, became available this week. So I recommend pulling demand forward in the plan and qualifying the cross with a 60/40 quota, plus a buffer build while engineering validates it.`;
   }
   if (/engineer|waiting|actions|who|owner|assigned/.test(t)) {
     toolLine('<b>get_actions</b>'); setView('actions');
@@ -1705,8 +2013,14 @@ async function fallbackChat(text, body) {
     const want = /gan|gallium/.test(t) && byC.gan ? 'gan' : Object.keys(byC).sort((x, y) => byC[y].reduce((s, r) => s + r.revenueAtRisk, 0) - byC[x].reduce((s, r) => s + r.revenueAtRisk, 0))[0];
     const g = byC[want]; const name = COMMODITIES[want].name.split(' · ')[1] || COMMODITIES[want].name;
     const drivers = [...new Set(g.flatMap(r => [r.mkt && CONSTRAINED(r.mkt.status) ? `the ${name} market is ${r.mkt.status.toLowerCase()} (lead time ${r.mkt.lt} wks)` : null, ...r.hits.map(e => e.title.charAt(0).toLowerCase() + e.title.slice(1)), r.sole ? 'sole sourcing' : null, r.rrDrop >= 5 ? `Resilience Rating down ${r.rrDrop} on ${r.part.mpn}` : null]).filter(Boolean))].slice(0, 3);
-    S.hz.scope = g[0].part.id; setView('horizon');
-    return `**${name} is ${money(g.reduce((s, r) => s + r.revenueAtRisk, 0))} of the ${money(rs.reduce((s, r) => s + r.revenueAtRisk, 0))} at risk.** The signals that stack up: ${drivers.join('; ')}.\n\n${g.map(r => `- **${r.part.mpn}**: short from ${WEEKS[r.firstShortWeek].label}; recommend ${r.policies.join(' + ')}`).join('\n')}\n\nI've put ${g[0].part.mpn} on the Horizon so you can see where the gap opens.`;
+    S.hz.group = 'part'; S.hz.scope = g[0].part.id; S.hz.source = 'base'; setView('horizon');
+    return `**${name} is ${money(g.reduce((s, r) => s + r.revenueAtRisk, 0))} of the ${money(rs.reduce((s, r) => s + r.revenueAtRisk, 0))} at risk.** The signals that stack up: ${drivers.join('; ')}.\n\n${g.map(r => `- **${r.part.mpn}**: short from ${WEEKS[r.firstShortWeek].label}; recommend ${r.policies.join(' + ')}`).join('\n')}\n\nI've put ${g[0].part.mpn} on the Roadmap so you can see where the gap opens.`;
+  }
+  if (/calendar|holiday|shutdown|golden week|tariff|polysilicon|new year|compliance|cbam|important dates|coming up/.test(t)) {
+    toolLine('<b>get_portfolio_summary</b> strategic calendar');
+    const next = STRATEGIC.filter(x => x.view === 'in' && !x.lane).sort((a, b) => a.week - b.week).slice(0, 6);
+    setView('horizon');
+    return `**Key dates in the next 16 weeks:**\n${next.map(x => `- **${x.timing}**: ${x.title} (${x.geo}). ${x.action}.`).join('\n')}\n\nThe full strategic calendar, including later and ongoing items, is under **Strategic calendar** on the Roadmap.`;
   }
   if (/change|what's new|what is new|summary|brief/.test(t)) {
     const ch = changedResults(); const by = {}; for (const r of ch) for (const p of r.policies) by[p] = (by[p] || 0) + 1;
@@ -1715,6 +2029,24 @@ async function fallbackChat(text, body) {
   toolLine('<b>get_portfolio_summary</b>');
   const f = portfolioFacts();
   return `Across ${f.parts} parts, **${money(f.revenue_at_risk_usd)}** of revenue is at risk over 16 weeks (clear-to-build ${f.clear_to_build_pct}%). With the recommended plan it drops to ${money(f.revenue_at_risk_with_ai_plan_usd)}. ${f.awaiting_decision} changes await your decision. Try asking about a part, a what-if, or a standing instruction like “every morning, check my sole-source parts”.`;
+}
+
+async function explainCommodity(k, c, list, el, modeEl, srcEl) {
+  WHY_CTL = new AbortController(); const sig = WHY_CTL.signal;
+  const r0 = list[0];
+  const fb = !c.status
+    ? `There is no market intelligence for ${c.name}, so the agent leaves the forecast recommendation blank rather than guess. The ${list.length} part${list.length > 1 ? 's' : ''} in this classification stay on the statistical forecast, and their supply policy is set separately in Plan For Every Part.`
+    : `${c.name} is ${c.status.toLowerCase()}${c.prev !== c.status ? `, up from ${c.prev.toLowerCase()} last week` : ''}. Lead times are ${c.lt} weeks${c.lt !== c.ltPrev ? ` (were ${c.ltPrev})` : ''} and prices are ${c.price > 0 ? 'up' : c.price < 0 ? 'down' : 'flat'} ${c.price ? Math.abs(c.price) + '%' : ''}. ${c.note}\n\n${CONSTRAINED(c.status) ? `A forecast built only on history would place orders too late for these lead times. The recommendation is to pull demand forward for all ${list.length} parts, so the next MRP run releases orders ahead of the constraint.` : c.status === 'Surplus' ? `With supply loose and prices falling, buying ahead ties up cash. The recommendation is to push demand out so the next MRP run buys closer to need.` : `Nothing in the market argues for changing the plan, so the statistical forecast holds.`}\n\nThis is the planner's decision. Supply policies such as buffers, LTSAs or multi-sourcing for these parts are handled in Plan For Every Part.`;
+  if (AI.live) {
+    modeEl.textContent = 'Claude'; srcEl.textContent = 'Written live by Claude from the market facts on this page.';
+    try {
+      el.textContent = 'Thinking…';
+      await aiCall(`You are the planning agent. Explain to a C-level executive, in 3 short paragraphs (90 words total, plain text, no headings or bullets), why the demand forecast recommendation for this commodity is "${r0.forecast || 'blank'}". Cover what the market is doing, why a history-based forecast would be wrong now, and that supply policies (buffer, LTSA, multi-source) are decided separately in Plan For Every Part. Do not quote unit quantities. Use only these facts:\n${JSON.stringify({ commodity: c.name, status: c.status, last_week: c.prev, lead_time_weeks: c.lt, lead_time_last_week: c.ltPrev, price_change_pct: c.price, note: c.note, parts: list.map(r => r.part.mpn), recommendation: r0.forecast, rule: forecastBasis(c) })}`, { signal: sig, onText: ({ text }) => { el.classList.remove('thinking'); el.textContent = text; } });
+      return;
+    } catch (e) { if (e && e.code === 'cancelled') return; srcEl.textContent = 'Claude was unavailable, so this explanation was assembled from the market data.'; }
+  } else srcEl.textContent = 'Demo mode: explanation assembled from the market data. With Claude connected, this is written live.';
+  modeEl.textContent = 'Scripted';
+  typeInto(el, fb, sig);
 }
 
 // ───────────────────────── Actions: orchestration + reassess ─────────────────────────
@@ -1965,200 +2297,338 @@ async function runWorkflow(sp) {
   agentSay(`**${sp.name}** ran. ${WF.run.text}`, created ? [{ label: 'Open actions', fn: () => setView('actions') }] : []);
 }
 
-// ───────────────────────── Scenarios: what-if + reassess ─────────────────────────
+// ───────────────────────── Scenarios: executive briefing + simulator ─────────────────────────
+// A news-style view of the supply chain for a CEO: headline, ticker, scoreboard, a plain-language
+// story, and a simulator whose levers (increase supply, bypass disruptions, stress tests) update
+// the numbers and the story together.
 const REGIONS = () => [...new Set(S.world.parts.map(p => p.region))].sort();
+const GROSS_MARGIN = 0.35, CARRY_RATE = 0.25, EXPEDITE_PREMIUM = 0.3, AIR_PER_WEEK = 22000, QUAL_PER_PART = 12000;
 const PRESETS = [
-  { label: 'MLCC constraint lasts 6 months', scp: { shock: { commodity: 'mlcc', ltDelta: 8, supplyImpact: 0.3, from: 4, weeks: 12 } } },
-  { label: 'Kaohsiung closure runs 8 weeks', scp: { region: { region: 'Taiwan', impact: 0.5, from: 1, weeks: 8 } } },
-  { label: 'Program win: demand +20%', scp: { demandPct: 20 } },
-  { label: 'New crosses qualified in 4 weeks', scp: { crossQualified: true } },
-  { label: 'DDR4 allocation cut 40%', scp: { shock: { commodity: 'dram', ltDelta: 6, supplyImpact: 0.4, from: 2, weeks: 14 } } },
+  { group: 'play', label: 'Fastest OTD recovery', scp: { approveAI: true } },
+  { group: 'play', label: 'Low-cost fix', scp: { airFreight: true, crossQualified: true } },
+  { group: 'play', label: 'Max supply push', scp: { boost: { commodity: 'all', pct: 25 }, bufferWeeks: 2 } },
+  { group: 'stress', label: 'MLCC constraint lasts 6 months', scp: { shock: { commodity: 'mlcc', ltDelta: 8, supplyImpact: 0.3, from: 4, weeks: 12 } } },
+  { group: 'stress', label: 'Kaohsiung closure runs 8 weeks', scp: { region: { region: 'Taiwan', impact: 0.5, from: 1, weeks: 8 } } },
+  { group: 'stress', label: 'Program win: demand +20%', scp: { demandPct: 20 } },
+  { group: 'stress', label: 'DDR4 allocation cut 40%', scp: { shock: { commodity: 'dram', ltDelta: 6, supplyImpact: 0.4, from: 2, weeks: 14 } } },
 ];
-function blankScp() { return { label: '', demandPct: 0, shock: { commodity: '', ltDelta: 0, supplyImpact: 0, from: 2, weeks: 8 }, region: { region: '', impact: 0, from: 1, weeks: 4 }, crossQualified: false }; }
-function mergeScp(p) { const b = blankScp(); return { ...b, ...p, shock: { ...b.shock, ...(p.shock || {}) }, region: { ...b.region, ...(p.region || {}) } }; }
+function blankScp() { return { label: '', demandPct: 0, shock: { commodity: '', ltDelta: 0, supplyImpact: 0, from: 2, weeks: 8 }, region: { region: '', impact: 0, from: 1, weeks: 4 }, crossQualified: false, boost: { commodity: 'all', pct: 0 }, airFreight: false, bufferWeeks: 0, approveAI: false }; }
+function mergeScp(p) { const b = blankScp(); p = p || {}; return { ...b, ...p, shock: { ...b.shock, ...(p.shock || {}) }, region: { ...b.region, ...(p.region || {}) }, boost: { ...b.boost, ...(p.boost || {}) } }; }
+function isBaseScp(s) { return !s.demandPct && !s.shock.commodity && !(s.region.region && s.region.impact) && !s.crossQualified && !s.boost.pct && !s.airFreight && !s.bufferWeeks && !s.approveAI; }
 function scpToParams(scp) {
-  const prm = { label: scp.label || describeScp(scp), demandPct: scp.demandPct || 0, commodityShocks: [], regionEvents: [], crossQualified: !!scp.crossQualified };
+  const prm = { label: scp.label || describeScp(scp), demandPct: scp.demandPct || 0, commodityShocks: [], regionEvents: [], crossQualified: !!scp.crossQualified, boost: scp.boost.pct ? scp.boost : null, bufferWeeks: scp.bufferWeeks || 0, eventOverrides: [] };
   if (scp.shock.commodity) prm.commodityShocks.push({ commodity: scp.shock.commodity, status: 'Constrained', ltDelta: scp.shock.ltDelta, supplyImpact: scp.shock.supplyImpact, from: scp.shock.from, weeks: scp.shock.weeks });
   if (scp.region.region && scp.region.impact) prm.regionEvents.push({ region: scp.region.region, impact: scp.region.impact, from: scp.region.from, weeks: scp.region.weeks, title: `${scp.region.region} disruption (what-if)` });
+  if (scp.airFreight) prm.eventOverrides.push({ id: 'ev1', impact: 0.05 });
   return prm;
 }
 function describeScp(s) {
   const bits = [];
+  if (s.approveAI) bits.push('agent recommendations approved');
+  if (s.boost.pct) bits.push(`expedite +${s.boost.pct}% supply${s.boost.commodity !== 'all' ? ' on ' + (COMMODITIES[s.boost.commodity].name.split(' · ')[1] || '') : ''}`);
+  if (s.airFreight) bits.push('air-freight around Kaohsiung');
+  if (s.bufferWeeks) bits.push(`+${s.bufferWeeks} wks safety stock`);
+  if (s.crossQualified) bits.push('new second sources qualified');
   if (s.shock.commodity) bits.push(`${COMMODITIES[s.shock.commodity].name.split(' · ')[1]} supply −${Math.round(s.shock.supplyImpact * 100)}% for ${s.shock.weeks} wks`);
   if (s.region.region && s.region.impact) bits.push(`${s.region.region} −${Math.round(s.region.impact * 100)}% for ${s.region.weeks} wks`);
   if (s.demandPct) bits.push(`demand ${s.demandPct > 0 ? '+' : ''}${s.demandPct}%`);
-  if (s.crossQualified) bits.push('new crosses qualified');
-  return bits.join(', ') || 'No change';
+  return bits.length ? cap(bits.join(', ')) : 'Current plan';
 }
 function runScenario(scp, render = true) {
   scp = mergeScp(scp);
   const prm = scpToParams(scp);
-  const world = scenarioWorld(S.world, prm);
+  let world = scenarioWorld(S.world, prm);
+  if (scp.approveAI) world = withAllApplied(world, compute(world));
   const comp = compute(world);
-  S.scenario = { scp, label: prm.label, world, comp, ai: compute(withAllApplied(world, comp)), narrative: null };
-  S.dirty.scenarios = true; S.dirty.horizon = true;
-  if (render && S.view === 'scenarios') VIEWS.scenarios();
+  S.scenario = { scp, label: scp.label || describeScp(scp), world, comp, ai: compute(withAllApplied(world, comp)), narrative: null, by: S.scenario?.by };
+  S.dirty.horizon = true;
+  if (render && S.view === 'scenarios') updateBriefing();
 }
-function refreshScenario() { const s = S.scenario; const prm = scpToParams(s.scp); s.world = scenarioWorld(S.world, prm); s.comp = compute(s.world); s.ai = compute(withAllApplied(s.world, s.comp)); s.narrative = null; }
+function refreshScenario() { if (S.scenario) runScenario(S.scenario.scp, false); }
+
+// ── Metrics, costs and summary
+function metrics(comp) {
+  const c = comp.ctb, plan = c.plan.reduce((a, b) => a + b, 0), built = c.built.reduce((a, b) => a + b, 0);
+  const worst = c.shortBoards.indexOf(Math.max(...c.shortBoards));
+  return {
+    otd: Math.round(built / plan * 1000) / 10, rar: c.revenueAtRisk, late: plan - built, plan, built,
+    inv: comp.results.reduce((a, r) => a + r.startInv * r.part.price, 0),
+    short: comp.results.filter(r => r.shortUnits > 0).length,
+    firstShort: c.shortBoards.findIndex(x => x > 0), worst: c.shortBoards[worst] > 0 ? worst : -1,
+  };
+}
+function simCosts(scp, base, sim) {
+  const b = metrics(base), s = metrics(sim);
+  let expedite = 0;
+  if (scp.boost.pct) for (const r of sim.results) if (scp.boost.commodity === 'all' || r.part.commodity === scp.boost.commodity) expedite += r.part.supplyPlan.slice(2).reduce((a, x) => a + x, 0) * scp.boost.pct / 100 * r.part.price * EXPEDITE_PREMIUM;
+  const air = scp.airFreight ? AIR_PER_WEEK * (EVENTS.find(e => e.id === 'ev1')?.weeks || 4) : 0;
+  const qual = scp.crossQualified ? QUAL_PER_PART * S.world.parts.filter(p => p.crossNew).length : 0;
+  const wc = Math.max(0, s.inv - b.inv);
+  const carry = wc * CARRY_RATE * NWEEKS / 52;
+  const total = expedite + air + qual + carry;
+  const protectedRev = Math.max(0, b.rar - s.rar);
+  const margin = protectedRev * GROSS_MARGIN;
+  return { expedite, air, qual, wc, carry, total, protectedRev, margin, roi: total > 0 ? margin / total : null, extraRisk: Math.max(0, s.rar - b.rar) };
+}
 function scenarioSummary() {
-  const s = S.scenario, b = S.comp, sc = s.comp;
+  const s = S.scenario, b = S.comp, sc = s.comp; const mb = metrics(b), ms = metrics(sc);
   const changes = sc.results.filter(r => { const x = b.byId[r.part.id]; return x.policies.join('|') !== r.policies.join('|') || x.forecast !== r.forecast; });
-  const pct = x => Math.round(x.built.reduce((a, v) => a + v, 0) / x.plan.reduce((a, v) => a + v, 0) * 100);
+  const costs = simCosts(s.scp, b, sc);
   return {
     scenario: s.label,
-    baseline: { revenue_at_risk_usd: Math.round(b.ctb.revenueAtRisk), with_ai_plan_usd: Math.round(S.ai.ctb.revenueAtRisk), clear_to_build_pct: pct(b.ctb), parts_short: b.results.filter(r => r.shortUnits > 0).length },
-    scenario_result: { revenue_at_risk_usd: Math.round(sc.ctb.revenueAtRisk), with_ai_plan_usd: Math.round(s.ai.ctb.revenueAtRisk), clear_to_build_pct: pct(sc.ctb), parts_short: sc.results.filter(r => r.shortUnits > 0).length },
+    baseline: { on_time_delivery_pct: mb.otd, revenue_at_risk_usd: Math.round(mb.rar), boards_late: mb.late, parts_short: mb.short, inventory_usd: Math.round(mb.inv), with_ai_plan_usd: Math.round(S.ai.ctb.revenueAtRisk), clear_to_build_pct: mb.otd },
+    scenario_result: { on_time_delivery_pct: ms.otd, revenue_at_risk_usd: Math.round(ms.rar), boards_late: ms.late, parts_short: ms.short, inventory_usd: Math.round(ms.inv), with_ai_plan_usd: Math.round(s.ai.ctb.revenueAtRisk), clear_to_build_pct: ms.otd },
+    economics: { incremental_cost_usd: Math.round(costs.total), working_capital_usd: Math.round(costs.wc), revenue_protected_usd: Math.round(costs.protectedRev), gross_margin_protected_usd: Math.round(costs.margin), roi_multiple: costs.roi ? Math.round(costs.roi * 10) / 10 : null },
     recommendation_changes: changes.slice(0, 12).map(r => ({ part: r.part.mpn, from: [b.byId[r.part.id].forecast, ...b.byId[r.part.id].policies].filter(Boolean), to: [r.forecast, ...r.policies].filter(Boolean), revenue_at_risk_usd: Math.round(r.revenueAtRisk) })),
     changes_count: changes.length,
   };
 }
+
+// ── Natural-language what-ifs → levers
 function scenarioFromTool(i) {
   const s = blankScp(); s.label = i.label || '';
   if (i.demand_pct) s.demandPct = +i.demand_pct;
   if (i.commodity) { const k = COMMODITIES[i.commodity] ? i.commodity : Object.keys(COMMODITIES).find(k => COMMODITIES[k].name.toLowerCase().includes(String(i.commodity).toLowerCase())); if (k) s.shock = { commodity: k, ltDelta: +i.lead_time_delta_weeks || 6, supplyImpact: Math.min(0.9, (+i.supply_impact_pct || 25) / 100), from: +i.from_week_index || 2, weeks: +i.duration_weeks || 8 }; }
   if (i.region) { const reg = REGIONS().find(r => r.toLowerCase().includes(String(i.region).toLowerCase())); if (reg) s.region = { region: reg, impact: Math.min(0.9, (+i.region_impact_pct || 50) / 100), from: +i.from_week_index || 1, weeks: +i.duration_weeks || 4 }; }
   if (i.crosses_qualified) s.crossQualified = true;
+  if (i.supply_boost_pct) s.boost = { commodity: i.supply_boost_commodity && COMMODITIES[i.supply_boost_commodity] ? i.supply_boost_commodity : 'all', pct: Math.min(40, +i.supply_boost_pct) };
+  if (i.air_freight) s.airFreight = true;
+  if (i.buffer_weeks) s.bufferWeeks = Math.min(6, +i.buffer_weeks);
+  if (i.approve_ai_plan) s.approveAI = true;
   return s;
 }
+const CM_RE = { mlcc: /mlcc|capacitor/, dram: /dram|ddr4|memory/, gan: /gan|gallium/, mcu: /mcu|microcontroller/, pmic: /pmic|regulator/, phy: /phy|ethernet/, nand: /nand|emmc|flash/, conn: /connector/ };
 function parseScenarioFallback(text) {
   const t = text.toLowerCase(); const s = blankScp(); s.label = text.replace(/^what if\s*/i, '').replace(/\?$/, '');
   const dur = t.match(/(\d+)\s*(weeks?|wks?|months?)/); const wks = dur ? Math.min(16, Math.round(+dur[1] * (/month/.test(dur[2]) ? 4.3 : 1))) : 8;
-  const CM = { mlcc: /mlcc|capacitor/, dram: /dram|ddr4|memory/, gan: /gan|gallium/, mcu: /mcu|microcontroller/, pmic: /pmic|regulator/, phy: /phy|ethernet/, nand: /nand|emmc|flash/, conn: /connector/ };
-  const k = Object.keys(CM).find(k => CM[k].test(t));
+  const k = Object.keys(CM_RE).find(k => CM_RE[k].test(t));
   const pct = (t.match(/(\d+)\s*%/) || [])[1];
-  if (/demand|program|win|orders|volume/.test(t) && pct) s.demandPct = (/(drop|down|cut|fall|lower|decrease)/.test(t) ? -1 : 1) * +pct;
-  else if (k) s.shock = { commodity: k, ltDelta: 8, supplyImpact: pct ? +pct / 100 : 0.3, from: 3, weeks: wks };
-  const reg = REGIONS().find(r => t.includes(r.toLowerCase().split(' · ').pop())) || (/kaohsiung|port/.test(t) ? 'Taiwan' : null) || (/china/.test(t) ? 'China · Jiangsu' : null);
-  if (reg) s.region = { region: reg, impact: pct && !s.demandPct && !k ? +pct / 100 : 0.5, from: 1, weeks: wks };
-  if (/cross|qualif|alternate/.test(t)) s.crossQualified = true;
-  if (!k && !reg && !s.demandPct && !s.crossQualified) s.shock = { commodity: 'mlcc', ltDelta: 8, supplyImpact: 0.3, from: 3, weeks: wks };
+  let lever = false;
+  if (/increase supply|more supply|expedite|spot buy|boost|add supply|extra supply/.test(t)) { s.boost = { commodity: k || 'all', pct: Math.min(40, pct ? +pct : 20) }; lever = true; }
+  if (/air.?freight|fly|bypass/.test(t)) { s.airFreight = true; lever = true; }
+  if (/safety stock|buffer|stock up/.test(t)) { s.bufferWeeks = Math.min(6, +((t.match(/(\d+)\s*(weeks?|wks?)\s*(of )?(safety|buffer|stock)/) || [])[1] || 2)); lever = true; }
+  if (/approve|accept (all|the)|ai plan|recommendations/.test(t)) { s.approveAI = true; lever = true; }
+  if (/cross|qualif|second source|alternate/.test(t)) { s.crossQualified = true; lever = true; }
+  if (/demand|program|win|orders|volume/.test(t) && pct && !/supply/.test(t)) s.demandPct = (/(drop|down|cut|fall|lower|decrease)/.test(t) ? -1 : 1) * +pct;
+  else if (k && !s.boost.pct) s.shock = { commodity: k, ltDelta: 8, supplyImpact: pct ? +pct / 100 : 0.3, from: 3, weeks: wks };
+  const reg = REGIONS().find(r => t.includes(r.toLowerCase().split(' · ').pop())) || (/kaohsiung|port/.test(t) && !s.airFreight ? 'Taiwan' : null) || (/china/.test(t) ? 'China · Jiangsu' : null);
+  if (reg) s.region = { region: reg, impact: pct && !s.demandPct && !k && !s.boost.pct ? +pct / 100 : 0.5, from: 1, weeks: wks };
+  if (!lever && !k && !reg && !s.demandPct) s.shock = { commodity: 'mlcc', ltDelta: 8, supplyImpact: 0.3, from: 3, weeks: wks };
   return s;
 }
 async function parseScenarioAI(text) {
   if (AI.live) {
     try {
-      const j = await aiCall(`Translate this supply-planning what-if into parameters. Reply with only JSON:
-{"label": "short name", "demandPct": number (e.g. 20 or -10, 0 if none),
- "shock": {"commodity": one of [${Object.keys(COMMODITIES).map(k => `"${k}"`).join(', ')}] or "", "ltDelta": weeks of extra lead time, "supplyImpact": 0-0.9 fraction of supply lost, "from": week index 0-15 when it starts, "weeks": duration 1-16},
- "region": {"region": one of [${REGIONS().map(r => `"${r}"`).join(', ')}] or "", "impact": 0-0.9, "from": 0-15, "weeks": 1-16},
- "crossQualified": boolean (true if new alternate/cross parts become qualified)}
-Commodity names: ${Object.entries(COMMODITIES).map(([k, c]) => `${k}=${c.name}`).join('; ')}. Months = 4.3 weeks. Kaohsiung is in Taiwan.
+      const j = await aiCall(`Translate this CEO's supply-chain what-if into simulator settings. Reply with only JSON:
+{"label": "short name",
+ "demandPct": number (e.g. 20 or -10, 0 if none),
+ "boost": {"commodity": "all" or one of [${Object.keys(COMMODITIES).map(k => `"${k}"`).join(', ')}], "pct": 0-40 extra supply via expedite / spot buys},
+ "airFreight": boolean (air-freight around the Kaohsiung port congestion),
+ "bufferWeeks": 0-6 weeks of extra safety stock,
+ "crossQualified": boolean (qualify new second sources / pin-to-pin crosses),
+ "approveAI": boolean (approve all of the agent's recommendations),
+ "shock": {"commodity": one of the keys or "", "ltDelta": extra lead-time weeks, "supplyImpact": 0-0.9 fraction of supply lost, "from": week index 0-15, "weeks": 1-16},
+ "region": {"region": one of [${REGIONS().map(r => `"${r}"`).join(', ')}] or "", "impact": 0-0.9, "from": 0-15, "weeks": 1-16}}
+Commodity names: ${Object.entries(COMMODITIES).map(([k, c]) => `${k}=${c.name}`).join('; ')}. Months = 4.3 weeks. Kaohsiung is in Taiwan. Leave levers the user did not mention at 0/false/"".
 What-if: ${text}`, { json: true, tier: 'quick', cache: false });
-      if (j && typeof j === 'object') { const s = mergeScp(j); if (s.shock.commodity && !COMMODITIES[s.shock.commodity]) s.shock.commodity = ''; if (s.region.region && !REGIONS().includes(s.region.region)) s.region.region = ''; s.label = j.label || text; return { scp: s, by: 'Claude' }; }
+      if (j && typeof j === 'object') { const s = mergeScp(j); if (s.shock.commodity && !COMMODITIES[s.shock.commodity]) s.shock.commodity = ''; if (s.region.region && !REGIONS().includes(s.region.region)) s.region.region = ''; if (s.boost.commodity !== 'all' && !COMMODITIES[s.boost.commodity]) s.boost.commodity = 'all'; s.boost.pct = Math.max(0, Math.min(40, +s.boost.pct || 0)); s.bufferWeeks = Math.max(0, Math.min(6, +s.bufferWeeks || 0)); s.label = j.label || text; return { scp: s, by: 'Claude' }; }
     } catch (e) { /* fall back */ }
   }
   return { scp: parseScenarioFallback(text), by: 'scripted parser' };
 }
 
+// ── Story: the plain-language narrative, built from the numbers so it always matches the page
+function topDrivers(comp, n = 3) {
+  return comp.results.filter(r => r.revenueAtRisk > 0).sort((a, b) => b.revenueAtRisk - a.revenueAtRisk).slice(0, n).map(r => {
+    const cause = r.hits[0] ? r.hits[0].title.replace(/ \(what-if\)$/, '') : r.mkt && CONSTRAINED(r.mkt.status) ? `${r.mkt.name.split(' · ')[1]} market ${r.mkt.status.toLowerCase()}` : 'supply shortfall';
+    return { r, cause };
+  });
+}
+function buildStory() {
+  const s = S.scenario, base = S.comp, sim = s.comp, scp = s.scp;
+  const mb = metrics(base), ms = metrics(sim), active = !isBaseScp(scp);
+  const m = active ? ms : mb, comp = active ? sim : base;
+  const drivers = topDrivers(comp);
+  const topC = drivers[0] ? (COMMODITIES[drivers[0].r.part.commodity].name.split(' · ')[1] || '') : '';
+  const costs = simCosts(scp, base, sim);
+  const aiM = metrics(S.ai);
+  const upcoming = STRATEGIC.filter(x => x.view === 'in' && !x.lane && x.week <= 8 && !/^Closes/.test(x.note || '')).sort((a, b) => a.week - b.week).slice(0, 3);
+  const headline = !active
+    ? (m.rar > 0 ? `${topC || 'Supply'} squeeze puts ${money(m.rar)} of ${PRODUCT.name} revenue at risk` : `${PRODUCT.name} supply is on track for the next 16 weeks`)
+    : ms.otd > mb.otd ? `Simulation: on-time delivery rises from ${mb.otd}% to ${ms.otd}%` : ms.otd < mb.otd ? `Stress test: on-time delivery falls from ${mb.otd}% to ${ms.otd}%` : `Simulation: on-time delivery holds at ${ms.otd}%`;
+  const dek = !active
+    ? `On-time delivery is ${mb.otd}% with ${fmt(mb.late)} boards late over 16 weeks${mb.firstShort >= 0 ? `, starting ${WEEKS[mb.firstShort].label} (${WEEKS[mb.firstShort].date})` : ''}. Approving the agent's recommendations would lift it to ${aiM.otd}%.`
+    : `${describeScp(scp)}. Revenue at risk moves from ${money(mb.rar)} to ${money(ms.rar)}${costs.total ? ` for about ${money(costs.total)} of incremental cost` : ''}.`;
+  const sections = [];
+  sections.push(['What is happening', m.rar > 0
+    ? `${active ? 'In this simulation, ' : ''}${fmt(m.late)} of ${fmt(m.plan)} planned boards ship late, so on-time delivery is ${m.otd}%. ${m.worst >= 0 ? `The worst week is ${WEEKS[m.worst].label} (${WEEKS[m.worst].date}). ` : ''}The biggest drivers are ${drivers.map(d => `${d.r.part.mpn} (${d.cause.charAt(0).toLowerCase() + d.cause.slice(1)}, ${money(d.r.revenueAtRisk)})`).join('; ')}.`
+    : `${active ? 'In this simulation, every' : 'Every'} planned board can be built on time for the next 16 weeks. On-time delivery is ${m.otd}%.`]);
+  sections.push(['Why it matters', m.rar > 0
+    ? `${money(m.rar)} of revenue is at risk, about ${money(m.rar * GROSS_MARGIN)} of gross margin. ${upcoming.length ? `Pressure builds from the calendar: ${upcoming.map(x => `${x.title} (${x.note || x.timing})`).join(', ')}.` : ''}`
+    : `Customer commitments are covered. ${upcoming.length ? `Watch the calendar: ${upcoming.map(x => `${x.title} (${x.note || x.timing})`).join(', ')}.` : ''}`]);
+  const pend = pendingChanged().length, open = S.actions.filter(a => a.status !== 'Done').length;
+  sections.push(['What we are doing', `The planning agent has ${changedResults().length} recommendation changes this week; ${pend} await a decision and ${open} actions are with owners in Design Engineering, Supply Chain, Procurement and Demand Planning. It re-scores every part daily and reassesses each part as its actions close.`]);
+  sections.push(['What to decide', !active
+    ? `The fastest recovery is approving the agent's plan: on-time delivery goes to ${aiM.otd}% and revenue at risk to ${money(S.ai.ctb.revenueAtRisk)}. Use the simulator to test cheaper plays, such as air-freighting around Kaohsiung or qualifying the new second sources, and see what each buys.`
+    : costs.protectedRev > 0
+      ? `This play protects ${money(costs.protectedRev)} of revenue (${money(costs.margin)} margin) for ${money(costs.total)} of incremental cost${costs.wc ? ` and ${money(costs.wc)} of working capital` : ''}${costs.roi ? `, a ${costs.roi >= 10 ? Math.round(costs.roi) : costs.roi.toFixed(1)}× return` : ''}. ${ms.rar > 0 ? `${money(ms.rar)} remains at risk${ms.firstShort >= 0 ? ` from ${WEEKS[ms.firstShort].label}` : ''}; ${ms.otd < aiM.otd ? 'adding the agent plan closes more of it.' : 'consider a second play.'}` : 'It closes the gap completely.'}`
+      : costs.extraRisk > 0
+        ? `This scenario adds ${money(costs.extraRisk)} of revenue at risk. Pair it with a play: approving the agent's plan under these conditions brings on-time delivery to ${metrics(s.ai).otd}%.`
+        : `No material change versus today's plan.`]);
+  return { headline, dek, sections, mb, ms, active, costs };
+}
+
+// ── View
+let SC_T = null;
 VIEWS.scenarios = function () {
-  if (!S.scenario) { runScenario({ ...PRESETS[0].scp, label: PRESETS[0].label }, false); S.scenario.by = 'preset'; }
-  const el = $('#v-scenarios'); const s = S.scenario; const scp = s.scp; const sum = scenarioSummary();
-  const b = sum.baseline, x = sum.scenario_result;
-  const dlt = (a, c, money_ = true) => { const d = c - a; if (!d) return '<small>no change</small>'; return `<small class="${d > 0 ? 'delta-up' : 'delta-dn'}">${d > 0 ? '+' : '−'}${money_ ? money(Math.abs(d)) : Math.abs(d)}</small>`; };
-  const commOpts = `<option value="">None</option>` + Object.entries(COMMODITIES).map(([k, c]) => `<option value="${k}" ${scp.shock.commodity === k ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  if (!S.scenario) runScenario(blankScp(), false);
+  const el = $('#v-scenarios'); const scp = S.scenario.scp;
+  const commOpts = (v, none = 'None') => `<option value="">${none}</option>` + Object.entries(COMMODITIES).map(([k, c]) => `<option value="${k}" ${v === k ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
   const regOpts = `<option value="">None</option>` + REGIONS().map(r => `<option ${scp.region.region === r ? 'selected' : ''}>${esc(r)}</option>`).join('');
-  const wkOpts = (v) => WEEKS.map((w, i) => `<option value="${i}" ${+v === i ? 'selected' : ''}>${w.label} · ${w.date}</option>`).join('');
+  const ticker = tickerItems();
   el.innerHTML = `
-    <div class="eyebrow">Reassess · what-if</div><h2 class="section-title" style="font-size:24px;margin-top:6px">Scenarios</h2>
-    <p class="lede">Ask a what-if in plain language or set the assumptions. The agent re-runs every part and shows how the plan, the risk and its recommendations change.</p>
-    <div class="sc-grid" style="margin-top:18px">
-      <div class="card sc-panel">
-        <div><label class="eyebrow" for="sc-ask">Ask the agent</label>
-          <form class="ask" id="sc-form" style="margin-top:8px"><input class="field" id="sc-ask" placeholder="What if Kaohsiung stays closed for 8 weeks?"><button class="btn primary" type="submit">Run</button></form>
-          <div class="muted" id="sc-by" style="font-size:11.5px;margin-top:6px">${s.by ? 'Assumptions set by ' + esc(s.by) : ''}</div></div>
-        <div><div class="eyebrow" style="margin-bottom:8px">Presets</div><div class="presets">${PRESETS.map((p, i) => `<button data-pre="${i}" aria-pressed="${s.label === p.label}">${esc(p.label)}</button>`).join('')}</div></div>
-        <div class="eyebrow">Assumptions</div>
-        <div class="param"><label for="sc-dem">Demand change</label><output id="o-dem">${scp.demandPct > 0 ? '+' : ''}${scp.demandPct}%</output><input type="range" id="sc-dem" min="-30" max="40" step="5" value="${scp.demandPct}"></div>
-        <div class="param"><label for="sc-com">Commodity supply shock</label><span></span><select class="field" id="sc-com">${commOpts}</select></div>
-        <div class="param"><label for="sc-imp">Supply lost</label><output id="o-imp">${Math.round(scp.shock.supplyImpact * 100)}%</output><input type="range" id="sc-imp" min="0" max="80" step="5" value="${Math.round(scp.shock.supplyImpact * 100)}"></div>
-        <div class="param"><label for="sc-lt">Extra lead time</label><output id="o-lt">+${scp.shock.ltDelta} wks</output><input type="range" id="sc-lt" min="0" max="20" step="1" value="${scp.shock.ltDelta}"></div>
-        <div class="param"><label for="sc-sw">Starts · lasts</label><output id="o-sw">${scp.shock.weeks} wks</output><select class="field" id="sc-sf">${wkOpts(scp.shock.from)}</select><input type="range" id="sc-sw" min="1" max="16" value="${scp.shock.weeks}"></div>
-        <div class="param"><label for="sc-reg">Regional disruption</label><span></span><select class="field" id="sc-reg">${regOpts}</select></div>
-        <div class="param"><label for="sc-rimp">Regional supply lost</label><output id="o-rimp">${Math.round(scp.region.impact * 100)}%</output><input type="range" id="sc-rimp" min="0" max="90" step="5" value="${Math.round(scp.region.impact * 100)}"></div>
-        <div class="param"><label for="sc-rw">Starts · lasts</label><output id="o-rw">${scp.region.weeks} wks</output><select class="field" id="sc-rf">${wkOpts(scp.region.from)}</select><input type="range" id="sc-rw" min="1" max="16" value="${scp.region.weeks}"></div>
-        <label class="toggle"><input type="checkbox" id="sc-x" ${scp.crossQualified ? 'checked' : ''}> New pin-to-pin crosses qualified</label>
-        <button class="btn" id="sc-run">Re-run with these assumptions</button>
+    <div class="brief">
+      <div class="brief-hero">
+        <div class="brief-tag"><span class="live"></span>Supply chain briefing</div>
+        <div class="brief-meta">${esc(PRODUCT.name)} · ${S.world.parts.length} parts · ${esc(PRODUCT.site)} · next 16 weeks</div>
+        <h2 class="brief-h" id="br-h"></h2>
+        <p class="brief-dek" id="br-dek"></p>
       </div>
-      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
-        <div class="card" style="padding:16px 18px">
-          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
-            <div><div class="eyebrow">Scenario</div><h3 style="margin:6px 0 4px;font:600 19px/1.25 var(--cond)">${esc(s.label)}</h3><div class="muted" style="font-size:12.5px">${esc(describeScp(scp))}</div></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sc-hz">Explore in Horizon</button><button class="btn" id="sc-agent">Discuss with agent</button></div>
+      <div class="ticker" aria-label="Signal ticker"><span class="tk-lab">Signals</span><div class="tk-track"><div class="tk-run">${ticker}${ticker}</div></div></div>
+      <div class="score" id="br-score"></div>
+      <div class="brief-grid">
+        <div class="brief-col">
+          <div class="card story">
+            <div class="story-h"><div class="eyebrow">The story</div><span class="chip agent" id="br-src">Built from live numbers</span><span style="flex:1"></span><button class="btn sm" id="br-ai">${AI.live ? 'Have the agent write it' : 'Agent write-up (needs Claude)'}</button></div>
+            <div id="br-story"></div>
           </div>
-          <div class="cmp" style="margin-top:14px">
-            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">Revenue at risk</div><div class="v">${money(x.revenue_at_risk_usd)}${dlt(b.revenue_at_risk_usd, x.revenue_at_risk_usd)}</div><div class="s">Current plan: ${money(b.revenue_at_risk_usd)}</div></div>
-            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">With AI plan</div><div class="v" style="color:var(--agent)">${money(x.with_ai_plan_usd)}</div><div class="s">Recovers ${money(x.revenue_at_risk_usd - x.with_ai_plan_usd)}</div></div>
-            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">Clear-to-build</div><div class="v">${x.clear_to_build_pct}%${x.clear_to_build_pct === b.clear_to_build_pct ? '<small>no change</small>' : `<small class="${x.clear_to_build_pct < b.clear_to_build_pct ? 'delta-up' : 'delta-dn'}">${x.clear_to_build_pct > b.clear_to_build_pct ? '+' : '−'}${Math.abs(x.clear_to_build_pct - b.clear_to_build_pct)} pts</small>`}</div><div class="s">Current plan: ${b.clear_to_build_pct}%</div></div>
-            <div class="card kpi" style="background:var(--deep)"><div class="eyebrow">Recommendations change</div><div class="v">${sum.changes_count}</div><div class="s">${x.parts_short} parts short (now ${b.parts_short})</div></div>
+          <div class="card" style="padding:16px 18px">
+            <div class="why-sec"><h4>On-time delivery by week · boards</h4></div>
+            <div class="chart" id="br-chart"></div>
+            <div class="hz-legend"><span><i style="background:var(--demand)"></i>Build plan</span><span><i style="background:var(--supply)"></i>Today's plan</span><span><i style="background:var(--agent)"></i>Simulation</span></div>
           </div>
-          <div class="chart" style="margin-top:14px">${scenarioChart()}</div>
-          <div class="hz-legend"><span><i style="background:var(--demand)"></i>Build plan</span><span><i style="background:var(--supply)"></i>Clear-to-build today</span><span><i style="background:var(--rec)"></i>Clear-to-build in scenario</span><span><i style="background:repeating-linear-gradient(90deg,var(--agent) 0 4px,transparent 4px 7px)"></i>Scenario with AI plan</span></div>
+          <div class="card" style="padding:16px 18px"><div class="why-sec"><h4 id="br-chg-h">What changes</h4></div><div id="br-chg"></div></div>
         </div>
-        <div class="card" style="padding:16px 18px"><div class="why-sec"><h4>Agent assessment <span class="chip agent" id="sc-mode">…</span></h4><div class="agent-text thinking" id="sc-nar">Assessing the scenario…</div></div></div>
-        <div class="card" style="padding:16px 18px"><div class="why-sec"><h4>How recommendations change · ${sum.changes_count} parts</h4></div>
-          <div class="tablewrap" style="max-height:none"><table class="grid"><thead><tr><th class="l">Part</th><th class="l">Today</th><th class="l">In this scenario</th><th>Revenue at risk</th><th></th></tr></thead><tbody>
-          ${s.comp.results.filter(r => { const y = S.comp.byId[r.part.id]; return y.policies.join('|') !== r.policies.join('|') || y.forecast !== r.forecast; }).sort((a, b2) => b2.revenueAtRisk - a.revenueAtRisk).slice(0, 25).map(r => { const y = S.comp.byId[r.part.id]; return `<tr class="grp-end"><td class="l mono">${esc(r.part.mpn)}</td><td class="l muted" style="font-size:12px">${esc([y.forecast, ...y.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</td><td class="l red" style="font-size:12px;font-weight:500">${esc([r.forecast, ...r.policies.map(shortPolicy)].filter(Boolean).join(' · '))}</td><td class="v ${r.revenueAtRisk ? 'neg' : ''}">${r.revenueAtRisk ? money(r.revenueAtRisk) : '—'}</td><td><button class="why-btn" data-swhy="${r.part.id}">Why?</button></td></tr>`; }).join('') || '<tr><td class="l muted" colspan="5">No recommendation changes.</td></tr>'}
-          </tbody></table></div></div>
+        <div class="card sim">
+          <div class="sim-h"><div><div class="eyebrow">Simulator</div><h3>Run a what-if</h3></div><button class="btn sm ghost" id="sim-reset">Reset</button></div>
+          <form class="ask" id="sc-form"><input class="field" id="sc-ask" placeholder="e.g. What if we expedite 20% more MLCC supply?" aria-label="Ask a what-if"><button class="btn primary" type="submit">Run</button></form>
+          <div class="muted" id="sc-by" style="font-size:11.5px">${S.scenario.by ? 'Levers set by ' + esc(S.scenario.by) : 'Ask in plain language, pick a play, or move the levers.'}</div>
+          <div><div class="eyebrow" style="margin-bottom:6px">Plays</div><div class="presets">${PRESETS.filter(p => p.group === 'play').map(p => `<button data-pre="${PRESETS.indexOf(p)}">${esc(p.label)}</button>`).join('')}</div></div>
+          <div><div class="eyebrow" style="margin-bottom:6px">Stress tests</div><div class="presets">${PRESETS.filter(p => p.group === 'stress').map(p => `<button data-pre="${PRESETS.indexOf(p)}">${esc(p.label)}</button>`).join('')}</div></div>
+          <div class="lev-group"><div class="lev-t">Increase supply</div>
+            <div class="param"><label for="sc-boost">Expedite and spot-buy</label><output id="o-boost">+${scp.boost.pct}%</output><input type="range" id="sc-boost" min="0" max="40" step="5" value="${scp.boost.pct}"><select class="field" id="sc-boostc" aria-label="Expedite scope">${commOpts(scp.boost.commodity === 'all' ? '' : scp.boost.commodity, 'All commodities')}</select></div>
+            <div class="param"><label for="sc-buf">Build safety stock</label><output id="o-buf">+${scp.bufferWeeks} wks</output><input type="range" id="sc-buf" min="0" max="6" step="1" value="${scp.bufferWeeks}"></div>
+            <label class="toggle"><input type="checkbox" id="sc-air" ${scp.airFreight ? 'checked' : ''}> Air-freight around Kaohsiung congestion</label>
+            <label class="toggle"><input type="checkbox" id="sc-x" ${scp.crossQualified ? 'checked' : ''}> Qualify the new second sources</label>
+            <label class="toggle"><input type="checkbox" id="sc-ai" ${scp.approveAI ? 'checked' : ''}> Approve all agent recommendations</label>
+          </div>
+          <div class="lev-group"><div class="lev-t">Stress the plan</div>
+            <div class="param"><label for="sc-dem">Demand change</label><output id="o-dem">${scp.demandPct > 0 ? '+' : ''}${scp.demandPct}%</output><input type="range" id="sc-dem" min="-30" max="40" step="5" value="${scp.demandPct}"></div>
+            <div class="param"><label for="sc-com">Commodity supply shock</label><output id="o-imp">−${Math.round(scp.shock.supplyImpact * 100)}% · ${scp.shock.weeks} wks</output><select class="field" id="sc-com">${commOpts(scp.shock.commodity)}</select><input type="range" id="sc-imp" min="0" max="80" step="5" value="${Math.round(scp.shock.supplyImpact * 100)}" aria-label="Supply lost"><input type="range" id="sc-sw" min="1" max="16" value="${scp.shock.weeks}" aria-label="Shock duration"></div>
+            <div class="param"><label for="sc-reg">Regional disruption</label><output id="o-rimp">−${Math.round(scp.region.impact * 100)}% · ${scp.region.weeks} wks</output><select class="field" id="sc-reg">${regOpts}</select><input type="range" id="sc-rimp" min="0" max="90" step="5" value="${Math.round(scp.region.impact * 100)}" aria-label="Regional supply lost"><input type="range" id="sc-rw" min="1" max="16" value="${scp.region.weeks}" aria-label="Disruption duration"></div>
+          </div>
+          <div class="econ" id="br-econ"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sc-hz">See it on the Roadmap</button><button class="btn" id="sc-agent">Discuss with agent</button></div>
+          <p class="muted" style="font-size:11px;margin:0">Cost assumptions: expedite premium ${EXPEDITE_PREMIUM * 100}% of part value, air freight ${money(AIR_PER_WEEK)}/week, ${money(QUAL_PER_PART)} per part qualification, inventory carrying ${CARRY_RATE * 100}%/yr, gross margin ${GROSS_MARGIN * 100}%.</p>
+        </div>
       </div>
     </div>`;
-  const read = () => {
-    const n = mergeScp({
-      label: '', demandPct: +$('#sc-dem').value, crossQualified: $('#sc-x').checked,
-      shock: { commodity: $('#sc-com').value, supplyImpact: +$('#sc-imp').value / 100, ltDelta: +$('#sc-lt').value, from: +$('#sc-sf').value, weeks: +$('#sc-sw').value },
-      region: { region: $('#sc-reg').value, impact: +$('#sc-rimp').value / 100, from: +$('#sc-rf').value, weeks: +$('#sc-rw').value },
-    }); n.label = describeScp(n); return n;
+  const read = () => mergeScp({
+    label: '', demandPct: +$('#sc-dem').value, crossQualified: $('#sc-x').checked, airFreight: $('#sc-air').checked, approveAI: $('#sc-ai').checked, bufferWeeks: +$('#sc-buf').value,
+    boost: { commodity: $('#sc-boostc').value || 'all', pct: +$('#sc-boost').value },
+    shock: { commodity: $('#sc-com').value, supplyImpact: +$('#sc-imp').value / 100, ltDelta: 8, from: 3, weeks: +$('#sc-sw').value },
+    region: { region: $('#sc-reg').value, impact: +$('#sc-rimp').value / 100, from: 1, weeks: +$('#sc-rw').value },
+  });
+  const live = () => {
+    $('#o-boost').textContent = '+' + $('#sc-boost').value + '%'; $('#o-buf').textContent = '+' + $('#sc-buf').value + ' wks';
+    $('#o-dem').textContent = (+$('#sc-dem').value > 0 ? '+' : '') + $('#sc-dem').value + '%';
+    $('#o-imp').textContent = `−${$('#sc-imp').value}% · ${$('#sc-sw').value} wks`; $('#o-rimp').textContent = `−${$('#sc-rimp').value}% · ${$('#sc-rw').value} wks`;
+    clearTimeout(SC_T); SC_T = setTimeout(() => { S.scenario.by = 'you'; runScenario(read()); $('#sc-by').textContent = 'Levers set by you'; markPresets(); }, 140);
   };
-  const outs = { 'sc-dem': ['o-dem', v => (v > 0 ? '+' : '') + v + '%'], 'sc-imp': ['o-imp', v => v + '%'], 'sc-lt': ['o-lt', v => '+' + v + ' wks'], 'sc-sw': ['o-sw', v => v + ' wks'], 'sc-rimp': ['o-rimp', v => v + '%'], 'sc-rw': ['o-rw', v => v + ' wks'] };
-  for (const [id, [o, f]] of Object.entries(outs)) $('#' + id).oninput = e => { $('#' + o).textContent = f(+e.target.value); };
-  $('#sc-run').onclick = () => { runScenario(read()); S.scenario.by = 'you'; };
-  $$('[data-pre]', el).forEach(bt => bt.onclick = () => { const p = PRESETS[+bt.dataset.pre]; runScenario({ ...p.scp, label: p.label }); S.scenario.by = 'preset'; VIEWS.scenarios(); });
-  $('#sc-form').onsubmit = async e => { e.preventDefault(); const q = $('#sc-ask').value.trim(); if (!q) return; $('#sc-by').textContent = 'Setting assumptions…'; const { scp: n, by } = await parseScenarioAI(q); n.label = n.label || q; runScenario(n); S.scenario.by = by; VIEWS.scenarios(); };
+  $$('.sim input, .sim select', el).forEach(i => { if (i.id !== 'sc-ask') i.addEventListener('input', live); });
+  $$('[data-pre]', el).forEach(bt => bt.onclick = () => { const p = PRESETS[+bt.dataset.pre]; S.scenario.by = 'preset'; runScenario({ ...p.scp, label: p.label }, false); VIEWS.scenarios(); });
+  $('#sim-reset').onclick = () => { S.scenario.by = null; runScenario(blankScp(), false); VIEWS.scenarios(); };
+  $('#sc-form').onsubmit = async e => { e.preventDefault(); const q = $('#sc-ask').value.trim(); if (!q) return; $('#sc-by').textContent = 'Setting the levers…'; const { scp: n, by } = await parseScenarioAI(q); n.label = n.label || q; S.scenario.by = by; runScenario(n, false); VIEWS.scenarios(); };
   $('#sc-hz').onclick = () => { S.hz.source = 'scenario'; S.hz.scope = 'portfolio'; setView('horizon'); };
-  $('#sc-agent').onclick = () => chat(`Given the scenario "${s.label}", what should we do first?`);
-  $$('[data-swhy]', el).forEach(bt => bt.onclick = () => openWhy(bt.dataset.swhy, { comp: s.comp }));
-  narrateScenario();
+  $('#sc-agent').onclick = () => chat(isBaseScp(S.scenario.scp) ? 'Give me the one-minute CEO briefing on our supply chain.' : `Given the simulation "${S.scenario.label}", what should we do first?`);
+  $('#br-ai').onclick = () => agentStory();
+  updateBriefing();
 };
+function markPresets() { $$('[data-pre]').forEach(b => b.setAttribute('aria-pressed', String(PRESETS[+b.dataset.pre].label === S.scenario.label))); }
 
-function scenarioChart() {
-  const s = S.scenario; const W = 700, H = 200, L = 46, R = 10, T = 12, B = 26;
-  const plan = s.comp.ctb.plan, base = S.comp.ctb.built, sc = s.comp.ctb.built, ai = s.ai.ctb.built;
-  const max = Math.max(...plan, ...S.comp.ctb.plan) * 1.08;
+function tickerItems() {
+  const it = [];
+  for (const c of Object.values(COMMODITIES)) if (c.status && (c.status !== c.prev || CONSTRAINED(c.status))) it.push(`<span class="tk ${CONSTRAINED(c.status) ? 'dn' : 'up'}">${esc(c.name.split(' · ')[1] || c.name)} <b>${CONSTRAINED(c.status) ? '▲' : '▼'} ${esc(c.status)}</b> LT ${c.ltPrev}→${c.lt} wks · price ${c.price > 0 ? '+' : ''}${c.price}%</span>`);
+  for (const e of S.world.events) it.push(`<span class="tk dn">${esc(e.title)} <b>−${Math.round(e.impact * 100)}% supply</b> ${esc(WEEKS[e.from].label)}</span>`);
+  for (const x of STRATEGIC.filter(x => x.view === 'in' && !x.lane).sort((a, b) => a.week - b.week).slice(0, 6)) it.push(`<span class="tk">${esc(x.note || x.timing)} <b>${esc(x.title)}</b></span>`);
+  const top = S.comp.results.filter(r => r.revenueAtRisk > 0).sort((a, b) => b.revenueAtRisk - a.revenueAtRisk).slice(0, 3);
+  for (const r of top) it.push(`<span class="tk dn">${esc(r.part.mpn)} <b>${money(r.revenueAtRisk)} at risk</b> from ${esc(WEEKS[r.firstShortWeek].label)}</span>`);
+  return it.join('<span class="tk-sep">•</span>') + '<span class="tk-sep">•</span>';
+}
+
+function updateBriefing() {
+  if (!$('#br-h')) return;
+  const st = buildStory(); const { mb, ms, active, costs } = st;
+  $('#br-h').textContent = st.headline; $('#br-dek').textContent = st.dek;
+  const tile = (label, now, sim, fmtv, goodUp, sub, dfmt) => {
+    const d = sim - now; const good = goodUp ? d > 0 : d < 0; dfmt = dfmt || fmtv;
+    return `<div class="sc-tile"><div class="eyebrow">${label}</div><div class="v">${fmtv(active ? sim : now)}</div>
+      <div class="s">${active && Math.abs(d) > 1e-6 ? `<span class="${good ? 'delta-dn' : 'delta-up'}">${d > 0 ? '▲' : '▼'} ${dfmt(Math.abs(d))}</span> vs today ${fmtv(now)}` : esc(sub)}</div></div>`;
+  };
+  $('#br-score').innerHTML = [
+    tile('On-time delivery', mb.otd, ms.otd, v => (Math.round(v * 10) / 10) + '%', true, 'Boards shipped on plan, 16 wks', v => (Math.round(v * 10) / 10) + ' pts'),
+    tile('Revenue at risk', mb.rar, ms.rar, v => money(v), false, `${money(mb.rar * GROSS_MARGIN)} of gross margin`),
+    tile('Boards late', mb.late, ms.late, v => fmt(v), false, `of ${fmt(mb.plan)} planned`),
+    tile('Parts short', mb.short, ms.short, v => fmt(v), false, `of ${S.world.parts.length} on the BOM`),
+    tile('Inventory', mb.inv, ms.inv, v => money(v), null, 'On hand, at cost'),
+  ].join('');
+  $('#br-story').innerHTML = (S.scenario.narrative && S.scenario.narrative.key === storyKey()) ? aiStoryHtml(S.scenario.narrative.text) : st.sections.map(([h2, p]) => `<div class="st-sec"><h5>${esc(h2)}</h5><p>${esc(p)}</p></div>`).join('');
+  $('#br-src').textContent = (S.scenario.narrative && S.scenario.narrative.key === storyKey()) ? 'Written by Claude' : 'Built from live numbers';
+  $('#br-chart').innerHTML = briefChart();
+  $('#br-econ').innerHTML = !active ? `<div class="muted" style="font-size:12.5px">Move a lever to see what it costs and what it buys.</div>` : `
+    <div class="econ-row"><span>Revenue protected</span><b class="${costs.protectedRev ? 'good' : ''}">${money(costs.protectedRev)}</b></div>
+    ${costs.extraRisk ? `<div class="econ-row"><span>Added revenue at risk</span><b class="bad">${money(costs.extraRisk)}</b></div>` : ''}
+    <div class="econ-row"><span>Incremental cost</span><b>${money(costs.total)}</b></div>
+    ${costs.wc ? `<div class="econ-row"><span>Working capital tied up</span><b>${money(costs.wc)}</b></div>` : ''}
+    <div class="econ-row big"><span>Return on the play</span><b>${costs.roi ? (costs.roi >= 10 ? Math.round(costs.roi) : costs.roi.toFixed(1)) + '× margin / cost' : '—'}</b></div>`;
+  // what changes
+  const b = S.comp, sim = S.scenario.comp;
+  const rows = sim.results.map(r => ({ r, b: b.byId[r.part.id] })).filter(x => Math.round(x.b.revenueAtRisk) !== Math.round(x.r.revenueAtRisk)).sort((x, y) => Math.abs(y.r.revenueAtRisk - y.b.revenueAtRisk) - Math.abs(x.r.revenueAtRisk - x.b.revenueAtRisk)).slice(0, 10);
+  $('#br-chg-h').textContent = active ? `What changes · ${rows.length ? rows.length + ' parts move' : 'no part-level change'}` : 'Where the risk sits today';
+  const list = active ? rows : b.results.filter(r => r.revenueAtRisk > 0).sort((x, y) => y.revenueAtRisk - x.revenueAtRisk).slice(0, 8).map(r => ({ r, b: r }));
+  $('#br-chg').innerHTML = list.length ? `<div class="tablewrap" style="max-height:none"><table class="grid"><thead><tr><th class="l">Part</th><th class="l">Driver</th>${active ? '<th>Today</th><th>Simulated</th>' : '<th>Revenue at risk</th><th>Short from</th>'}<th></th></tr></thead><tbody>${list.map(({ r, b: rb }) => `<tr class="grp-end"><td class="l mono">${esc(r.part.mpn)}</td><td class="l muted" style="font-size:12px">${esc((r.hits[0] ? r.hits[0].title : r.mkt && r.mkt.status ? r.mkt.name.split(' · ')[1] + ' ' + r.mkt.status.toLowerCase() : '').replace(/ \(what-if\)$/, ''))}</td>${active ? `<td class="v ${rb.revenueAtRisk ? 'neg' : ''}">${rb.revenueAtRisk ? money(rb.revenueAtRisk) : '—'}</td><td class="v ${r.revenueAtRisk ? 'neg' : 'pos'}">${r.revenueAtRisk ? money(r.revenueAtRisk) : 'Resolved'}</td>` : `<td class="v neg">${money(r.revenueAtRisk)}</td><td class="v">${esc(WEEKS[r.firstShortWeek].label)}</td>`}<td><button class="why-btn" data-swhy="${r.part.id}">Why?</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted" style="margin:0">No parts are short.</p>';
+  $$('[data-swhy]').forEach(bt => bt.onclick = () => openWhy(bt.dataset.swhy, active ? { comp: S.scenario.comp } : undefined));
+  markPresets();
+}
+
+function briefChart() {
+  const s = S.scenario; const W = 700, H = 210, L = 46, R = 12, T = 14, B = 26;
+  const plan = s.comp.ctb.plan, base = S.comp.ctb.built, sim = s.comp.ctb.built, basePlan = S.comp.ctb.plan;
+  const max = Math.max(...plan, ...basePlan) * 1.08;
   const x = i => L + i * (W - L - R) / (NWEEKS - 1); const y = v => T + (1 - v / max) * (H - T - B);
   const path = a => a.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
-  const area = `${path(sc)}L${x(NWEEKS - 1)},${y(0)}L${x(0)},${y(0)}Z`;
+  const gap = `${path(plan)}${sim.slice().reverse().map((v, j) => `L${x(NWEEKS - 1 - j).toFixed(1)},${y(v).toFixed(1)}`).join('')}Z`;
   const ticks = [0, max / 2, max].map(v => `<text class="ax" x="${L - 6}" y="${y(v) + 3}" text-anchor="end">${kfmt(v)}</text><line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/>`).join('');
   const lbl = WEEKS.map((w, i) => i % 2 === 0 ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="middle">${w.iso}</text>` : '').join('');
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Clear-to-build by week">${ticks}<path d="${area}" fill="rgba(255,91,79,.1)"/><path d="${path(plan)}" fill="none" stroke="var(--demand)" stroke-width="2"/><path d="${path(base)}" fill="none" stroke="var(--supply)" stroke-width="2"/><path d="${path(sc)}" fill="none" stroke="var(--rec)" stroke-width="2.2"/><path d="${path(ai)}" fill="none" stroke="var(--agent)" stroke-width="2" stroke-dasharray="5 4"/><circle cx="${x(NWEEKS - 1)}" cy="${y(sc[NWEEKS - 1])}" r="3.5" fill="var(--rec)"/>${lbl}<text class="ax" x="${L}" y="${T - 2}">boards / week</text></svg>`;
+  const active = !isBaseScp(s.scp);
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Boards built on time by week">${ticks}<path d="${gap}" fill="rgba(255,91,79,.14)"/><path d="${path(plan)}" fill="none" stroke="var(--demand)" stroke-width="2"/><path d="${path(base)}" fill="none" stroke="var(--supply)" stroke-width="2" ${active ? 'stroke-dasharray="4 4" opacity=".8"' : ''}/>${active ? `<path d="${path(sim)}" fill="none" stroke="var(--agent)" stroke-width="2.4"/><circle cx="${x(NWEEKS - 1)}" cy="${y(sim[NWEEKS - 1])}" r="3.5" fill="var(--agent)"/>` : ''}${lbl}</svg>`;
 }
 
-let SC_CTL = null;
-async function narrateScenario() {
-  const s = S.scenario; const el = $('#sc-nar'), mode = $('#sc-mode'); if (!el) return;
-  if (s.narrative) { el.classList.remove('thinking'); el.textContent = s.narrative.text; mode.textContent = s.narrative.by; return; }
-  SC_CTL?.abort(); SC_CTL = new AbortController(); const sig = SC_CTL.signal; const key = s;
-  if (AI.live) {
-    mode.textContent = 'Claude';
-    try {
-      const text = await aiCall(`You are the planning agent. Assess this what-if for a C-level executive in 3 short paragraphs, 100 words total, plain text, no headings or bullets: what the scenario does to revenue and clear-to-build, which parts and policies drive the change, and the first decision leadership should make. Use only these facts.\n${JSON.stringify(scenarioSummary())}`, { signal: sig, onText: ({ text }) => { if (S.scenario === key) { el.classList.remove('thinking'); el.textContent = text; } } });
-      if (S.scenario === key) s.narrative = { text, by: 'Claude' };
-      return;
-    } catch (e) { if (e && e.code === 'cancelled') return; }
-  }
-  const text = scenarioNarrativeFallback();
-  mode.textContent = 'Scripted'; s.narrative = { text, by: 'Scripted' };
-  typeInto(el, text, sig);
-}
-function scenarioNarrativeFallback() {
-  const sm = scenarioSummary(); const b = sm.baseline, x = sm.scenario_result;
-  const pols = {}; for (const c of sm.recommendation_changes) for (const p of c.to) if (!/Hold|MRP/.test(p) && !c.from.includes(p)) pols[p] = (pols[p] || 0) + 1;
-  const topPol = Object.entries(pols).sort((a, c) => c[1] - a[1]).slice(0, 2).map(([p, n]) => `${n} to ${p.replace('Adjust forecast (pull)', 'pull the forecast forward').replace('Adjust forecast (push)', 'push the forecast out').replace('Long Term Supply Agreement', 'LTSA')}`).join(' and ');
-  const lead = sm.recommendation_changes.filter(c => c.revenue_at_risk_usd > 0)[0];
-  const up = x.revenue_at_risk_usd - b.revenue_at_risk_usd;
-  return `In the scenario “${sm.scenario}”, revenue at risk ${up > 0 ? `rises from ${money(b.revenue_at_risk_usd)} to ${money(x.revenue_at_risk_usd)}` : up < 0 ? `falls from ${money(b.revenue_at_risk_usd)} to ${money(x.revenue_at_risk_usd)}` : `stays at ${money(x.revenue_at_risk_usd)}`}, and clear-to-build moves from ${b.clear_to_build_pct}% to ${x.clear_to_build_pct}%.
-
-${sm.changes_count} parts change recommendation${topPol ? `, mostly ${topPol}` : ''}.${lead ? ` ${lead.part} becomes the largest exposure at ${money(lead.revenue_at_risk_usd)}.` : ''}
-
-With the AI plan applied, risk falls to ${money(x.with_ai_plan_usd)}. The first decision: ${x.with_ai_plan_usd < x.revenue_at_risk_usd ? 'approve the buffer and strategic buys now, because their lead times are longer than the window before the gap opens.' : 'no new spend is needed; keep the current plan and watch the trigger.'}`;
+// ── Live agent write-up of the story
+function storyKey() { return JSON.stringify(S.scenario.scp) + '|' + S.comp.ctb.revenueAtRisk; }
+function aiStoryHtml(text) { return `<div class="st-ai">${mdToHtml(text)}</div>`; }
+async function agentStory() {
+  const btn = $('#br-ai'); const box = $('#br-story');
+  if (!AI.live) { toast('Claude is not available in this view, so the story stays built from the numbers.'); return; }
+  const st = buildStory(); const key = storyKey();
+  btn.disabled = true; $('#br-src').textContent = 'Claude is writing…';
+  const facts = { headline: st.headline, summary: scenarioSummary(), top_drivers: topDrivers(S.scenario.comp).map(d => ({ part: d.r.part.mpn, cause: d.cause, revenue_at_risk_usd: Math.round(d.r.revenueAtRisk) })), calendar_next_8_weeks: STRATEGIC.filter(x => x.view === 'in' && !x.lane && x.week <= 8).map(x => `${x.note || x.timing}: ${x.title}`), pending_decisions: pendingChanged().length, open_actions: S.actions.filter(a => a.status !== 'Done').length };
+  try {
+    let first = true;
+    const text = await aiCall(`You are the anchor of a daily supply-chain briefing for a CEO. Using only these facts, write four short sections with bold lead-ins exactly: **What is happening**, **Why it matters**, **What we are doing**, **What to decide**. Each section 1–2 sentences, plain words, numbers from the facts only, no jargon. If a simulation is active, say what it buys and costs.\n${JSON.stringify(facts)}`, { tier: 'quick', onText: ({ text }) => { if (first) { box.innerHTML = ''; first = false; } box.innerHTML = aiStoryHtml(text); } });
+    S.scenario.narrative = { text, key }; $('#br-src').textContent = 'Written by Claude';
+  } catch (e) { $('#br-src').textContent = 'Built from live numbers'; if (e && e.code !== 'cancelled') toast('Claude could not write the story right now.'); updateBriefing(); }
+  btn.disabled = false;
 }
 
 // ───────────────────────── Boot ─────────────────────────
